@@ -1,14 +1,16 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
+from __future__ import print_function  # use python 3 syntax but make it compatible with python 2
+from __future__ import division  # ''
 
-#import brickpi3 # import the BrickPi3 drivers
-import time     # import the time library for the sleep function
+# import brickpi3 # import the BrickPi3 drivers
+import math
+import time  # import the time library for the sleep function
 import sys
 
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, Array, Lock
+
 
 class Robot:
     def __init__(self, init_position=[0.0, 0.0, 0.0]):
@@ -19,71 +21,77 @@ class Robot:
         """
 
         # Robot construction parameters
-        #self.R = ??
-        #self.L = ??
-        #self. ...
+        # self.R = ??
+        # self.L = ??
+        # self. ...
 
         ##################################################
         # Motors and sensors setup
 
         # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-        #self.BP = brickpi3.BrickPi3()
+        # self.BP = brickpi3.BrickPi3()
 
         # Configure sensors, for example a touch sensor.
-        #self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
+        # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
 
         # reset encoder B and C (or all the motors you are using)
-        #self.BP.offset_motor_encoder(self.BP.PORT_B,
+        # self.BP.offset_motor_encoder(self.BP.PORT_B,
         #    self.BP.get_motor_encoder(self.BP.PORT_B))
-        #self.BP.offset_motor_encoder(self.BP.PORT_C,
+        # self.BP.offset_motor_encoder(self.BP.PORT_C,
         #    self.BP.get_motor_encoder(self.BP.PORT_C))
 
         ##################################################
         # odometry shared memory values
-        self.x = Value('d',0.0)
-        self.y = Value('d',0.0)
-        self.th = Value('d',0.0)
-        self.finished = Value('b',1) # boolean to show if odometry updates are finished
+        self.x = Value('d', 0.0)
+        self.y = Value('d', 0.0)
+        self.th = Value('d', 0.0)
+        self.finished = Value('b', 1)  # boolean to show if odometry updates are finished
 
         # if we want to block several instructions to be run together, we may want to use an explicit Lock
         self.lock_odometry = Lock()
-        #self.lock_odometry.acquire()
-        #print('hello world', i)
-        #self.lock_odometry.release()
+        # self.lock_odometry.acquire()
+        # print('hello world', i)
+        # self.lock_odometry.release()
 
         # odometry update period
         self.P = 1.0
 
-
-
-    def setSpeed(self, v,w):
+    def setSpeed(self, v, w):
         """ To be filled """
         print("setting speed to %.2f %.2f" % (v, w))
 
         # compute the speed that should be set in each motor ...
 
-        #speedPower = 100
-        #BP.set_motor_power(BP.PORT_B + BP.PORT_C, speedPower)
+        # speedPower = 100
+        # BP.set_motor_power(BP.PORT_B + BP.PORT_C, speedPower)
 
         speedDPS_left = 180
         speedDPS_right = 180
-        #self.BP.set_motor_dps(self.BP.PORT_B, speedDPS_left)
-        #self.BP.set_motor_dps(self.BP.PORT_C, speedDPS_right)
-
+        # self.BP.set_motor_dps(self.BP.PORT_B, speedDPS_left)
+        # self.BP.set_motor_dps(self.BP.PORT_C, speedDPS_right)
 
     def readSpeed(self):
         """ To be filled"""
 
-        return 0,0
+        return 0, 0
 
     def readOdometry(self):
         """ Returns current value of odometry estimation """
-        return self.x.value, self.y.value, self.th.value
+        self.lock_odometry.acquire()
+        x = self.x.value
+        y = self.y.value
+        th = self.th.value
+        self.lock_odometry.release()
+
+        return x, y, th
 
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
+
+        # Odometry update process
         self.p = Process(target=self.updateOdometry, args=(self.x, self.y, self.th, self.finished))
+
         self.p.start()
         print("PID: ", self.p.pid)
         # we don't really need to pass the shared params x, y, th, finished,
@@ -92,58 +100,65 @@ class Robot:
 
     # You may want to pass additional shared variables besides the odometry values and stop flag
     def updateOdometry(self, x_odo, y_odo, th_odo, finished):
-        """ To be filled ...  """
+
+        t_last_odo = time.clock()
 
         while not finished.value:
             # current processor time in a floating point value, in seconds
-            tIni = time.clock()
+            t_ini = time.clock()
 
-            # compute updates
-            sys.stdout.write("Dummy update of odometry ...., X=  %d, \
-                Y=  %d, th=  %d \n" %(x_odo.value, y_odo.value, th_odo.value) )
-            #print("Dummy update of odometry ...., X=  %d" %(x_odo.value) )
+            t_actual_odo = time.clock()
 
-            # update odometry uses values that require mutex
-            # (they are declared as value, so lock is implicitly done for atomic operations, BUT =+ is NOT atomic)
+            [v, w] = self.readSpeed()
 
-            # Operations like += which involve a read and write are not atomic.
-            with x_odo.get_lock():
-                x_odo.value+=1
+            x = x_odo.value
 
-            # to "lock" a whole set of operations, we can use a "mutex"
+            y = y_odo.value
+
+            th = th_odo.value
+
+            if w == 0:
+                # Straight movement
+                x = x + (t_actual_odo - t_last_odo) * v * math.cos(th)
+                y = y + (t_actual_odo - t_last_odo) * v * math.sin(th)
+            else:
+                # Curved movement
+                x = x + (v / w) * (math.sin(th + w * (t_actual_odo - t_last_odo)) - math.sin(th))
+                y = y - (v / w) * (math.cos(th + w * (t_actual_odo - t_last_odo)) - math.cos(th))
+
+            th = th + (t_actual_odo - t_last_odo) * w
+
+            # update odometry
             self.lock_odometry.acquire()
-            #x_odo.value+=1
-            y_odo.value+=1
-            th_odo.value+=1
+            x_odo.value = x
+            y_odo.value = y
+            th_odo.value = self.normalizeAngle(th)
+
             self.lock_odometry.release()
 
-            try:
-                # Each of the following BP.get_motor_encoder functions returns the encoder value
-                # (what we want to store).
-                #print("Reading encoder values ....")
-                sys.stdout.write("Reading encoder values .... \n")
-                #[encoder1, encoder2] = [self.BP.get_motor_encoder(self.BP.PORT_B),
-                #    self.BP.get_motor_encoder(self.BP.PORT_C)]
-            except IOError as error:
-                #print(error)
-                sys.stdout.write(error)
-
-            #sys.stdout.write("Encoder (%s) increased (in degrees) B: %6d  C: %6d " %
-            #        (type(encoder1), encoder1, encoder2))
-
+            # Update last measurement time
+            t_last_odo = t_actual_odo
 
             # save LOG
-            # Need to decide when to store a log with the updated odometry ...
+            t_end_log = time.clock()
+            self.logWrite("Function processing time:  %d " % (t_end_log - t_ini))
 
-            tEnd = time.clock()
-            time.sleep(self.P - (tEnd-tIni))
+            t_end = time.clock()
+            time.sleep(self.P - (t_end - t_ini))
 
-        #print("Stopping odometry ... X= %d" %(x_odo.value))
+        # print("Stopping odometry ... X= %d" %(x_odo.value))
         sys.stdout.write("Stopping odometry ... X=  %d, \
-                Y=  %d, th=  %d \n" %(x_odo.value, y_odo.value, th_odo.value))
-
+                Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
 
     # Stop the odometry thread.
     def stopOdometry(self):
         self.finished.value = True
-        #self.BP.reset_all()
+        # self.BP.reset_all()
+
+    # Write message in the log
+    def logWrite(self, message):
+        print(message)
+
+    # Normalize angle between -pi and pi
+    def normalizeAngle(self, angle):
+        return angle
