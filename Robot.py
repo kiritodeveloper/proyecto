@@ -3,13 +3,16 @@
 from __future__ import print_function  # use python 3 syntax but make it compatible with python 2
 from __future__ import division  # ''
 
-# import brickpi3 # import the BrickPi3 drivers
+import brickpi3  # import the BrickPi3 drivers
 import math
 import time  # import the time library for the sleep function
 import sys
 
 # tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, Array, Lock
+
+import numpy as np
+from scipy import linalg
 
 
 class Robot:
@@ -19,11 +22,6 @@ class Robot:
 
         Initialize Motors and Sensors according to the set up in your robot
         """
-
-        # Robot construction parameters
-        # self.R = ??
-        # self.L = ??
-        # self. ...
 
         ##################################################
         # Motors and sensors setup
@@ -56,24 +54,52 @@ class Robot:
         # odometry update period
         self.P = 1.0
 
+        # Set robot physical parameters
+        self.wheel_radius = 0.025  # m TODO: Set correct value
+        self.axis_length = 0.2  # m TODO: Set correct value
+
+        # Set initial speed
+        self.v = 0
+        self.w=0
+
     def setSpeed(self, v, w):
-        """ To be filled """
+        '''
+        Set the speed of the robot
+        :param v: lineal speed in m/s
+        :param w: angular speed in rad/s
+        '''
+
         print("setting speed to %.2f %.2f" % (v, w))
 
         # compute the speed that should be set in each motor ...
+        w_motors = linalg.inv(np.array([[self.wheel_radius / 2, self.wheel_radius / 2],
+                                        [self.wheel_radius / self.axis_length,
+                                         -self.wheel_radius / self.axis_length]])).dot(np.array([v, w]))
 
-        # speedPower = 100
-        # BP.set_motor_power(BP.PORT_B + BP.PORT_C, speedPower)
+        # Set motors ports
+        motor_port_left = brickpi3.PORT_B  # TODO: Change to correct value
+        motor_port_right = brickpi3.PORT_C  # TODO: Change to correct value
 
-        speedDPS_left = 180
-        speedDPS_right = 180
-        # self.BP.set_motor_dps(self.BP.PORT_B, speedDPS_left)
-        # self.BP.set_motor_dps(self.BP.PORT_C, speedDPS_right)
+        # Set motor power
+        speed_power_left = 100  # TODO: Change to correct value
+        speed_power_right = 100  # TODO: Change to correct value
+        brickpi3.set_motor_power(motor_port_left, speed_power_left)
+        brickpi3.set_motor_power(motor_port_right, speed_power_right)
+
+        # Set motors speed
+        speed_dps_left = math.degrees(w_motors[0])
+        speed_dps_right = math.degrees(w_motors[1])
+
+        brickpi3.set_motor_dps(motor_port_left, speed_dps_left)
+        brickpi3.set_motor_dps(motor_port_right, speed_dps_right)
 
     def readSpeed(self):
-        """ To be filled"""
+        '''
+        Read the robot speed
+        :return: robot speed
+        '''
 
-        return 0, 0
+        return self.v, self.w
 
     def readOdometry(self):
         """ Returns current value of odometry estimation """
