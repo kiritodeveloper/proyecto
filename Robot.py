@@ -62,6 +62,8 @@ class Robot:
         self.v = 0
         self.w = 0
 
+        self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+
     def setSpeed(self, v, w):
         '''
         Set the speed of the robot
@@ -77,21 +79,21 @@ class Robot:
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors ports
-        motor_port_left = brickpi3.PORT_B  # TODO: Change to correct value
-        motor_port_right = brickpi3.PORT_C  # TODO: Change to correct value
+        motor_port_left = self.BP.PORT_B  # TODO: Change to correct value
+        motor_port_right = self.BP.PORT_C  # TODO: Change to correct value
 
         # Set motor power
         speed_power_left = 100  # TODO: Change to correct value
         speed_power_right = 100  # TODO: Change to correct value
-        brickpi3.set_motor_power(motor_port_left, speed_power_left)
-        brickpi3.set_motor_power(motor_port_right, speed_power_right)
+        self.BP.set_motor_power(motor_port_left, speed_power_left)
+        self.BP.set_motor_power(motor_port_right, speed_power_right)
 
         # Set motors speed
         speed_dps_left = math.degrees(w_motors[0])
         speed_dps_right = math.degrees(w_motors[1])
 
-        brickpi3.set_motor_dps(motor_port_left, speed_dps_left)
-        brickpi3.set_motor_dps(motor_port_right, speed_dps_right)
+        self.BP.set_motor_dps(motor_port_left, speed_dps_left)
+        self.BP.set_motor_dps(motor_port_right, speed_dps_right)
 
     def readSpeed(self):
         '''
@@ -179,7 +181,7 @@ class Robot:
     # Stop the odometry thread.
     def stopOdometry(self):
         self.finished.value = True
-        brickpi3.reset_all()
+        self.BP.reset_all()
 
     # Write message in the log
     def logWrite(self, message):
