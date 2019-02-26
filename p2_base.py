@@ -7,6 +7,7 @@ import numpy as np
 import time
 
 from Robot import Robot
+from plot_robot import dibrobot
 
 
 def trayectoria_1_tiempos(robot):
@@ -122,31 +123,9 @@ def main(args):
 
         # 2. perform trajectory
 
-        trayectoria_1_odometria(robot)
-        '''
-        # DUMMY CODE! delete when you have your own
-        robot.setSpeed(1,0)
-        print "Start : %s" % time.ctime()
-        time.sleep(3)
-        print("X value from main tmp %d" % robot.x.value)
-        time.sleep(3)
-        print "End : %s" % time.ctime()
-
-        robot.lock_odometry.acquire()
-        print("Odom values at main at the END: %d, %d, %d" % (robot.x.value, robot.y.value, robot.th.value))
-        robot.lock_odometry.release()
-
-        # PART 1:
-        # robot.setSpeed()
-        # until ...
-
-        # PART 2:
-        # robot.setSpeed()
-        # until ...
-
-        # ...
-
-        '''
+        #trayectoria_1_tiempos(robot)
+        dibrobot([0, 0, 0], 'r', 'p')
+        time.sleep(10)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,

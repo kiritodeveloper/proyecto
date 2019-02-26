@@ -3,7 +3,6 @@
 from __future__ import print_function  # use python 3 syntax but make it compatible with python 2
 from __future__ import division  # ''
 
-import brickpi3  # import the BrickPi3 drivers
 import math
 import time  # import the time library for the sleep function
 import sys
@@ -13,6 +12,13 @@ from multiprocessing import Process, Value, Array, Lock
 
 import numpy as np
 from scipy import linalg
+
+is_debug = True
+
+if not is_debug:
+    import brickpi3  # import the BrickPi3 drivers
+else:
+    from FakeBlockPi import FakeBlockPi
 
 
 class Robot:
@@ -40,16 +46,13 @@ class Robot:
 
         ##################################################
         # odometry shared memory values
-        self.x = Value('d', 0.0)
-        self.y = Value('d', 0.0)
-        self.th = Value('d', 0.0)
+        self.x = Value('d', init_position[0])
+        self.y = Value('d', init_position[1])
+        self.th = Value('d', init_position[2])
         self.finished = Value('b', 1)  # boolean to show if odometry updates are finished
 
         # if we want to block several instructions to be run together, we may want to use an explicit Lock
         self.lock_odometry = Lock()
-        # self.lock_odometry.acquire()
-        # print('hello world', i)
-        # self.lock_odometry.release()
 
         # odometry update period
         self.P = 0.05
@@ -62,7 +65,10 @@ class Robot:
         self.v = Value('d', 0.0)
         self.w = Value('d', 0.0)
 
-        self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+        if not is_debug:
+            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+        else:
+            self.BP = FakeBlockPi()
 
     def setSpeed(self, v, w):
         '''
@@ -88,10 +94,6 @@ class Robot:
 
         self.BP.set_motor_dps(motor_port_left, speed_dps_left)
         self.BP.set_motor_dps(motor_port_right, speed_dps_right)
-
-        print("Speed: ")
-        print(speed_dps_left)
-        print(speed_dps_right)
 
         self.lock_odometry.acquire()
         self.v.value = v
@@ -137,13 +139,9 @@ class Robot:
     # You may want to pass additional shared variables besides the odometry values and stop flag
     def updateOdometry(self, x_odo, y_odo, th_odo, finished):
 
-        t_last_odo = time.clock()
-
         while not finished.value:
             # current processor time in a floating point value, in seconds
             t_ini = time.clock()
-
-            t_actual_odo = time.clock()
 
             d_t = self.P
 
@@ -166,7 +164,6 @@ class Robot:
 
             th = th + d_t * w
 
-
             # update odometry
             self.lock_odometry.acquire()
             x_odo.value = x
@@ -175,19 +172,17 @@ class Robot:
 
             self.lock_odometry.release()
 
-            # Update last measurement time
-            t_last_odo = t_actual_odo
+            if not is_debug:
+                self.logWrite(
+                    "th: " + str(th) + ", dt: " + str(d_t) + ", w: " + str(w) + ", x: " + str(x) + ", y: " + str(y)
+                )
+            else:
+                pass
 
             # save LOG
-            t_end_log = time.clock()
-            self.logWrite("Function processing time:  %d " % (t_end_log - t_ini))
-
             t_end = time.clock()
             time.sleep(self.P - (t_end - t_ini))
 
-            #print("TH dt w x y", th, d_t, w, x, y)
-
-        # print("Stopping odometry ... X= %d" %(x_odo.value))
         sys.stdout.write("Stopping odometry ... X=  %d, \
                 Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
 
@@ -202,4 +197,4 @@ class Robot:
 
     # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
-        return angle # TODO
+        return angle  # TODO
