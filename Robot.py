@@ -52,7 +52,7 @@ class Robot:
         # self.lock_odometry.release()
 
         # odometry update period
-        self.P = 1.0
+        self.P = 0.5
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
@@ -145,7 +145,7 @@ class Robot:
 
             t_actual_odo = time.clock()
 
-            d_t = t_actual_odo - t_last_odo
+            d_t = self.P
 
             [v, w] = self.readSpeed()
 
