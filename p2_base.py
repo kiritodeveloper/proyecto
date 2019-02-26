@@ -27,7 +27,7 @@ def espera_posicion(x, y, th, robot):
     [x_odo, y_odo, th_odo] = robot.readOdometry()
     margen_error = 0.1
 
-    margen_error_th = 0.05
+    margen_error_th = 0.02
 
     print("valores ", x_odo, y_odo, th_odo , x , y, th)
 
