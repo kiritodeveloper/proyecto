@@ -57,6 +57,8 @@ def trayectoria_1_odometria(robot):
     robot.setSpeed(math.pi / 16, -math.pi / 16)
     espera_posicion(4, 0, -math.pi / 2, robot)
 
+    print ("entre dos")
+
     espera_posicion(2, 0, math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, math.pi / 16)
