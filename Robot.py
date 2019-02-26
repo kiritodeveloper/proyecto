@@ -59,8 +59,8 @@ class Robot:
         self.axis_length = 0.115  # m
 
         # Set initial speed
-        self.v = 0
-        self.w = 0
+        self.v = Value('d', 0.0)
+        self.w = Value('d', 0.0)
 
         self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
@@ -93,8 +93,10 @@ class Robot:
         print(speed_dps_left)
         print(speed_dps_right)
 
-        self.v = v
-        self.w = w
+        self.lock_odometry.acquire()
+        self.v.value = v
+        self.w.value = w
+        self.lock_odometry.release()
 
     def readSpeed(self):
         '''
@@ -102,7 +104,12 @@ class Robot:
         :return: robot speed
         '''
 
-        return self.v, self.w
+        self.lock_odometry.acquire()
+        v = self.v.value
+        w = self.w.value
+        self.lock_odometry.release()
+
+        return v, w
 
     def readOdometry(self):
         """ Returns current value of odometry estimation """
