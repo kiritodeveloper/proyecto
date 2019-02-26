@@ -138,6 +138,8 @@ class Robot:
 
             t_actual_odo = time.clock()
 
+            d_t = t_actual_odo - t_last_odo
+
             [v, w] = self.readSpeed()
 
             x = x_odo.value
@@ -148,14 +150,14 @@ class Robot:
 
             if w == 0:
                 # Straight movement
-                x = x + (t_actual_odo - t_last_odo) * v * math.cos(th)
-                y = y + (t_actual_odo - t_last_odo) * v * math.sin(th)
+                x = x + d_t * v * math.cos(th)
+                y = y + d_t * v * math.sin(th)
             else:
                 # Curved movement
-                x = x + (v / w) * (math.sin(th + w * (t_actual_odo - t_last_odo)) - math.sin(th))
-                y = y - (v / w) * (math.cos(th + w * (t_actual_odo - t_last_odo)) - math.cos(th))
+                x = x + (v / w) * (math.sin(th + w * d_t) - math.sin(th))
+                y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
-            th = th + (t_actual_odo - t_last_odo) * w
+            th = th + d_t * w
 
             # update odometry
             self.lock_odometry.acquire()
@@ -174,6 +176,7 @@ class Robot:
 
             t_end = time.clock()
             time.sleep(self.P - (t_end - t_ini))
+            print("D_t", d_t)
 
         # print("Stopping odometry ... X= %d" %(x_odo.value))
         sys.stdout.write("Stopping odometry ... X=  %d, \

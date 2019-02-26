@@ -31,8 +31,7 @@ def espera_posicion(x, y, th, robot):
 
     #while (margen_error > math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) & (margen_error_th > abs(th - th_odo)):
     while(True):
-        print("TH: ")
-        print(th_odo)
+        #print("TH: ", th_odo)
         [x_odo, y_odo, th_odo] = robot.readOdometry()
 
 
