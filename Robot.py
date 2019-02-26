@@ -72,9 +72,9 @@ class Robot:
         print("setting speed to %.2f %.2f" % (v, w))
 
         # compute the speed that should be set in each motor ...
-        w_motors = linalg.inv(np.array([[self.wheel_radius / 2, self.wheel_radius / 2],
-                                        [self.wheel_radius / self.axis_length,
-                                         -self.wheel_radius / self.axis_length]])).dot(np.array([v, w]))
+        w_motors = np.array([[1 / self.wheel_radius , self.axis_length / (2 * self.wheel_radius)],
+                                        [1 / self.wheel_radius,
+                                         -self.axis_length / (2 * self.wheel_radius)]])).dot(np.array([v, w])
 
         # Set motors ports
         motor_port_left = brickpi3.PORT_B  # TODO: Change to correct value
