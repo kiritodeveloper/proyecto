@@ -39,7 +39,7 @@ def espera_posicion(x, y, th, robot):
 
 def trayectoria_90_grados_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
-    espera_posicion(0, 0, math.pi / 2, robot)
+    espera_posicion(0, 0, - math.pi / 2, robot)
 
 
 def trayectoria_1_m_odometria(robot):
