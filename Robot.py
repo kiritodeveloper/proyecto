@@ -93,7 +93,7 @@ class Robot:
         speed_dps_right = math.degrees(w_motors[1])
 
         self.BP.set_motor_dps(motor_port_left, speed_dps_left)
-        self.BP.set_motor_dps(motor_port_right, speed_dps_right)
+        #self.BP.set_motor_dps(motor_port_right, speed_dps_right)
 
         print("Speed: ")
         print(speed_dps_left)
