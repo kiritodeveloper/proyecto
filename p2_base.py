@@ -9,7 +9,7 @@ import time
 from Robot import Robot
 
 
-def trayectoria_1(robot):
+def trayectoria_1_tiempos(robot):
     robot.setSpeed(0, -math.pi / 8)
     time.sleep(4)
 
@@ -21,6 +21,60 @@ def trayectoria_1(robot):
 
     robot.setSpeed(math.pi / 16, math.pi / 16)
     time.sleep(16)
+
+
+def espera_posicion(x, y, th, robot):
+    [x_odo, y_odo, th_odo] = robot.startOdometry()
+    margen_error = 0.02
+
+    margen_error_th = 0.1
+
+    while (margen_error > math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) & (margen_error_th > abs(th - th_odo)):
+        [x_odo, y_odo, th_odo] = robot.startOdometry()
+
+
+def trayectoria_90_grados_odometria(robot):
+    robot.setSpeed(0, -math.pi / 8)
+    espera_posicion(0, 0, math.pi / 2, robot)
+
+
+def trayectoria_1_m_odometria(robot):
+    robot.setSpeed(0.1, -math.pi / 8)
+    espera_posicion(0.8, 0, 0, robot)
+
+
+def trayectoria_1_odometria(robot):
+    robot.setSpeed(0, -math.pi / 8)
+    espera_posicion(0, 0, math.pi / 2, robot)
+
+    robot.setSpeed(math.pi / 16, math.pi / 16)
+    time.sleep(16)
+
+    robot.setSpeed(math.pi / 16, -math.pi / 16)
+    time.sleep(32)
+
+    robot.setSpeed(math.pi / 16, math.pi / 16)
+    time.sleep(16)
+
+
+def trayectoria_2_tiempos(robot):
+    robot.setSpeed(0, math.pi / 8)
+    time.sleep(4)
+
+    robot.setSpeed(math.pi / 18, - math.pi / 9)
+    time.sleep(3)
+
+    robot.setSpeed(0.1, 0)
+    time.sleep(10)
+
+    robot.setSpeed(math.pi / 15, - math.pi / 15)
+    time.sleep(20)
+
+    robot.setSpeed(0.1, 0)
+    time.sleep(10)
+
+    robot.setSpeed(math.pi / 18, - math.pi / 9)
+    time.sleep(3)
 
 
 def main(args):
@@ -39,7 +93,7 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        trayectoria_1(robot)
+        trayectoria_90_grados_odometria(robot)
         '''
         # DUMMY CODE! delete when you have your own
         robot.setSpeed(1,0)
