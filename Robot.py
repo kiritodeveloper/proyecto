@@ -93,6 +93,9 @@ class Robot:
         print(speed_dps_left)
         print(speed_dps_right)
 
+        self.v = v
+        self.w = w
+
     def readSpeed(self):
         '''
         Read the robot speed
