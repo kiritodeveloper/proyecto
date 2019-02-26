@@ -24,6 +24,8 @@ def main(args):
 
         # 2. perform trajectory
         robot.setSpeed(1, 0)
+
+        time.sleep(3)
         '''
         # DUMMY CODE! delete when you have your own
         robot.setSpeed(1,0)
