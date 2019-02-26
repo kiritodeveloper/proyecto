@@ -55,7 +55,7 @@ class Robot:
         self.P = 1.0
 
         # Set robot physical parameters
-        self.wheel_radius = 0.025  # m TODO: Set correct value
+        self.wheel_radius = 0.028  # m
         self.axis_length = 0.2  # m TODO: Set correct value
 
         # Set initial speed
@@ -179,7 +179,7 @@ class Robot:
     # Stop the odometry thread.
     def stopOdometry(self):
         self.finished.value = True
-        # self.BP.reset_all()
+        brickpi3.reset_all()
 
     # Write message in the log
     def logWrite(self, message):
