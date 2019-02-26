@@ -10,17 +10,7 @@ from Robot import Robot
 
 
 def trayectoria_1():
-    robot.setSpeed(0, -math.pi / 8)
-    time.sleep(4)
-
-    robot.setSpeed(math.pi / 8, math.pi / 8)
-    time.sleep(8)
-
-    robot.setSpeed(math.pi / 8, math.pi / 8)
-    time.sleep(16)
-
-    robot.setSpeed(math.pi / 8, math.pi / 8)
-    time.sleep(8)
+    pass
 
 
 
@@ -40,7 +30,17 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        trayectoria_1()
+        robot.setSpeed(0, -math.pi / 8)
+        time.sleep(4)
+
+        robot.setSpeed(math.pi / 8, math.pi / 8)
+        time.sleep(8)
+
+        robot.setSpeed(math.pi / 8, math.pi / 8)
+        time.sleep(16)
+
+        robot.setSpeed(math.pi / 8, math.pi / 8)
+        time.sleep(8)
         '''
         # DUMMY CODE! delete when you have your own
         robot.setSpeed(1,0)
