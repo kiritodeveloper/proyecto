@@ -177,6 +177,7 @@ class Robot:
             t_end = time.clock()
             time.sleep(self.P - (t_end - t_ini))
             print("D_t", d_t)
+            print("TH", self.normalizeAngle(th))
 
         # print("Stopping odometry ... X= %d" %(x_odo.value))
         sys.stdout.write("Stopping odometry ... X=  %d, \
@@ -193,4 +194,4 @@ class Robot:
 
     # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
-        return angle
+        return angle # TODO
