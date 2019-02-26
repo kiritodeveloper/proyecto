@@ -185,7 +185,7 @@ class Robot:
             t_end = time.clock()
             time.sleep(self.P - (t_end - t_ini))
 
-            print("TH dt w x y", th, d_t, w, x, y)
+            #print("TH dt w x y", th, d_t, w, x, y)
 
         # print("Stopping odometry ... X= %d" %(x_odo.value))
         sys.stdout.write("Stopping odometry ... X=  %d, \
