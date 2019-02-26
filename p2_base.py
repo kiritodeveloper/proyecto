@@ -115,7 +115,8 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        trayectoria_90_grados_odometria(robot)
+
+        #trayectoria_90_grados_odometria(robot)
         '''
         # DUMMY CODE! delete when you have your own
         robot.setSpeed(1,0)
