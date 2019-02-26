@@ -8,24 +8,24 @@ from Robot import Robot
 
 def main(args):
     try:
-        if args.radioD < 0:
+        '''  if args.radioD < 0:
             print 'd must be a positive value'
             exit(1)
-
+        '''
         # Instantiate Odometry. Default value will be 0,0,0
         # robot = Robot(init_position=args.pos_ini)
         robot = Robot()
 
-        print("X value at the beginning from main X= %d" %(robot.x.value))
+        print("X value at the beginning from main X= %d" % (robot.x.value))
 
         # 1. launch updateOdometry Process()
         robot.startOdometry()
 
         # 2. perform trajectory
-
-
+        robot.setSpeed(1, 0)
+        '''
         # DUMMY CODE! delete when you have your own
-        robot.setSpeed(1,1)
+        robot.setSpeed(1,0)
         print "Start : %s" % time.ctime()
         time.sleep(3)
         print("X value from main tmp %d" % robot.x.value)
@@ -46,21 +46,20 @@ def main(args):
 
         # ...
 
-
+        '''
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
 
-
     except KeyboardInterrupt:
-    # except the program gets interrupted by Ctrl+C on the keyboard.
-    # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
+        # except the program gets interrupted by Ctrl+C on the keyboard.
+        # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         robot.stopOdometry()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # get and parse arguments passed to main
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
@@ -69,5 +68,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args)
-
-
