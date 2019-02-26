@@ -4,7 +4,7 @@ import argparse
 import numpy as np
 import time
 
-from practica2.Robot import Robot
+from Robot import Robot
 
 
 def main(args):
