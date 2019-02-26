@@ -56,7 +56,7 @@ class Robot:
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
-        self.axis_length = 0.2  # m TODO: Set correct value
+        self.axis_length = 0.115  # m
 
         # Set initial speed
         self.v = 0
