@@ -45,19 +45,41 @@ def trayectoria_1_m_odometria(robot):
 
 def trayectoria_1_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
-    espera_posicion(0, 0, math.pi / 2, robot)
+    espera_posicion(0, 0, - math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, math.pi / 16)
-    time.sleep(16)
+    espera_posicion(2, 0, math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, -math.pi / 16)
-    time.sleep(32)
+    espera_posicion(4, 0, -math.pi / 2, robot)
+
+    espera_posicion(2, 0, math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, math.pi / 16)
-    time.sleep(16)
+    espera_posicion(0, 0, - math.pi / 2, robot)
 
 
 def trayectoria_2_tiempos(robot):
+    robot.setSpeed(0, math.pi / 8)
+    time.sleep(4)
+
+    robot.setSpeed(math.pi / 18, - math.pi / 9)
+    time.sleep(3)
+
+    robot.setSpeed(0.1, 0)
+    time.sleep(10)
+
+    robot.setSpeed(math.pi / 15, - math.pi / 15)
+    time.sleep(20)
+
+    robot.setSpeed(0.1, 0)
+    time.sleep(10)
+
+    robot.setSpeed(math.pi / 18, - math.pi / 9)
+    time.sleep(3)
+
+
+def trayectoria_2_odometria(robot):
     robot.setSpeed(0, math.pi / 8)
     time.sleep(4)
 
