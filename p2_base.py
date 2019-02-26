@@ -1,10 +1,27 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import argparse
+import math
+
 import numpy as np
 import time
 
 from Robot import Robot
+
+
+def trayectoria_1():
+    robot.setSpeed(0, -math.pi / 2)
+    time.sleep(1)
+
+    robot.setSpeed(math.pi / 4, math.pi / 4)
+    time.sleep(4)
+
+    robot.setSpeed(0, -math.pi / 2)
+    time.sleep(1)
+
+    robot.setSpeed(0, -math.pi / 2)
+    time.sleep(1)
+
 
 
 def main(args):
@@ -23,7 +40,7 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        robot.setSpeed(1, 0)
+        robot.setSpeed(0.5, 0)
 
         time.sleep(3)
         '''
