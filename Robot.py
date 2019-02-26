@@ -52,7 +52,7 @@ class Robot:
         # self.lock_odometry.release()
 
         # odometry update period
-        self.P = 0.5
+        self.P = 0.05
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
