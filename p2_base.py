@@ -3,7 +3,8 @@
 import argparse
 import numpy as np
 import time
-from Robot import Robot
+
+from practica2.Robot import Robot
 
 
 def main(args):

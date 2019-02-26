@@ -60,7 +60,7 @@ class Robot:
 
         # Set initial speed
         self.v = 0
-        self.w=0
+        self.w = 0
 
     def setSpeed(self, v, w):
         '''
@@ -71,10 +71,10 @@ class Robot:
 
         print("setting speed to %.2f %.2f" % (v, w))
 
-        # compute the speed that should be set in each motor ...
-        w_motors = np.array([[1 / self.wheel_radius , self.axis_length / (2 * self.wheel_radius)],
-                                        [1 / self.wheel_radius,
-                                         -self.axis_length / (2 * self.wheel_radius)]])).dot(np.array([v, w])
+        # compute the speed that should be set in each motor ..
+        w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
+                             [1 / self.wheel_radius,
+                              -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors ports
         motor_port_left = brickpi3.PORT_B  # TODO: Change to correct value
