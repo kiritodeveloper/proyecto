@@ -201,4 +201,8 @@ class Robot:
 
     # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
-        return angle  # TODO
+        if(angle < -math.pi): #To positive
+            angle = angle + 2*math.pi
+        elif(angle > math.pi):
+            angle = angle - 2*math.pi
+        return angle

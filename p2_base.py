@@ -44,7 +44,8 @@ def espera_posicion(x, y, th, robot):
         # plt.show()
         # plt.draw()
         plt.pause(0.1)
-
+        if(x==2):
+            print("valores ", x_odo, y_odo, th_odo, x, y, th)
 
 def trayectoria_90_grados_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
