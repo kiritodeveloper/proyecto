@@ -2,15 +2,15 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import math
-from multiprocessing import Pipe
+from multiprocessing import Pipe, Queue
 
 import time
 
 from Robot import Robot, is_debug
 from RobotDrawer import start_robot_drawer
 
-# Pipe defined for communication with RobotDrawer
-parent_conn, child_conn = Pipe()
+# Queue defined for communication with RobotDrawer
+inter_process_queue = Queue()
 
 
 def trayectoria_1_tiempos(robot):
@@ -35,9 +35,10 @@ def wait_for_position(x, y, th, robot):
 
     print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
 
-    while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (th_error_margin < abs(th - th_odo)):
+    while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
+            th_error_margin < abs(th - th_odo)):
         [x_odo, y_odo, th_odo] = robot.readOdometry()
-        parent_conn.send([x_odo, y_odo, th_odo])
+        inter_process_queue.put([x_odo, y_odo, th_odo])
         time.sleep(robot.P)
 
 
@@ -119,7 +120,7 @@ def main(args):
         robot = Robot()
 
         if is_debug:
-            start_robot_drawer(robot.finished, robot.P, child_conn)
+            start_robot_drawer(robot.finished, robot.P, inter_process_queue)
 
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
@@ -128,20 +129,24 @@ def main(args):
 
         # 2. perform trajectory
         trayectoria_1_odometria(robot)
-        time.sleep(10)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
 
-        parent_conn.close()
+        # Wait until all print is done
+        print("Printeando final")
+        while not inter_process_queue.empty():
+            time.sleep(1)
+
+        inter_process_queue.close()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         robot.stopOdometry()
-        parent_conn.close()
+        inter_process_queue.close()
 
 
 if __name__ == "__main__":

@@ -132,8 +132,6 @@ class Robot:
         # Odometry update process
         self.p = Process(target=self.updateOdometry, args=(self.x, self.y, self.th, self.finished))
 
-
-
         self.p.start()
         print("PID: ", self.p.pid)
         # we don't really need to pass the shared params x, y, th, finished,
@@ -201,8 +199,8 @@ class Robot:
 
     # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
-        if(angle < -math.pi): #To positive
-            angle = angle + 2*math.pi
-        elif(angle > math.pi):
-            angle = angle - 2*math.pi
+        if (angle < -math.pi):  # To positive
+            angle = angle + 2 * math.pi
+        elif (angle > math.pi):
+            angle = angle - 2 * math.pi
         return angle
