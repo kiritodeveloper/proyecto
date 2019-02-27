@@ -2,13 +2,15 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import math
+from multiprocessing import Pipe
 
-import numpy as np
 import time
 
-from Robot import Robot
-from plot_robot import dibrobot
-import matplotlib.pyplot as plt
+from Robot import Robot, is_debug
+from RobotDrawer import start_robot_drawer
+
+# Pipe defined for communication with RobotDrawer
+parent_conn, child_conn = Pipe()
 
 
 def trayectoria_1_tiempos(robot):
@@ -25,60 +27,45 @@ def trayectoria_1_tiempos(robot):
     time.sleep(16)
 
 
-def espera_posicion(x, y, th, robot):
+def wait_for_position(x, y, th, robot):
     [x_odo, y_odo, th_odo] = robot.readOdometry()
-    margen_error = 0.2
 
-    margen_error_th = 0.02
+    position_error_margin = 0.2
+    th_error_margin = 0.02
 
-    print("valores ", x_odo, y_odo, th_odo , x , y, th)
+    print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
 
-    while (margen_error < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (margen_error_th < abs(th - th_odo)):
-        #print(margen_error < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2))
-        #print(abs(th - th_odo))
+    while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (th_error_margin < abs(th - th_odo)):
         [x_odo, y_odo, th_odo] = robot.readOdometry()
+        parent_conn.send([x_odo, y_odo, th_odo])
+        time.sleep(robot.P)
 
-        # Plot odometry
-        # print ("DIBUJO ODOMETRIA")
-        dibrobot([x_odo, y_odo, th_odo], 'r', 'p')
-        # plt.show()
-        # plt.draw()
-        plt.pause(0.1)
-        if(x==2):
-            print("valores ", x_odo, y_odo, th_odo, x, y, th)
 
 def trayectoria_90_grados_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
-    espera_posicion(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot)
 
 
 def trayectoria_1_m_odometria(robot):
     robot.setSpeed(0.1, 0)
-    espera_posicion(0.8, 0, 0, robot)
+    wait_for_position(0.8, 0, 0, robot)
 
 
 def trayectoria_1_odometria(robot):
     # Plotting odometry
-    dibrobot([0, 0, 0], 'r', 'p')
-    plt.ion()
-    # plt.draw()
-    # plt.pause(0.001)
-
     robot.setSpeed(0, -math.pi / 8)
-    espera_posicion(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, math.pi / 16)
-    espera_posicion(2, 0, math.pi / 2, robot)
+    wait_for_position(2, 0, math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, -math.pi / 16)
-    espera_posicion(4, 0, -math.pi / 2, robot)
+    wait_for_position(4, 0, -math.pi / 2, robot)
 
-    print ("entre dos")
-
-    espera_posicion(2, 0, math.pi / 2, robot)
+    wait_for_position(2, 0, math.pi / 2, robot)
 
     robot.setSpeed(math.pi / 16, math.pi / 16)
-    espera_posicion(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot)
 
 
 def trayectoria_2_tiempos(robot):
@@ -131,6 +118,9 @@ def main(args):
         # robot = Robot(init_position=args.pos_ini)
         robot = Robot()
 
+        if is_debug:
+            start_robot_drawer(robot.finished, robot.P, child_conn)
+
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
         # 1. launch updateOdometry Process()
@@ -145,10 +135,13 @@ def main(args):
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
 
+        parent_conn.close()
+
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         robot.stopOdometry()
+        parent_conn.close()
 
 
 if __name__ == "__main__":
