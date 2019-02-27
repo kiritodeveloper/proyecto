@@ -12,6 +12,8 @@ from multiprocessing import Process, Value, Array, Lock
 
 import numpy as np
 from scipy import linalg
+from plot_robot import dibrobot
+import matplotlib.pyplot as plt
 
 is_debug = True
 
@@ -129,6 +131,8 @@ class Robot:
 
         # Odometry update process
         self.p = Process(target=self.updateOdometry, args=(self.x, self.y, self.th, self.finished))
+
+
 
         self.p.start()
         print("PID: ", self.p.pid)

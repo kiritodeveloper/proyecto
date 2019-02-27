@@ -8,6 +8,7 @@ import time
 
 from Robot import Robot
 from plot_robot import dibrobot
+import matplotlib.pyplot as plt
 
 
 def trayectoria_1_tiempos(robot):
@@ -37,6 +38,13 @@ def espera_posicion(x, y, th, robot):
         #print(abs(th - th_odo))
         [x_odo, y_odo, th_odo] = robot.readOdometry()
 
+        # Plot odometry
+        # print ("DIBUJO ODOMETRIA")
+        dibrobot([x_odo, y_odo, th_odo], 'r', 'p')
+        # plt.show()
+        # plt.draw()
+        plt.pause(0.1)
+
 
 def trayectoria_90_grados_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
@@ -49,6 +57,12 @@ def trayectoria_1_m_odometria(robot):
 
 
 def trayectoria_1_odometria(robot):
+    # Plotting odometry
+    dibrobot([0, 0, 0], 'r', 'p')
+    plt.ion()
+    # plt.draw()
+    # plt.pause(0.001)
+
     robot.setSpeed(0, -math.pi / 8)
     espera_posicion(0, 0, - math.pi / 2, robot)
 
@@ -122,9 +136,7 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-
-        #trayectoria_1_tiempos(robot)
-        dibrobot([0, 0, 0], 'r', 'p')
+        trayectoria_1_odometria(robot)
         time.sleep(10)
 
         # 3. wrap up and close stuff ...
