@@ -87,15 +87,15 @@ class Robot:
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors ports
-        motor_port_left = self.BP.PORT_B  # TODO: Change to correct value
-        motor_port_right = self.BP.PORT_C  # TODO: Change to correct value
+        self.motor_port_left = self.BP.PORT_B  # TODO: Change to correct value
+        self.motor_port_right = self.BP.PORT_C  # TODO: Change to correct value
 
         # Set motors speed
         speed_dps_left = math.degrees(w_motors[0])
         speed_dps_right = math.degrees(w_motors[1])
 
-        self.BP.set_motor_dps(motor_port_left, speed_dps_left)
-        self.BP.set_motor_dps(motor_port_right, speed_dps_right)
+        self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
+        self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
 
         self.lock_odometry.acquire()
         self.v.value = v
@@ -109,8 +109,23 @@ class Robot:
         '''
 
         self.lock_odometry.acquire()
-        v = self.v.value
-        w = self.w.value
+        if (is_debug):
+            v = self.v.value
+            w = self.w.value
+        else:
+            [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left), self.BP.get_motor_encoder(self.motor_port_right)]
+            rad_izq = math.radians(grad_izq)
+            rad_der = math.radians(grad_der)
+
+            w_izq = rad_izq / self.P
+            w_der = rad_der / self.P
+
+            v_w = np.array([[self.wheel_radius / 2, self.wheel_radius / 2],
+                             [self.wheel_radius / self.axis_length,
+                              -self.axis_radius / self.axis_length]]).dot(np.array([w_der, w_izq]))
+
+            v = v_w[0]
+            w = v_w[1]
         self.lock_odometry.release()
 
         return v, w
