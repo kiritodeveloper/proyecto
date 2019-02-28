@@ -5,14 +5,14 @@ from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
 
+
 def start_robot_drawer(finished, robot):
-    p: Process = Process(target=loop_robot_drawer, args=(finished, robot))
+    p = Process(target=loop_robot_drawer, args=(finished, robot))
     p.start()
 
     # Time to start drawer
     print("Init drawer")
     time.sleep(10)
-
 
 def loop_robot_drawer(finished, robot):
     print("Drawer started")
