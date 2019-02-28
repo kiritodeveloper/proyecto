@@ -66,10 +66,21 @@ class Robot:
         self.v = Value('d', 0.0)
         self.w = Value('d', 0.0)
 
+        # Set motors ports
+        self.motor_port_left = self.BP.PORT_B
+        self.motor_port_right = self.BP.PORT_C
+
         if not is_debug:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
         else:
             self.BP = FakeBlockPi()
+
+        # Encoder timer
+        self.encoder_timer = 0
+
+        # Previous values of encoders in rads
+        self.r_prev_encoder_left = 0
+        self.r_prev_encoder_right = 0
 
     def setSpeed(self, v, w):
         '''
@@ -84,10 +95,6 @@ class Robot:
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
                              [1 / self.wheel_radius,
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
-
-        # Set motors ports
-        self.motor_port_left = self.BP.PORT_B  # TODO: Change to correct value
-        self.motor_port_right = self.BP.PORT_C  # TODO: Change to correct value
 
         # Set motors speed
         speed_dps_left = math.degrees(w_motors[0])
@@ -108,23 +115,33 @@ class Robot:
         '''
 
         self.lock_odometry.acquire()
-        if (is_debug):
+        if is_debug:
             v = self.v.value
             w = self.w.value
         else:
-            [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left), self.BP.get_motor_encoder(self.motor_port_right)]
+            [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
+                                    self.BP.get_motor_encoder(self.motor_port_right)]
             rad_izq = math.radians(grad_izq)
             rad_der = math.radians(grad_der)
 
-            w_izq = rad_izq / self.P
-            w_der = rad_der / self.P
+            last_timer = self.encoder_timer
+            self.encoder_timer = time.time()
+
+            dt = self.encoder_timer - last_timer
+
+            w_izq = (rad_izq - self.r_prev_encoder_left) / dt
+            w_der = (rad_der - self.r_prev_encoder_right) / dt
+
+            self.r_prev_encoder_left = rad_izq
+            self.r_prev_encoder_right = rad_der
 
             v_w = np.array([[self.wheel_radius / 2, self.wheel_radius / 2],
-                             [self.wheel_radius / self.axis_length,
-                              -self.axis_radius / self.axis_length]]).dot(np.array([w_der, w_izq]))
+                            [self.wheel_radius / self.axis_length,
+                             -self.axis_radius / self.axis_length]]).dot(np.array([w_der, w_izq]))
 
             v = v_w[0]
             w = v_w[1]
+
         self.lock_odometry.release()
 
         return v, w
@@ -142,6 +159,14 @@ class Robot:
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
+
+        if not is_debug:
+            self.BP.offset_motor_encoder(self.motor_port_left,
+                                         self.BP.get_motor_encoder(self.motor_port_left))  # reset encoder B
+            self.BP.offset_motor_encoderself(self.motor_port_right,
+                                             self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
+
+        self.encoder_timer = time.time()
 
         # Odometry update process
         self.p = Process(target=self.updateOdometry, args=(self.x, self.y, self.th, self.finished))
