@@ -14,7 +14,7 @@ import numpy as np
 
 from utils import delay_until
 
-is_debug = True
+is_debug = False
 
 if not is_debug:
     import brickpi3  # import the BrickPi3 drivers
@@ -66,14 +66,14 @@ class Robot:
         self.v = Value('d', 0.0)
         self.w = Value('d', 0.0)
 
-        # Set motors ports
-        self.motor_port_left = self.BP.PORT_B
-        self.motor_port_right = self.BP.PORT_C
-
         if not is_debug:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
         else:
             self.BP = FakeBlockPi()
+
+        # Set motors ports
+        self.motor_port_left = self.BP.PORT_B
+        self.motor_port_right = self.BP.PORT_C
 
         # Encoder timer
         self.encoder_timer = 0
