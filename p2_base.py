@@ -3,11 +3,13 @@
 import argparse
 import math
 
-import numpy as np
 import time
 
-from Robot import Robot
-from plot_robot import dibrobot
+from Robot import Robot, is_debug
+from RobotDrawer import start_robot_drawer
+
+# Queue defined for communication with RobotDrawer
+from utils import delay_until
 
 
 def trayectoria_1_tiempos(robot):
@@ -24,46 +26,31 @@ def trayectoria_1_tiempos(robot):
     time.sleep(16)
 
 
-def espera_posicion(x, y, th, robot):
-    [x_odo, y_odo, th_odo] = robot.readOdometry()
-    margen_error = 0.2
-
-    margen_error_th = 0.02
-
-    print("valores ", x_odo, y_odo, th_odo , x , y, th)
-
-    while (margen_error < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (margen_error_th < abs(th - th_odo)):
-        #print(margen_error < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2))
-        #print(abs(th - th_odo))
-        [x_odo, y_odo, th_odo] = robot.readOdometry()
-
-
 def trayectoria_90_grados_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
-    espera_posicion(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot)
 
 
 def trayectoria_1_m_odometria(robot):
     robot.setSpeed(0.1, 0)
-    espera_posicion(0.8, 0, 0, robot)
+    wait_for_position(0.8, 0, 0, robot)
 
 
 def trayectoria_1_odometria(robot):
+    # Plotting odometry
     robot.setSpeed(0, -math.pi / 8)
-    espera_posicion(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot)
 
-    robot.setSpeed(math.pi / 16, math.pi / 16)
-    espera_posicion(2, 0, math.pi / 2, robot)
+    robot.setSpeed(0.2, 0.5)
+    wait_for_position(0.8, 0, math.pi / 2, robot)
 
-    robot.setSpeed(math.pi / 16, -math.pi / 16)
-    espera_posicion(4, 0, -math.pi / 2, robot)
+    robot.setSpeed(0.2, -0.5)
+    wait_for_position(1.6, 0, -math.pi / 2, robot)
 
-    print ("entre dos")
+    wait_for_position(0.8, 0, math.pi / 2, robot)
 
-    espera_posicion(2, 0, math.pi / 2, robot)
-
-    robot.setSpeed(math.pi / 16, math.pi / 16)
-    espera_posicion(0, 0, - math.pi / 2, robot)
+    robot.setSpeed(0.2, 0.5)
+    wait_for_position(0, 0, - math.pi / 2, robot)
 
 
 def trayectoria_2_tiempos(robot):
@@ -106,6 +93,23 @@ def trayectoria_2_odometria(robot):
     time.sleep(3)
 
 
+def wait_for_position(x, y, th, robot: Robot):
+    [x_odo, y_odo, th_odo] = robot.readOdometry()
+
+    position_error_margin = 0.2
+    th_error_margin = 0.02
+
+    print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
+
+    t_next_period = time.time()
+
+    while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
+            th_error_margin < abs(th - th_odo)):
+        [x_odo, y_odo, th_odo] = robot.readOdometry()
+        t_next_period += robot.P
+        delay_until(t_next_period)
+
+
 def main(args):
     try:
         '''  if args.radioD < 0:
@@ -116,21 +120,24 @@ def main(args):
         # robot = Robot(init_position=args.pos_ini)
         robot = Robot()
 
+        if is_debug:
+            start_robot_drawer(robot.finished, robot)
+
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
         # 1. launch updateOdometry Process()
         robot.startOdometry()
 
         # 2. perform trajectory
-
-        #trayectoria_1_tiempos(robot)
-        dibrobot([0, 0, 0], 'r', 'p')
-        time.sleep(10)
+        trayectoria_1_odometria(robot)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
+
+        # Wait until all print is done
+        print("Printeando final")
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.

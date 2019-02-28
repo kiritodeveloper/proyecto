@@ -11,7 +11,8 @@ import sys
 from multiprocessing import Process, Value, Array, Lock
 
 import numpy as np
-from scipy import linalg
+
+from utils import delay_until
 
 is_debug = True
 
@@ -139,9 +140,10 @@ class Robot:
     # You may want to pass additional shared variables besides the odometry values and stop flag
     def updateOdometry(self, x_odo, y_odo, th_odo, finished):
 
+        # current processor time in a floating point value, in seconds
+        t_next_period = time.time()
+
         while not finished.value:
-            # current processor time in a floating point value, in seconds
-            t_ini = time.clock()
 
             d_t = self.P
 
@@ -179,9 +181,9 @@ class Robot:
             else:
                 pass
 
-            # save LOG
-            t_end = time.clock()
-            time.sleep(self.P - (t_end - t_ini))
+            # Periodic task
+            t_next_period += self.P
+            delay_until(t_next_period)
 
         sys.stdout.write("Stopping odometry ... X=  %d, \
                 Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
@@ -197,4 +199,8 @@ class Robot:
 
     # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
-        return angle  # TODO
+        if angle < -math.pi:  # To positive
+            angle = angle + 2 * math.pi
+        elif angle > math.pi:
+            angle = angle - 2 * math.pi
+        return angle
