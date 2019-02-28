@@ -163,7 +163,7 @@ class Robot:
         if not is_debug:
             self.BP.offset_motor_encoder(self.motor_port_left,
                                          self.BP.get_motor_encoder(self.motor_port_left))  # reset encoder B
-            self.BP.offset_motor_encoderself(self.motor_port_right,
+            self.BP.offset_motor_encoder(self.motor_port_right,
                                              self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
 
         self.encoder_timer = time.time()

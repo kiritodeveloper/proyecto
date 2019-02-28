@@ -93,7 +93,7 @@ def trayectoria_2_odometria(robot):
     time.sleep(3)
 
 
-def wait_for_position(x, y, th, robot: Robot):
+def wait_for_position(x, y, th, robot):
     [x_odo, y_odo, th_odo] = robot.readOdometry()
 
     position_error_margin = 0.2
