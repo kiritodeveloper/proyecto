@@ -115,7 +115,7 @@ class Robot:
         '''
 
         self.lock_odometry.acquire()
-        if is_debug:
+        if not is_debug:
             v = self.v.value
             w = self.w.value
         else:
