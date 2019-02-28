@@ -41,15 +41,15 @@ def trayectoria_1_odometria(robot):
     robot.setSpeed(0, -math.pi / 8)
     wait_for_position(0, 0, - math.pi / 2, robot)
 
-    robot.setSpeed(math.pi / 16, math.pi / 16)
-    wait_for_position(2, 0, math.pi / 2, robot)
+    robot.setSpeed(0.2, 0.5)
+    wait_for_position(0.8, 0, math.pi / 2, robot)
 
-    robot.setSpeed(math.pi / 16, -math.pi / 16)
-    wait_for_position(4, 0, -math.pi / 2, robot)
+    robot.setSpeed(0.2, -0.5)
+    wait_for_position(1.6, 0, -math.pi / 2, robot)
 
-    wait_for_position(2, 0, math.pi / 2, robot)
+    wait_for_position(0.8, 0, math.pi / 2, robot)
 
-    robot.setSpeed(math.pi / 16, math.pi / 16)
+    robot.setSpeed(0.2, 0.5)
     wait_for_position(0, 0, - math.pi / 2, robot)
 
 
