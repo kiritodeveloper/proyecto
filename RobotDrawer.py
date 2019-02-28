@@ -5,8 +5,8 @@ from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
 
-def start_robot_drawer(finished: Value, period: float, child_conn: Queue):
-    p: Process = Process(target=loop_robot_drawer, args=(finished, period, child_conn))
+def start_robot_drawer(finished, period, child_conn):
+    p = Process(target=loop_robot_drawer, args=(finished, period, child_conn))
     p.start()
 
     # Time to start drawer
@@ -14,7 +14,7 @@ def start_robot_drawer(finished: Value, period: float, child_conn: Queue):
     time.sleep(10)
 
 
-def loop_robot_drawer(finished: Value, period: float, child_conn: Queue):
+def loop_robot_drawer(finished, period, child_conn):
     print("Drawer started")
     dibrobot([0, 0, 0], 'r', 'p')
     plt.ion()
