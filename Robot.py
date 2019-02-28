@@ -137,7 +137,7 @@ class Robot:
 
             v_w = np.array([[self.wheel_radius / 2, self.wheel_radius / 2],
                             [self.wheel_radius / self.axis_length,
-                             -self.axis_radius / self.axis_length]]).dot(np.array([w_der, w_izq]))
+                             -self.wheel_radius / self.axis_length]]).dot(np.array([w_der, w_izq]))
 
             v = v_w[0]
             w = v_w[1]
