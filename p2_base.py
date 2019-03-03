@@ -5,7 +5,8 @@ import math
 
 import time
 
-from Robot import Robot, is_debug
+from config_file import is_debug
+from Robot import Robot
 from RobotDrawer import start_robot_drawer
 
 # Queue defined for communication with RobotDrawer

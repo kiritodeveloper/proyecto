@@ -6,15 +6,11 @@ from __future__ import division  # ''
 import math
 import time  # import the time library for the sleep function
 import sys
-
-# tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, Array, Lock
-
 import numpy as np
 
+from config_file import *
 from utils import delay_until
-
-is_debug = False
 
 if not is_debug:
     import brickpi3  # import the BrickPi3 drivers
@@ -115,7 +111,7 @@ class Robot:
         '''
 
         self.lock_odometry.acquire()
-        if not is_debug:
+        if is_debug:
             v = self.v.value
             w = self.w.value
         else:
