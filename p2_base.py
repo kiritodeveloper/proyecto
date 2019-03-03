@@ -51,57 +51,53 @@ def path_2_timed(robot):
 # Odometry paths tests
 def path_90_degree_odometry(robot):
     robot.setSpeed(0, -math.pi / 8)
-    wait_for_position(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
 
 def path_1_m_odometry(robot):
     robot.setSpeed(0.1, 0)
-    wait_for_position(0.8, 0, 0, robot)
+    wait_for_position(0.8, 0, 0, robot, 0.2, 0.02)
 
 
 # Odometry paths
 def path_1_odometry(robot):
-    # Plotting odometry
     robot.setSpeed(0, -math.pi / 8)
-    wait_for_position(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
     robot.setSpeed(0.2, 0.5)
-    wait_for_position(0.8, 0, math.pi / 2, robot)
+    wait_for_position(0.8, 0, math.pi / 2, robot, 0.2, 0.02)
 
     robot.setSpeed(0.2, -0.5)
-    wait_for_position(1.6, 0, -math.pi / 2, robot)
+    wait_for_position(1.6, 0, -math.pi / 2, robot, 0.2, 0.02)
 
-    wait_for_position(0.8, 0, math.pi / 2, robot)
+    wait_for_position(0.8, 0, math.pi / 2, robot, 0.2, 0.02)
 
     robot.setSpeed(0.2, 0.5)
-    wait_for_position(0, 0, - math.pi / 2, robot)
+    wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
 
 def path_2_odometry(robot):
     robot.setSpeed(0, math.pi / 8)
-    time.sleep(4)
+    wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
-    robot.setSpeed(math.pi / 18, - math.pi / 9)
-    time.sleep(3)
+    robot.setSpeed(0.1, - 1 / 3)
+    wait_for_position(0.236, 0.293, None, robot, 0.01, 0.02)
 
-    robot.setSpeed(0.1, 0)
-    time.sleep(10)
+    robot.setSpeed(0.2, 0)
+    wait_for_position(1.575, 0.586, None, robot, 0.01, 0.02)
 
-    robot.setSpeed(math.pi / 15, - math.pi / 15)
-    time.sleep(20)
+    robot.setSpeed(0.1, - 1 / 6)
+    wait_for_position(1.575, -0.586, None, robot, 0.01, 0.02)
 
-    robot.setSpeed(0.1, 0)
-    time.sleep(10)
+    robot.setSpeed(0.2, 0)
+    wait_for_position(0.236, - 0.293, None, robot, 0.01, 0.02)
 
-    robot.setSpeed(math.pi / 18, - math.pi / 9)
-    time.sleep(3)
+    robot.setSpeed(0.1, - 1 / 3)
+    wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
 
-def wait_for_position(x, y, th, robot):
+def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     [x_odo, y_odo, th_odo] = robot.readOdometry()
-
-    position_error_margin = 0.2
-    th_error_margin = 0.02
 
     print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
 
