@@ -104,6 +104,14 @@ class Robot:
         self.w.value = w
         self.lock_odometry.release()
 
+    def prueba_encoders(self):
+        [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
+                                self.BP.get_motor_encoder(self.motor_port_right)]
+        rad_izq = math.radians(grad_izq)
+        rad_der = math.radians(grad_der)
+
+        print("Rueda izquierda: ",rad_izq," | Rueda derecha: ", rad_der)
+
     def readSpeed(self):
         '''
         Read the robot speed
@@ -125,8 +133,9 @@ class Robot:
 
             dt = self.encoder_timer - last_timer
 
-            w_izq = (rad_izq - self.r_prev_encoder_left) / dt
-            w_der = (rad_der - self.r_prev_encoder_right) / dt
+            # Hacia delante es negativo, se cambia el signo
+            w_izq = (self.r_prev_encoder_left - rad_izq) / dt
+            w_der = (self.r_prev_encoder_right - rad_der) / dt
 
             self.r_prev_encoder_left = rad_izq
             self.r_prev_encoder_right = rad_der
