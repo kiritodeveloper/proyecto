@@ -6,15 +6,11 @@ from __future__ import division  # ''
 import math
 import time  # import the time library for the sleep function
 import sys
-
-# tambien se podria utilizar el paquete de threading
 from multiprocessing import Process, Value, Array, Lock
-
 import numpy as np
 
+from config_file import *
 from utils import delay_until
-
-is_debug = True
 
 if not is_debug:
     import brickpi3  # import the BrickPi3 drivers
@@ -71,6 +67,17 @@ class Robot:
         else:
             self.BP = FakeBlockPi()
 
+        # Set motors ports
+        self.motor_port_left = self.BP.PORT_B
+        self.motor_port_right = self.BP.PORT_C
+
+        # Encoder timer
+        self.encoder_timer = 0
+
+        # Previous values of encoders in rads
+        self.r_prev_encoder_left = 0
+        self.r_prev_encoder_right = 0
+
     def setSpeed(self, v, w):
         '''
         Set the speed of the robot
@@ -85,16 +92,12 @@ class Robot:
                              [1 / self.wheel_radius,
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
-        # Set motors ports
-        motor_port_left = self.BP.PORT_B  # TODO: Change to correct value
-        motor_port_right = self.BP.PORT_C  # TODO: Change to correct value
-
         # Set motors speed
         speed_dps_left = math.degrees(w_motors[0])
         speed_dps_right = math.degrees(w_motors[1])
 
-        self.BP.set_motor_dps(motor_port_left, speed_dps_left)
-        self.BP.set_motor_dps(motor_port_right, speed_dps_right)
+        self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
+        self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
 
         self.lock_odometry.acquire()
         self.v.value = v
@@ -108,8 +111,33 @@ class Robot:
         '''
 
         self.lock_odometry.acquire()
-        v = self.v.value
-        w = self.w.value
+        if is_debug:
+            v = self.v.value
+            w = self.w.value
+        else:
+            [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
+                                    self.BP.get_motor_encoder(self.motor_port_right)]
+            rad_izq = math.radians(grad_izq)
+            rad_der = math.radians(grad_der)
+
+            last_timer = self.encoder_timer
+            self.encoder_timer = time.time()
+
+            dt = self.encoder_timer - last_timer
+
+            w_izq = (rad_izq - self.r_prev_encoder_left) / dt
+            w_der = (rad_der - self.r_prev_encoder_right) / dt
+
+            self.r_prev_encoder_left = rad_izq
+            self.r_prev_encoder_right = rad_der
+
+            v_w = np.array([[self.wheel_radius / 2, self.wheel_radius / 2],
+                            [self.wheel_radius / self.axis_length,
+                             -self.wheel_radius / self.axis_length]]).dot(np.array([w_der, w_izq]))
+
+            v = v_w[0]
+            w = v_w[1]
+
         self.lock_odometry.release()
 
         return v, w
@@ -127,6 +155,14 @@ class Robot:
     def startOdometry(self):
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
+
+        if not is_debug:
+            self.BP.offset_motor_encoder(self.motor_port_left,
+                                         self.BP.get_motor_encoder(self.motor_port_left))  # reset encoder B
+            self.BP.offset_motor_encoder(self.motor_port_right,
+                                             self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
+
+        self.encoder_timer = time.time()
 
         # Odometry update process
         self.p = Process(target=self.updateOdometry, args=(self.x, self.y, self.th, self.finished))

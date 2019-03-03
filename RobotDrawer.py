@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 def start_robot_drawer(finished, robot):
-    p: Process = Process(target=loop_robot_drawer, args=(finished, robot))
+    p = Process(target=loop_robot_drawer, args=(finished, robot))
     p.start()
 
     # Time to start drawer
@@ -19,6 +19,7 @@ def loop_robot_drawer(finished, robot):
     dibrobot([0, 0, 0], 'r', 'p')
     plt.ion()
 
+    # Wait 10 seconds to give the drawer's window time to open
     time.sleep(10)
 
     while not finished.value:
