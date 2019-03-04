@@ -68,8 +68,8 @@ class Robot:
             self.BP = FakeBlockPi()
 
         # Set motors ports
-        self.motor_port_left = self.BP.PORT_B
-        self.motor_port_right = self.BP.PORT_C
+        self.motor_port_left = self.BP.PORT_C
+        self.motor_port_right = self.BP.PORT_B
 
         # Encoder timer
         self.encoder_timer = 0
@@ -93,8 +93,8 @@ class Robot:
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors speed
-        speed_dps_left = math.degrees(w_motors[0])
-        speed_dps_right = math.degrees(w_motors[1])
+        speed_dps_left = math.degrees(w_motors[1])
+        speed_dps_right = math.degrees(w_motors[0])
 
         self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
         self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
@@ -134,8 +134,8 @@ class Robot:
             dt = self.encoder_timer - last_timer
 
             # Hacia delante es negativo, se cambia el signo
-            w_izq = (self.r_prev_encoder_left - rad_izq) / dt
-            w_der = (self.r_prev_encoder_right - rad_der) / dt
+            w_izq = (rad_izq - self.r_prev_encoder_left) / dt
+            w_der = (rad_der - self.r_prev_encoder_right) / dt
 
             self.r_prev_encoder_left = rad_izq
             self.r_prev_encoder_right = rad_der

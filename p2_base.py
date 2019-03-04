@@ -81,19 +81,21 @@ def path_2_odometry(robot):
     wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
     robot.setSpeed(0.1, - 1 / 3)
-    wait_for_position(0.236, 0.293, None, robot, 0.01, 0.02)
+    wait_for_position(0.236, 0.293, 0.21644695864409869, robot, 0.02, 0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
 
     robot.setSpeed(0.2, 0)
-    wait_for_position(1.575, 0.586, None, robot, 0.01, 0.02)
+    wait_for_position(1.575, 0.586, 0.21644695864409869, robot, 0.05, 0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
 
     robot.setSpeed(0.1, - 1 / 6)
-    wait_for_position(1.575, -0.586, None, robot, 0.01, 0.02)
+    wait_for_position(1.575, -0.586, 2.9251456949456944, robot, 0.05,
+                      0.02)  # th = math.pi/2 + math.asin(0.586/0.6)
 
     robot.setSpeed(0.2, 0)
-    wait_for_position(0.236, - 0.293, None, robot, 0.01, 0.02)
+    wait_for_position(0.236, - 0.293, 2.9251456949456944, robot, 0.2,
+                      0.02)  # th = math.pi/2 + math.asin(0.586/0.6)
 
     robot.setSpeed(0.1, - 1 / 3)
-    wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
+    wait_for_position(0, 0, math.pi / 2, robot, 0.2, 0.02)
 
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
@@ -104,9 +106,10 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     t_next_period = time.time()
 
     if th is None:
+        print("TH none")
         # None th provided
         while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
-            [x_odo, y_odo, _] = robot.readOdometry()
+            [x_odo, y_odo, th_odo] = robot.readOdometry()
             t_next_period += robot.P
             delay_until(t_next_period)
     else:
@@ -115,6 +118,7 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
             t_next_period += robot.P
             delay_until(t_next_period)
+    print([x_odo, y_odo, th_odo])
 
 
 def main(args):
@@ -136,7 +140,7 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        path_2_odometry(robot)
+        path_1_odometry(robot)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
