@@ -140,7 +140,7 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        path_2_odometry(robot)
+        path_1_odometry(robot)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
