@@ -8,6 +8,7 @@ import time
 from config_file import is_debug
 from Robot import Robot
 from RobotDrawer import start_robot_drawer
+from RobotLogger import start_robot_logger
 
 # Queue defined for communication with RobotDrawer
 from utils import delay_until
@@ -133,6 +134,8 @@ def main(args):
 
         if is_debug:
             start_robot_drawer(robot.finished, robot)
+
+        start_robot_logger(robot.finished, robot, "/home/pi/trayectoria_1.csv")
 
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
