@@ -6,14 +6,12 @@ from multiprocessing import Process
 from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
-def plot_log(f, finished):
+def plot_log(f):
     with open(f) as log:
         i = csv.reader(log)
-
-        while not finished.value:
-            [x, y, th] = next(i)
-            dibrobot([x, y, th], 'r', 'p')
-            plt.pause(0.3)
+        for line in i:
+            dibrobot([float(line[0]), float(line[1]), float(line[2])], 'r', 'p')
+    plt.show()
 
 
 
