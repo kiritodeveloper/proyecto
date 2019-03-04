@@ -1,8 +1,20 @@
 import time
+import csv
 from multiprocessing import Process
+
 
 from plot_robot import dibrobot
 import matplotlib.pyplot as plt
+
+def plot_log(f, finished):
+    with open(f) as log:
+        i = csv.reader(log)
+
+        while not finished.value:
+            [x, y, th] = next(i)
+            dibrobot([x, y, th], 'r', 'p')
+            plt.pause(0.3)
+
 
 
 def start_robot_drawer(finished, robot):
