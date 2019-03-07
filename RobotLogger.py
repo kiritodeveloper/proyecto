@@ -20,6 +20,6 @@ def loop_robot_logger(finished, robot, file_name):
         [x, y, th] = robot.readOdometry()
         lineToWrite = str(x) + "," + str(y) + "," + str(th) + "\n"
         file.write(lineToWrite)
-        time.sleep(robot.P)
+        time.sleep(0.3)
 
     file.close()
