@@ -61,7 +61,7 @@ def path_2_odometry(robot):
     wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
     robot.setSpeed(0.2, -0.4)
-    wait_for_position(0.38, 0.48, 0.28379410920832804, robot, 0.1,
+    wait_for_position(0.38, 0.48, 0.28379410920832804, robot, 0.05,
                       0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
 
     robot.setSpeed(0.2, 0)
@@ -69,11 +69,11 @@ def path_2_odometry(robot):
                       0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
 
     robot.setSpeed(0.2, - 0.2222222222222222)
-    wait_for_position(1.88, -0.87, 2.882671111583572, robot, 0.3,
+    wait_for_position(1.88, -0.87, 2.882671111583572, robot, 0.15,
                       0.02)  # th = math.pi/2 + math.asin(0.586/0.6)
 
     robot.setSpeed(0.2, 0)
-    wait_for_position(0.38, -0.48, 2.882671111583572, robot, 0.3,
+    wait_for_position(0.38, -0.48, 2.882671111583572, robot, 0.2,
                       0.02)  # th = math.pi/2 + math.asin(0.586/0.6)
 
     robot.setSpeed(0.2, -0.4)
