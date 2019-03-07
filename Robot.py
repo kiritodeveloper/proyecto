@@ -110,7 +110,7 @@ class Robot:
         rad_izq = math.radians(grad_izq)
         rad_der = math.radians(grad_der)
 
-        print("Rueda izquierda: ",rad_izq," | Rueda derecha: ", rad_der)
+        print("Rueda izquierda: ", rad_izq, " | Rueda derecha: ", rad_der)
 
     def readSpeed(self):
         '''
@@ -169,7 +169,7 @@ class Robot:
             self.BP.offset_motor_encoder(self.motor_port_left,
                                          self.BP.get_motor_encoder(self.motor_port_left))  # reset encoder B
             self.BP.offset_motor_encoder(self.motor_port_right,
-                                             self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
+                                         self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
 
         self.encoder_timer = time.time()
 
@@ -221,7 +221,7 @@ class Robot:
 
             if not is_debug:
                 self.logWrite(
-                    "th: " + str(th) + ", dt: " + str(d_t) + ", w: " + str(w) + ", x: " + str(x) + ", y: " + str(y)
+                    "th: " + str(th) + ", v: " + str(v) + ", w: " + str(w) + ", x: " + str(x) + ", y: " + str(y)
                 )
             else:
                 pass
