@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import argparse
 import math
 
 import time
@@ -105,20 +104,16 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     print([x_odo, y_odo, th_odo])
 
 
-def main(args):
+def main():
     try:
-        '''  if args.radioD < 0:
-            print 'd must be a positive value'
-            exit(1)
-        '''
-        # Instantiate Odometry. Default value will be 0,0,0
+        # Instantiate odometry. Default value will be 0,0,0
         # robot = Robot(init_position=args.pos_ini)
         robot = Robot()
 
         if is_debug:
             start_robot_drawer(robot.finished, robot)
-
-        start_robot_logger(robot.finished, robot, "/home/pi/trayectoria_1.csv")
+        else:
+            start_robot_logger(robot.finished, robot, "./out/trayectoria_1.csv")
 
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
@@ -133,9 +128,6 @@ def main(args):
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
 
-        # Wait until all print is done
-        print("Printeando final")
-
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
@@ -143,11 +135,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    # get and parse arguments passed to main
-    # Add as many args as you need ...
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory (mm)",
-                        type=float, default=40.0)
-    args = parser.parse_args()
-
-    main(args)
+    main()
