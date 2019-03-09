@@ -249,3 +249,21 @@ class Robot:
         elif angle > math.pi:
             angle = angle - 2 * math.pi
         return angle
+
+    def trackObject(self, colorRangeMin=[0,0,0], colorRangeMax=[255,255,255]):
+        finished = False
+        targetFound = False
+        targetPositionReached = False
+
+
+
+        while not finished:
+        # 1. search the most promising blob ..
+            while not targetPositionReached:
+            # 2. decide v and w for the robot to get closer to target position
+            if ...
+                targetPositionReached = True
+                finished = True
+
+
+        return finished
