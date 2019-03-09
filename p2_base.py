@@ -29,26 +29,6 @@ def path_1_timed(robot):
     time.sleep(16)
 
 
-def path_2_timed(robot):
-    robot.setSpeed(0, math.pi / 8)
-    time.sleep(4)
-
-    robot.setSpeed(math.pi / 18, - math.pi / 9)
-    time.sleep(3)
-
-    robot.setSpeed(0.1, 0)
-    time.sleep(10)
-
-    robot.setSpeed(math.pi / 15, - math.pi / 15)
-    time.sleep(20)
-
-    robot.setSpeed(0.1, 0)
-    time.sleep(10)
-
-    robot.setSpeed(math.pi / 18, - math.pi / 9)
-    time.sleep(3)
-
-
 # Odometry paths tests
 def path_90_degree_odometry(robot):
     robot.setSpeed(0, -math.pi / 8)
@@ -81,22 +61,24 @@ def path_2_odometry(robot):
     robot.setSpeed(0, math.pi / 8)
     wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
-    robot.setSpeed(0.1, - 1 / 3)
-    wait_for_position(0.236, 0.293, 0.21644695864409869, robot, 0.02, 0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
+    robot.setSpeed(0.2, -0.4)
+    wait_for_position(0.38, 0.48, 0.28379410920832804, robot, 0.05,
+                      0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
 
     robot.setSpeed(0.2, 0)
-    wait_for_position(1.575, 0.586, 0.21644695864409869, robot, 0.05, 0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
+    wait_for_position(1.88, 0.87,  0.28379410920832804, robot, 0.1,
+                      0.02)  # th= math.pi/2 - math.asin(0.236/0.3)
 
-    robot.setSpeed(0.1, - 1 / 6)
-    wait_for_position(1.575, -0.586, 2.9251456949456944, robot, 0.05,
+    robot.setSpeed(0.2, - 0.2222222222222222)
+    wait_for_position(1.88, -0.87, 2.882671111583572, robot, 0.15,
                       0.02)  # th = math.pi/2 + math.asin(0.586/0.6)
 
     robot.setSpeed(0.2, 0)
-    wait_for_position(0.236, - 0.293, 2.9251456949456944, robot, 0.2,
+    wait_for_position(0.38, -0.48, 2.882671111583572, robot, 0.25,
                       0.02)  # th = math.pi/2 + math.asin(0.586/0.6)
 
-    robot.setSpeed(0.1, - 1 / 3)
-    wait_for_position(0, 0, math.pi / 2, robot, 0.2, 0.02)
+    robot.setSpeed(0.2, -0.4)
+    wait_for_position(0, 0, math.pi / 2, robot, 0.35, 0.02)
 
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
@@ -119,6 +101,7 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
             t_next_period += robot.P
             delay_until(t_next_period)
+            print ([x_odo, y_odo, th_odo])
     print([x_odo, y_odo, th_odo])
 
 
@@ -143,7 +126,7 @@ def main(args):
         robot.startOdometry()
 
         # 2. perform trajectory
-        path_1_odometry(robot)
+        path_2_odometry(robot)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
