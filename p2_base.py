@@ -15,6 +15,10 @@ from utils import delay_until
 
 # Timed paths
 def path_1_timed(robot):
+    """
+    Instructions to do the path 1 based on times
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, -math.pi / 8)
     time.sleep(4)
 
@@ -30,17 +34,29 @@ def path_1_timed(robot):
 
 # Odometry paths tests
 def path_90_degree_odometry(robot):
+    """
+    Instructions to do a 90 degrees turn based on odometry
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, -math.pi / 8)
     wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
 
 def path_1_m_odometry(robot):
+    """
+    Odometry test
+    :param robot: robot configuration
+    """
     robot.setSpeed(0.1, 0)
     wait_for_position(0.8, 0, 0, robot, 0.2, 0.02)
 
 
 # Odometry paths
 def path_1_odometry(robot):
+    """
+    Instructions to do the path 1 based on odometry
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, -math.pi / 8)
     wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
@@ -57,6 +73,10 @@ def path_1_odometry(robot):
 
 
 def path_2_odometry(robot):
+    """
+    Instructions to do the path 2 based on odometry
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, math.pi / 8)
     wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
@@ -81,6 +101,14 @@ def path_2_odometry(robot):
 
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
+    """
+    Wait until the robot reaches the position
+    :param x: x position to be reached
+    :param y: y position to be reached
+    :param robot: robot configuration
+    :param position_error_margin: error allowed in the position
+    :param th_error_margin: error allowed in the orientation
+    """
     [x_odo, y_odo, th_odo] = robot.readOdometry()
 
     print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
@@ -105,6 +133,9 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
 
 
 def main():
+    """
+    Main function
+    """
     try:
         # Instantiate odometry. Default value will be 0,0,0
         # robot = Robot(init_position=args.pos_ini)
