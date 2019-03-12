@@ -84,6 +84,40 @@ class Robot:
 
         # Frame capture
         self.camera = RobotFrameStealer()
+        self.frame = None
+
+    def start_camera(self, finished):
+        p = Process(target=self.loop_camera, args=(finished,))
+        p.start()
+        time.sleep(1)
+
+    def loop_camera(self, finished):
+        cam = picamera.PiCamera()
+
+        cam.resolution = (320, 240)
+        # cam.resolution = (640, 480)
+        cam.framerate = 32
+        rawCapture = PiRGBArray(cam, size=(320, 240))
+        # rawCapture = PiRGBArray(cam, size=(640, 480))
+
+        # allow the camera to warmup
+        time.sleep(0.1)
+
+        for img in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+            self.frame = img.array
+            if self.frame is None:
+                print ("Es none tambien")
+            #cv2.imshow('Captura', self.frame)
+            print("He sacado foto")
+            # self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            rawCapture.truncate(0)
+            cv2.waitKey(1)
+
+            time.sleep(1)
+
+            if finished.value:
+                break
+
 
     def setSpeed(self, v, w):
         '''
@@ -399,7 +433,7 @@ class Robot:
         return kp
 
     def startTracker(self):
-        self.camera.start(self.finished)
+        self.start_camera(self.finished)
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         finished = False
