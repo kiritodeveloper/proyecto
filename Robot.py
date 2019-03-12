@@ -12,6 +12,7 @@ import cv2
 import picamera
 from picamera.array import PiRGBArray
 
+from RobotFrameStealer import RobotFrameStealer
 from config_file import *
 from utils import delay_until
 
@@ -80,6 +81,9 @@ class Robot:
         # Previous values of encoders in rads
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
+
+        # Frame capture
+        self.camera = RobotFrameStealer()
 
     def setSpeed(self, v, w):
         '''
@@ -369,7 +373,7 @@ class Robot:
         :param colorRangeMax:
         :return:
         """
-        img_BGR = self.frame
+        img_BGR = self.camera.frame
 
         # 1. search the most promising blob ..
         mask = cv2.inRange(img_BGR, colorRangeMin, colorRangeMax)
@@ -385,24 +389,8 @@ class Robot:
 
         return kp
 
-    def get_frames(self):
-        cam = picamera.PiCamera()
-
-        cam.resolution = (320, 240)
-        # cam.resolution = (640, 480)
-        cam.framerate = 32
-        rawCapture = PiRGBArray(cam, size=(320, 240))
-        # rawCapture = PiRGBArray(cam, size=(640, 480))
-
-        # allow the camera to warmup
-        time.sleep(0.1)
-
-        for img in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-            self.frame = img.array
-            cv2.imshow('Captura', self.frame)
-            # self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            rawCapture.truncate(0)
-            cv2.waitKey(1)
+    def startTracker(self):
+        self.camera.start(self.finished)
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         finished = False
