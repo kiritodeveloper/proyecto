@@ -8,14 +8,12 @@ import time  # import the time library for the sleep function
 import sys
 from multiprocessing import Process, Value, Array, Lock
 import numpy as np
-import cv2
 
 from config_file import *
 from utils import delay_until
 
 if not is_debug:
     import brickpi3  # import the BrickPi3 drivers
-
 else:
     from FakeBlockPi import FakeBlockPi
 
@@ -252,158 +250,88 @@ class Robot:
             angle = angle - 2 * math.pi
         return angle
 
-# ------ TRACKING -------
-
-    def create_detector(self):
-        # Setup default values for SimpleBlobDetector parameters.
-        params = cv2.SimpleBlobDetector_Params()
-
-        # These are just examples, tune your own if needed
-        # Change thresholds
-        params.minThreshold = 10
-        params.maxThreshold = 200
-
-        # Filter by Area
-        params.filterByArea = True
-        params.minArea = 200
-        params.maxArea = 10000
-
-        # Filter by Circularity
-        params.filterByCircularity = True
-        params.minCircularity = 0.1
-
-        # Filter by Color
-        params.filterByColor = False
-        # not directly color, but intensity on the channel input
-        # params.blobColor = 0
-        params.filterByConvexity = False
-        params.filterByInertia = False
-
-        # Create a detector with the parameters
-        ver = (cv2.__version__).split('.')
-        if int(ver[0]) < 3:
-            detector = cv2.SimpleBlobDetector(params)
-        else:
-            detector = cv2.SimpleBlobDetector_create(params)
-
-        return detector
-
-    def get_area(self, size):
+    def getRecognisedBlobOrientation(self, trackedObject):
         """
-        Given the diameter, it returns the area
-        :param size: diameter of the BLOB
-        :return: area of the blob
+        Return recognised blob orientation based on actual position in range [pi, -pi]
         """
-        r = size / 2
-        return math.pi * r**2
+        # TODO:
+        return - math.pi
 
-    def get_w(self, x): # TODO OJO QUE LA X NO TIENE POR QUÉ SER EL CENTRO DE LA IMAGEN
+    def getRecognisedBlobSize(self, trackedObject):
         """
-        Return the w speed
-        :param x: horizontal position in the picture
-        :return: w speed
+        Return recognised blob size/ real size, return range [0, 1]. If 0 not blob is recognised, if 1 blob is in correct position to catch
         """
-        far_position = 200
-        medium_position = 100
-        near_position = 50
+        # TODO:
+        return 0.5
 
-        far_w = 10
-        medium_w = 5
-        near_w = 2
-
-        abs_value = abs(x)
-        if(abs_value > far_position):
-            w = np.sign(x)*far_w
-        elif(medium_position < abs_value and abs_value <= far_position):
-            w = np.sign(x)*medium_w
-        else:
-            w = np.sign(x)*near_w
-        return w
-
-    def get_v(self, A, targetSize):
+    def searchForPromisingBlob(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         """
-        Return the v speed
-        :param A: area of the blob
-        :param targetSize: area expected of the blob
-        :return: v speed
-        """
-
-        # Area's difference threshold
-        far_position = 200
-        medium_position = 100
-        near_position = 50
-
-        far_v = 10
-        medium_v = 5
-        near_v = 2
-
-        abs_value = abs(A - targetSize)
-        if (abs_value > far_position):
-            v = far_v
-        elif (medium_position < abs_value and abs_value <= far_position):
-            v = medium_v
-        else:
-            v = near_v
-        return v
-
-
-    def trackObject(self, colorRangeMin=[0,0,0], colorRangeMax=[255,255,255], targetSize=123, error_d=0.1, error_size=10):
-        """
-
-        :param colorRangeMin: target color range min
-        :param colorRangeMax: target color range max
+        Search promising blob and return an identification of it, None if not detected
+        :param colorRangeMin:
+        :param colorRangeMax:
         :return:
         """
+        # TODO:
+        return 0
+
+    def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         finished = False
         targetFound = False
         targetPositionReached = False
 
-        # Get the camera ready
-        cam = picamera.PiCamera()
+        trackObjectPeriod = 0.2
 
-        cam.resolution = (320, 240)
-        # cam.resolution = (640, 480)
-        cam.framerate = 32
-        rawCapture = PiRGBArray(cam, size=(320, 240))
-        # rawCapture = PiRGBArray(cam, size=(640, 480))
+        recognition_w = 0.2  # TODO: Change
 
-        # allow the camera to warmup
-        time.sleep(0.1)
+        recognition_v = 0  # TODO: Change
 
+        recognition_sample_period = 0.2  # TODO: Change
 
-# https://stackoverflow.com/questions/30807214/opencv-return-keypoints-coordinates-and-area-from-blob-detection-python
-        for img in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-            if finished:
-                break
-            img_BGR = img.array
-        # 1. search the most promising blob ..
+        while not finished:
+
+            promising_blob = self.searchForPromisingBlob(colorRangeMin, colorRangeMax)
+
+            # 1. search the most promising blob ..
+            # Find promising blob
+            self.setSpeed(recognition_v, recognition_w)
+            while promising_blob is None:
+                # While not promising blob found
+                time.sleep(recognition_sample_period)
+                promising_blob = self.searchForPromisingBlob(colorRangeMin, colorRangeMax)
+
+            # When promising blob is found, stop robot
+            self.setSpeed(0, 0)
+
             while not targetPositionReached:
-            # 2. decide v and w for the robot to get closer to target position
-                detector = self.create_detector()
-                mask = cv2.inRange(img_BGR, colorRangeMin, colorRangeMax)
-                keypoints = detector.detect(255-mask)
+                recognised_orientation = self.getRecognisedBlobOrientation(promising_blob)
+                recognised_size = self.getRecognisedBlobSize(promising_blob)
+                # 2. decide v and w for the robot to get closer to target position
+                next_w = 1
+                next_v = 1
 
-                kp = keypoints[0]
-                for kpAux in keypoints:
-                    if(kpAux.size > kp.size):
-                        kp = kpAux
+                if abs(recognised_orientation) < 0.2:  # TODO: Change
+                    next_w *= 0.1  # TODO: Change
+                else:
+                    next_w *= 0.4  # TODO: Change
 
-                x = kp.pt[0]
-                y = kp.pt[1]
-                s = kp.size
-                A = self.get_area(s)
+                if recognised_orientation < 0:
+                    next_w = -next_w
 
-                # Set w and v
-                w = self.get_w(x)
-                v = self.get_v(A, targetSize)
-
-                # TODO no es x, mirar las coordenadas y centrala
-                if(abs(x) < error_d and abs(A - targetSize)<error_size):
+                # decide v
+                if recognised_size == 0:
+                    # Not blob recognised
+                    next_w = recognition_w
+                    next_v = 0
+                elif recognised_size < 0.5:  # TODO: Change
+                    next_v *= 0.1  # TODO: Change
+                elif recognised_size < 0.9:  # TODO: Change
+                    next_v *= 0.04  # TODO: Change
+                else:
                     targetPositionReached = True
                     finished = True
+                    next_v = 0
+                    next_w = 0
 
+                self.setSpeed(next_v, next_w)
+                time.sleep(trackObjectPeriod)
         return finished
-
-    def catch(self):
-        # decide the strategy to catch the ball once you have reached the target position
-        # bajar la cesta
