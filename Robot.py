@@ -250,20 +250,88 @@ class Robot:
             angle = angle - 2 * math.pi
         return angle
 
-    def trackObject(self, colorRangeMin=[0,0,0], colorRangeMax=[255,255,255]):
+    def getRecognisedBlobOrientation(self, trackedObject):
+        """
+        Return recognised blob orientation based on actual position in range [pi, -pi]
+        """
+        # TODO:
+        return - math.pi
+
+    def getRecognisedBlobSize(self, trackedObject):
+        """
+        Return recognised blob size/ real size, return range [0, 1]. If 0 not blob is recognised, if 1 blob is in correct position to catch
+        """
+        # TODO:
+        return 0.5
+
+    def searchForPromisingBlob(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+        """
+        Search promising blob and return an identification of it, None if not detected
+        :param colorRangeMin:
+        :param colorRangeMax:
+        :return:
+        """
+        # TODO:
+        return 0
+
+    def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         finished = False
         targetFound = False
         targetPositionReached = False
 
+        trackObjectPeriod = 0.2
 
+        recognition_w = 0.2  # TODO: Change
+
+        recognition_v = 0  # TODO: Change
+
+        recognition_sample_period = 0.2  # TODO: Change
 
         while not finished:
-        # 1. search the most promising blob ..
+
+            promising_blob = self.searchForPromisingBlob(colorRangeMin, colorRangeMax)
+
+            # 1. search the most promising blob ..
+            # Find promising blob
+            self.setSpeed(recognition_v, recognition_w)
+            while promising_blob is None:
+                # While not promising blob found
+                time.sleep(recognition_sample_period)
+                promising_blob = self.searchForPromisingBlob(colorRangeMin, colorRangeMax)
+
+            # When promising blob is found, stop robot
+            self.setSpeed(0, 0)
+
             while not targetPositionReached:
-            # 2. decide v and w for the robot to get closer to target position
-            if ...
-                targetPositionReached = True
-                finished = True
+                recognised_orientation = self.getRecognisedBlobOrientation(promising_blob)
+                recognised_size = self.getRecognisedBlobSize(promising_blob)
+                # 2. decide v and w for the robot to get closer to target position
+                next_w = 1
+                next_v = 1
 
+                if abs(recognised_orientation) < 0.2:  # TODO: Change
+                    next_w *= 0.1  # TODO: Change
+                else:
+                    next_w *= 0.4  # TODO: Change
 
+                if recognised_orientation < 0:
+                    next_w = -next_w
+
+                # decide v
+                if recognised_size == 0:
+                    # Not blob recognised
+                    next_w = recognition_w
+                    next_v = 0
+                elif recognised_size < 0.5:  # TODO: Change
+                    next_v *= 0.1  # TODO: Change
+                elif recognised_size < 0.9:  # TODO: Change
+                    next_v *= 0.04  # TODO: Change
+                else:
+                    targetPositionReached = True
+                    finished = True
+                    next_v = 0
+                    next_w = 0
+
+                self.setSpeed(next_v, next_w)
+                time.sleep(trackObjectPeriod)
         return finished
