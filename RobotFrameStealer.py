@@ -17,6 +17,7 @@ class RobotFrameStealer(object):
     def start(self, finished):
         p = Process(target=self.loop, args=finished)
         p.start()
+        time.sleep(25)
 
     def loop(self, finished):
         cam = picamera.PiCamera()
