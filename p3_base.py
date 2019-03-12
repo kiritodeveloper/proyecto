@@ -6,14 +6,15 @@ import numpy as np
 import time
 from Robot import Robot
 
+
 def main(args):
     try:
-        if args.radioD < 0:
-            print('d must be a positive value')
-            exit(1)
+        # if args.radioD < 0:
+        #    print('d must be a positive value')
+        #    exit(1)
 
         # Initialize Odometry. Default value will be 0,0,0
-        robot = Robot() 
+        robot = Robot()
         # 1. launch updateOdometry thread()
         robot.startOdometry()
 
@@ -22,7 +23,7 @@ def main(args):
         # for example the different target properties we want (size, position, color, ..)
         # or a boolean to indicate if we want the robot to catch the object or not
         # At least COLOR, the rest are up to you, but always put a default value.
-    	# res = robot.trackObject(colorRangeMin=[0,0,0], colorRangeMax=[255,255,255], 
+        # res = robot.trackObject(colorRangeMin=[0,0,0], colorRangeMax=[255,255,255],
         #                   targetSize=??, target??=??, ...)
         res = robot.trackObject()
         # if res:
@@ -34,13 +35,13 @@ def main(args):
         robot.stopOdometry()
 
 
-    except KeyboardInterrupt: 
-    # except the program gets interrupted by Ctrl+C on the keyboard.
-    # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
+    except KeyboardInterrupt:
+        # except the program gets interrupted by Ctrl+C on the keyboard.
+        # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         robot.stopOdometry()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # get and parse arguments passed to main
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
@@ -49,5 +50,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args)
-
-

@@ -253,102 +253,100 @@ class Robot:
             angle = angle - 2 * math.pi
         return angle
 
+    # ------------------- TRACKING -------------------
 
-# ------------------- TRACKING -------------------
+    def create_detector(self):
+        # Setup default values for SimpleBlobDetector parameters.
+        params = cv2.SimpleBlobDetector_Params()
 
-        def create_detector(self):
-            # Setup default values for SimpleBlobDetector parameters.
-            params = cv2.SimpleBlobDetector_Params()
+        # These are just examples, tune your own if needed
+        # Change thresholds
+        params.minThreshold = 10
+        params.maxThreshold = 200
 
-            # These are just examples, tune your own if needed
-            # Change thresholds
-            params.minThreshold = 10
-            params.maxThreshold = 200
+        # Filter by Area
+        params.filterByArea = True
+        params.minArea = 200
+        params.maxArea = 10000
 
-            # Filter by Area
-            params.filterByArea = True
-            params.minArea = 200
-            params.maxArea = 10000
+        # Filter by Circularity
+        params.filterByCircularity = True
+        params.minCircularity = 0.1
 
-            # Filter by Circularity
-            params.filterByCircularity = True
-            params.minCircularity = 0.1
+        # Filter by Color
+        params.filterByColor = False
+        # not directly color, but intensity on the channel input
+        # params.blobColor = 0
+        params.filterByConvexity = False
+        params.filterByInertia = False
 
-            # Filter by Color
-            params.filterByColor = False
-            # not directly color, but intensity on the channel input
-            # params.blobColor = 0
-            params.filterByConvexity = False
-            params.filterByInertia = False
+        # Create a detector with the parameters
+        ver = (cv2.__version__).split('.')
+        if int(ver[0]) < 3:
+            detector = cv2.SimpleBlobDetector(params)
+        else:
+            detector = cv2.SimpleBlobDetector_create(params)
 
-            # Create a detector with the parameters
-            ver = (cv2.__version__).split('.')
-            if int(ver[0]) < 3:
-                detector = cv2.SimpleBlobDetector(params)
-            else:
-                detector = cv2.SimpleBlobDetector_create(params)
+        return detector
 
-            return detector
+    def get_area(self, size):
+        """
+        Given the diameter, it returns the area
+        :param size: diameter of the BLOB
+        :return: area of the blob
+        """
+        r = size / 2
+        return math.pi * r ** 2
 
-        def get_area(self, size):
-            """
-            Given the diameter, it returns the area
-            :param size: diameter of the BLOB
-            :return: area of the blob
-            """
-            r = size / 2
-            return math.pi * r ** 2
+    def get_w(self, x):  # TODO OJO QUE LA X NO TIENE POR QUÉ SER EL CENTRO DE LA IMAGEN
+        """
+        Return the w speed
+        :param x: horizontal position in the picture
+        :return: w speed
+        """
+        far_position = 200
+        medium_position = 100
+        near_position = 50
 
-        def get_w(self, x):  # TODO OJO QUE LA X NO TIENE POR QUÉ SER EL CENTRO DE LA IMAGEN
-            """
-            Return the w speed
-            :param x: horizontal position in the picture
-            :return: w speed
-            """
-            far_position = 200
-            medium_position = 100
-            near_position = 50
+        far_w = 10
+        medium_w = 5
+        near_w = 2
 
-            far_w = 10
-            medium_w = 5
-            near_w = 2
+        abs_value = abs(x)
+        if (abs_value > far_position):
+            w = np.sign(x) * far_w
+        elif (medium_position < abs_value and abs_value <= far_position):
+            w = np.sign(x) * medium_w
+        else:
+            w = np.sign(x) * near_w
+        return w
 
-            abs_value = abs(x)
-            if (abs_value > far_position):
-                w = np.sign(x) * far_w
-            elif (medium_position < abs_value and abs_value <= far_position):
-                w = np.sign(x) * medium_w
-            else:
-                w = np.sign(x) * near_w
-            return w
+    def get_v(self, A, targetSize):
+        """
+        Return the v speed
+        :param A: area of the blob
+        :param targetSize: area expected of the blob
+        :return: v speed
+        """
 
-        def get_v(self, A, targetSize):
-            """
-            Return the v speed
-            :param A: area of the blob
-            :param targetSize: area expected of the blob
-            :return: v speed
-            """
+        # Area's difference threshold
+        far_position = 200
+        medium_position = 100
+        near_position = 50
 
-            # Area's difference threshold
-            far_position = 200
-            medium_position = 100
-            near_position = 50
+        far_v = 10
+        medium_v = 5
+        near_v = 2
 
-            far_v = 10
-            medium_v = 5
-            near_v = 2
+        abs_value = abs(A - targetSize)
+        if (abs_value > far_position):
+            v = far_v
+        elif (medium_position < abs_value and abs_value <= far_position):
+            v = medium_v
+        else:
+            v = near_v
 
-            abs_value = abs(A - targetSize)
-            if (abs_value > far_position):
-                v = far_v
-            elif (medium_position < abs_value and abs_value <= far_position):
-                v = medium_v
-            else:
-                v = near_v
-
-            return v
-
+        return v
 
     def getRecognisedBlobOrientation(self, trackedObject):
         """
@@ -377,7 +375,7 @@ class Robot:
         mask = cv2.inRange(img_BGR, colorRangeMin, colorRangeMax)
         keypoints = detector.detect(255 - mask)
 
-        if(len(keypoints) != 0):
+        if (len(keypoints) != 0):
             kp = keypoints[0]
             for kpAux in keypoints:
                 if (kpAux.size > kp.size):
@@ -402,10 +400,9 @@ class Robot:
         for img in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
             self.frame = img.array
             cv2.imshow('Captura', self.frame)
-            #self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             rawCapture.truncate(0)
             cv2.waitKey(1)
-
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         finished = False
@@ -447,7 +444,7 @@ class Robot:
 
             # When promising blob is found, stop robot
             self.setSpeed(0, 0)
-            print ("Ya no es none")
+            print("Ya no es none")
             finished = True
             """
             while not targetPositionReached:
