@@ -406,17 +406,6 @@ class Robot:
 
         recognition_sample_period = 0.2  # TODO: Change
 
-        cam = picamera.PiCamera()
-
-        cam.resolution = (320, 240)
-        # cam.resolution = (640, 480)
-        cam.framerate = 32
-        rawCapture = PiRGBArray(cam, size=(320, 240))
-        # rawCapture = PiRGBArray(cam, size=(640, 480))
-
-        # allow the camera to warmup
-        time.sleep(0.1)
-
         detector = self.create_detector()
 
         while not finished:
