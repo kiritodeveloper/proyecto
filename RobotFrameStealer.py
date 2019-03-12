@@ -12,7 +12,7 @@ class RobotFrameStealer(object):
         self.frame = None
 
     def start(self, finished):
-        p = Process(target=self.loop, args=finished)
+        p = Process(target=self.loop, args=(finished,))
         p.start()
         time.sleep(25)
 
