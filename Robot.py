@@ -376,6 +376,8 @@ class Robot:
         img_BGR = self.camera.frame
 
         # 1. search the most promising blob ..
+        print ("Analizo frame")
+        cv2.imshow('Analizando', self.frame)
         mask = cv2.inRange(img_BGR, colorRangeMin, colorRangeMax)
         keypoints = detector.detect(255 - mask)
 

@@ -29,7 +29,7 @@ class RobotFrameStealer(object):
 
         for img in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
             self.frame = img.array
-            cv2.imshow('Captura', self.frame)
+            #cv2.imshow('Captura', self.frame)
             print("He sacado foto")
             # self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             rawCapture.truncate(0)
