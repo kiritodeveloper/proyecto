@@ -373,6 +373,12 @@ class Robot:
         :param colorRangeMax:
         :return:
         """
+        act = self.camera.frame
+
+        if act is None:
+            print("None")
+            return None
+
         img_BGR = self.camera.frame
 
         # 1. search the most promising blob ..
