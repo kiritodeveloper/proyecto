@@ -36,5 +36,7 @@ class RobotFrameStealer(object):
             rawCapture.truncate(0)
             cv2.waitKey(1)
 
+            time.sleep(1)
+
             if finished.value:
                 break

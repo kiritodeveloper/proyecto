@@ -366,7 +366,7 @@ class Robot:
         # TODO:
         return 0.5
 
-    def searchForPromisingBlob(self, detector, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+    def searchForPromisingBlob(self, detector, colorRangeMin, colorRangeMax):
         """
         Search promising blob and return an identification of it, None if not detected
         :param colorRangeMin:
@@ -379,6 +379,7 @@ class Robot:
         mask = cv2.inRange(img_BGR, colorRangeMin, colorRangeMax)
         keypoints = detector.detect(255 - mask)
 
+        print(len(keypoints))
         if (len(keypoints) != 0):
             kp = keypoints[0]
             for kpAux in keypoints:
@@ -421,6 +422,7 @@ class Robot:
         while not finished:
 
             promising_blob = self.searchForPromisingBlob(detector, colorRangeMin, colorRangeMax)
+            print("Pasado primero ---------------------------------------------------------------------")
 
             # 1. search the most promising blob ..
             # Find promising blob
@@ -428,7 +430,8 @@ class Robot:
             while promising_blob is None:
                 # While not promising blob found
                 time.sleep(recognition_sample_period)
-                promising_blob = self.searchForPromisingBlob(colorRangeMin, colorRangeMax)
+                promising_blob = self.searchForPromisingBlob(detector, colorRangeMin, colorRangeMax)
+                time.sleep(1)
 
             # When promising blob is found, stop robot
             self.setSpeed(0, 0)
