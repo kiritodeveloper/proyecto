@@ -1,8 +1,5 @@
 from multiprocessing import Process
 
-from plot_robot import dibrobot
-import matplotlib.pyplot as plt
-
 import time
 
 import cv2
