@@ -8,11 +8,10 @@ import time  # import the time library for the sleep function
 import sys
 from multiprocessing import Process, Value, Array, Lock
 import numpy as np
-import cv2
-import picamera
-from picamera.array import PiRGBArray
 
-from RobotFrameStealer import RobotFrameStealer
+import cv2
+
+from RobotFrameCapturer import RobotFrameCapturer
 from config_file import *
 from utils import delay_until
 
@@ -83,41 +82,8 @@ class Robot:
         self.r_prev_encoder_right = 0
 
         # Frame capture
-        self.camera = RobotFrameStealer()
+        self.camera = RobotFrameCapturer()
         self.frame = None
-
-    def start_camera(self, finished):
-        p = Process(target=self.loop_camera, args=(finished,))
-        p.start()
-        time.sleep(1)
-
-    def loop_camera(self, finished):
-        cam = picamera.PiCamera()
-
-        cam.resolution = (320, 240)
-        # cam.resolution = (640, 480)
-        cam.framerate = 32
-        rawCapture = PiRGBArray(cam, size=(320, 240))
-        # rawCapture = PiRGBArray(cam, size=(640, 480))
-
-        # allow the camera to warmup
-        time.sleep(0.1)
-
-        for img in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-            self.frame = img.array
-            if self.frame is None:
-                print ("Es none tambien")
-            #cv2.imshow('Captura', self.frame)
-            print("He sacado foto")
-            # self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            rawCapture.truncate(0)
-            cv2.waitKey(1)
-
-            time.sleep(1)
-
-            if finished.value:
-                break
-
 
     def setSpeed(self, v, w):
         '''
@@ -293,7 +259,7 @@ class Robot:
 
     # ------------------- TRACKING -------------------
 
-    def create_detector(self):
+    def createRedBallDetectorParams(self):
         # Setup default values for SimpleBlobDetector parameters.
         params = cv2.SimpleBlobDetector_Params()
 
@@ -317,24 +283,7 @@ class Robot:
         # params.blobColor = 0
         params.filterByConvexity = False
         params.filterByInertia = False
-
-        # Create a detector with the parameters
-        ver = (cv2.__version__).split('.')
-        if int(ver[0]) < 3:
-            detector = cv2.SimpleBlobDetector(params)
-        else:
-            detector = cv2.SimpleBlobDetector_create(params)
-
-        return detector
-
-    def get_area(self, size):
-        """
-        Given the diameter, it returns the area
-        :param size: diameter of the BLOB
-        :return: area of the blob
-        """
-        r = size / 2
-        return math.pi * r ** 2
+        return params
 
     def get_w(self, x):  # TODO OJO QUE LA X NO TIENE POR QUÉ SER EL CENTRO DE LA IMAGEN
         """
@@ -432,10 +381,10 @@ class Robot:
 
         return kp
 
-    def startTracker(self):
-        self.start_camera(self.finished)
-
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+        frame_caturer = RobotFrameCapturer()
+        frame_caturer.start()
+
         finished = False
         targetFound = False
         targetPositionReached = False
@@ -504,4 +453,5 @@ class Robot:
                 
                 print("ME PILLE EN EL BUCLE")
                 """
+        frame_caturer.stop()
         return finished
