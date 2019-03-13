@@ -9,8 +9,6 @@ import sys
 from multiprocessing import Process, Value, Array, Lock
 import numpy as np
 
-import cv2
-
 from RobotFrameCapturer import RobotFrameCapturer
 from config_file import *
 from utils import delay_until
@@ -110,14 +108,6 @@ class Robot:
         self.v.value = v
         self.w.value = w
         self.lock_odometry.release()
-
-    def prueba_encoders(self):
-        [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
-                                self.BP.get_motor_encoder(self.motor_port_right)]
-        rad_izq = math.radians(grad_izq)
-        rad_der = math.radians(grad_der)
-
-        print("Rueda izquierda: ", rad_izq, " | Rueda derecha: ", rad_der)
 
     def readSpeed(self):
         '''
@@ -259,31 +249,7 @@ class Robot:
 
     # ------------------- TRACKING -------------------
 
-    def createRedBallDetectorParams(self):
-        # Setup default values for SimpleBlobDetector parameters.
-        params = cv2.SimpleBlobDetector_Params()
 
-        # These are just examples, tune your own if needed
-        # Change thresholds
-        params.minThreshold = 10
-        params.maxThreshold = 200
-
-        # Filter by Area
-        params.filterByArea = True
-        params.minArea = 200
-        params.maxArea = 10000
-
-        # Filter by Circularity
-        params.filterByCircularity = True
-        params.minCircularity = 0.1
-
-        # Filter by Color
-        params.filterByColor = False
-        # not directly color, but intensity on the channel input
-        # params.blobColor = 0
-        params.filterByConvexity = False
-        params.filterByInertia = False
-        return params
 
     def get_w(self, x):  # TODO OJO QUE LA X NO TIENE POR QUÉ SER EL CENTRO DE LA IMAGEN
         """
@@ -349,41 +315,18 @@ class Robot:
         # TODO:
         return 0.5
 
-    def searchForPromisingBlob(self, detector, colorRangeMin, colorRangeMax):
+    def searchForPromisingBlob(self, frame_capturer, colorRangeMin, colorRangeMax):
         """
         Search promising blob and return an identification of it, None if not detected
         :param colorRangeMin:
         :param colorRangeMax:
         :return:
         """
-        act = self.camera.frame
-
-        if act is None:
-            print("None")
-            return None
-
-        img_BGR = self.camera.frame
-
-        # 1. search the most promising blob ..
-        print("Analizo frame")
-        #cv2.imshow('Analizando', self.camera.frame)
-        mask = cv2.inRange(img_BGR, colorRangeMin, colorRangeMax)
-        keypoints = detector.detect(255 - mask)
-
-        print(len(keypoints))
-        if (len(keypoints) != 0):
-            kp = keypoints[0]
-            for kpAux in keypoints:
-                if (kpAux.size > kp.size):
-                    kp = kpAux
-        else:
-            return None
-
-        return kp
+        return frame_capturer.getPosition()
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
-        frame_caturer = RobotFrameCapturer()
-        frame_caturer.start()
+        frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
+        frame_capturer.start()
 
         finished = False
         targetFound = False
@@ -397,11 +340,11 @@ class Robot:
 
         recognition_sample_period = 0.2  # TODO: Change
 
-        detector = self.create_detector()
-
         while not finished:
 
-            promising_blob = self.searchForPromisingBlob(detector, colorRangeMin, colorRangeMax)
+            promising_blob = self.searchForPromisingBlob(frame_capturer, colorRangeMin, colorRangeMax)
+            print(promising_blob)
+            time.sleep(1)
             print("Pasado primero ---------------------------------------------------------------------")
 
             # 1. search the most promising blob ..
@@ -410,7 +353,7 @@ class Robot:
             while promising_blob is None:
                 # While not promising blob found
                 time.sleep(recognition_sample_period)
-                promising_blob = self.searchForPromisingBlob(detector, colorRangeMin, colorRangeMax)
+                promising_blob = self.searchForPromisingBlob(frame_capturer, colorRangeMin, colorRangeMax)
                 time.sleep(1)
 
             # When promising blob is found, stop robot
@@ -453,5 +396,5 @@ class Robot:
                 
                 print("ME PILLE EN EL BUCLE")
                 """
-        frame_caturer.stop()
+        frame_capturer.stop()
         return finished

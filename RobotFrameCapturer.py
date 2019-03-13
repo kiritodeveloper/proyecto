@@ -2,6 +2,8 @@ import time
 
 from multiprocessing import Process, Value, Array, Lock
 
+import numpy as np
+
 from config_file import is_debug
 
 import cv2
@@ -12,11 +14,11 @@ if not is_debug:
 
 
 class RobotFrameCapturer(object):
-    def __init__(self, params):
+    def __init__(self, minRange, maxRange):
         # Store X, Y and size
-        self.x_object = Value('d', 0)
-        self.y_object = Value('d', 0)
-        self.size_object = Value('d', 0)
+        self.x_object = Value('d', 1)
+        self.y_object = Value('d', 1)
+        self.size_object = Value('d', 1)
 
         # Check if finished
         self.finished = Value('b', False)
@@ -24,19 +26,51 @@ class RobotFrameCapturer(object):
         # if we want to block several instructions to be run together, we may want to use an explicit Lock
         self.lock_frame_capturer = Lock()
 
+        # min and max range
+        self.minRange = minRange
+        self.maxRange = maxRange
+
+    def getDetectorParamsConfiguration(self):
+        # Setup default values for SimpleBlobDetector parameters.
+        params = cv2.SimpleBlobDetector_Params()
+
+        # These are just examples, tune your own if needed
+        # Change thresholds
+        params.minThreshold = 10
+        params.maxThreshold = 200
+
+        # Filter by Area
+        params.filterByArea = True
+        params.minArea = 200
+        params.maxArea = 10000
+
+        # Filter by Circularity
+        params.filterByCircularity = True
+        params.minCircularity = 0.1
+
+        # Filter by Color
+        params.filterByColor = False
+        # not directly color, but intensity on the channel input
+        # params.blobColor = 0
+        params.filterByConvexity = False
+        params.filterByInertia = False
+        return params
+
+    def getDetector(self):
         # Create a detector with the parameters
         ver = cv2.__version__.split('.')
         if int(ver[0]) < 3:
-            self.detector = cv2.SimpleBlobDetector(params)
+            return cv2.SimpleBlobDetector(self.getDetectorParamsConfiguration())
         else:
-            self.detector = cv2.SimpleBlobDetector_create(params)
+            return cv2.SimpleBlobDetector_create(self.getDetectorParamsConfiguration())
 
-    def start(self, finished, minRange, maxRange):
-        p = Process(target=self.loop, args=(finished, minRange, maxRange))
-        p.start()
+    def start(self):
+        self.p = Process(target=self.loop_frame_capturer)
+        self.p.start()
 
     def stop(self):
         self.finished.value = False
+        self.p.close()
 
     def getPosition(self):
         self.lock_frame_capturer.acquire()
@@ -46,21 +80,22 @@ class RobotFrameCapturer(object):
         self.lock_frame_capturer.release()
         return x, y, size
 
-    def obtainBlobPosition(self, imgBGR, minRange, maxRange):
+    def obtainBlobPosition(self, detector, imgBGR, minRange, maxRange):
         mask = cv2.inRange(imgBGR, minRange, maxRange)
 
-        keypoints = self.detector.detect(255 - mask)
+        keypoints = detector.detect(255 - mask)
+
+        # cv2.imshow('frame', mask)
 
         # documentation of SimpleBlobDetector is not clear on what kp.size is exactly,
         # but it looks like the diameter of the blob.
 
         bestKP = None
-        print(len(keypoints))
         if len(keypoints) != 0:
-            kp = keypoints[0]
-            for kpAux in keypoints:
-                if kpAux.size > kp.size:
-                    kp = kpAux
+            bestKP = keypoints[0]
+            for actualKP in keypoints:
+                if actualKP.size > bestKP.size:
+                    bestKP = actualKP
 
         # Update X, Y and size
         x = 0
@@ -72,26 +107,34 @@ class RobotFrameCapturer(object):
             y = bestKP.pt[1]
             size = bestKP.size
 
+        # Show image for debug only
+        # im_with_keypoints = cv2.drawKeypoints(imgBGR, keypoints, np.array([]),
+        #                                      (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        # cv2.imshow("Keypoints on RED", im_with_keypoints)
+        # cv2.waitKey(100)
+
         return x, y, size
 
-    def loop(self, finished, minRange, maxRange):
+    def loop_frame_capturer(self):
+        detector = self.getDetector()
+
+        print("Antes de nada")
         if is_debug:
             cap = cv2.VideoCapture(0)
             while True:
                 # Capture frame-by-frame
                 ret, imgBGR = cap.read()
 
-                x, y, size = self.obtainBlobPosition(imgBGR, minRange, maxRange)
+                x, y, size = self.obtainBlobPosition(detector, imgBGR, self.minRange, self.maxRange)
 
                 self.lock_frame_capturer.acquire()
-                self.x_object = x
-                self.y_object = y
-                self.size_object = size
+                self.x_object.value = x
+                self.y_object.value = y
+                self.size_object.value = size
                 self.lock_frame_capturer.release()
+                print(size)
 
-                cv2.waitKey(1)
-
-                if finished.value:
+                if self.finished.value:
                     break
 
         else:
@@ -110,16 +153,16 @@ class RobotFrameCapturer(object):
                 # Capture frame
                 imgBGR = img.array
 
-                x, y, size = self.obtainBlobPosition(imgBGR, minRange, maxRange)
+                x, y, size = self.obtainBlobPosition(detector, imgBGR, self.minRange, self.maxRange)
 
                 self.lock_frame_capturer.acquire()
-                self.x_object = x
-                self.y_object = y
-                self.size_object = size
+                self.x_object.value = x
+                self.y_object.value = y
+                self.size_object.value = size
                 self.lock_frame_capturer.release()
 
                 rawCapture.truncate(0)
                 cv2.waitKey(1)
 
-                if finished.value:
+                if self.finished.value:
                     break
