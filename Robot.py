@@ -248,9 +248,6 @@ class Robot:
         return angle
 
     # ------------------- TRACKING -------------------
-
-
-
     def get_w(self, x):  # TODO OJO QUE LA X NO TIENE POR QUÉ SER EL CENTRO DE LA IMAGEN
         """
         Return the w speed

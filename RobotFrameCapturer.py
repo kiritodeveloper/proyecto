@@ -102,16 +102,19 @@ class RobotFrameCapturer(object):
         y = 0
         size = 0
 
+        bkpa = []
+
         if bestKP is not None:
             x = bestKP.pt[0]
             y = bestKP.pt[1]
             size = bestKP.size
+            bkpa = [bestKP]
 
         # Show image for debug only
-        # im_with_keypoints = cv2.drawKeypoints(imgBGR, keypoints, np.array([]),
-        #                                      (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        # cv2.imshow("Keypoints on RED", im_with_keypoints)
-        # cv2.waitKey(100)
+        im_with_keypoints = cv2.drawKeypoints(imgBGR, bkpa, np.array([]),
+                                              (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        cv2.imshow("Keypoints on RED", im_with_keypoints)
+        cv2.waitKey(100)
 
         return x, y, size
 
