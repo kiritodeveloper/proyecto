@@ -81,11 +81,23 @@ class RobotFrameCapturer(object):
         return x, y, size
 
     def obtainBlobPosition(self, detector, imgBGR, minRange, maxRange):
-        mask = cv2.inRange(imgBGR, minRange, maxRange)
+        """
+
+        :param detector:
+        :param imgBGR:
+        :param minRange: in HSV
+        :param maxRange: in HSV
+        :return:
+        """
+        # Next lines copied from https://www.pyimagesearch.com/2015/09/14/ball-tracking-with-opencv/
+        blurred = cv2.GaussianBlur(imgBGR, (11, 11), 0)
+        hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+
+        mask = cv2.inRange(hsv, minRange, maxRange)
+        mask = cv2.erode(mask, None, iterations=2)
+        mask = cv2.dilate(mask, None, iterations=2)
 
         keypoints = detector.detect(255 - mask)
-
-        # cv2.imshow('frame', mask)
 
         # documentation of SimpleBlobDetector is not clear on what kp.size is exactly,
         # but it looks like the diameter of the blob.
@@ -113,7 +125,11 @@ class RobotFrameCapturer(object):
         # Show image for debug only
         im_with_keypoints = cv2.drawKeypoints(imgBGR, bkpa, np.array([]),
                                               (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        cv2.imshow("Keypoints on RED", im_with_keypoints)
+
+        output = cv2.bitwise_and(imgBGR, imgBGR, mask=mask)
+        cv2.imshow("images", np.hstack([im_with_keypoints, output]))
+
+        # Take images every 100 ms
         cv2.waitKey(100)
 
         return x, y, size

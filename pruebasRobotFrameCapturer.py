@@ -21,9 +21,12 @@ def trackObject(colorRangeMin=(0, 0, 0), colorRangeMax=(255, 255, 255)):
 
 
 def main():
-    redMin = (10, 10, 100)
-    redMax = (50, 50, 255)
-    trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
+    orangeMinHSV = (10, 180, 50)
+    orangeMaxHSV = (26, 255, 255)
+
+    redMinRGB = (10, 10, 100)
+    redMaxRGB = (50, 50, 255)
+    trackObject(colorRangeMin=orangeMinHSV, colorRangeMax=orangeMaxHSV)
 
 
 if __name__ == "__main__":
