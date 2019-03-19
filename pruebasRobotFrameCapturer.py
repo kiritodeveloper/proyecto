@@ -27,8 +27,8 @@ def main():
     redMinHSV = (0, 160, 105)
     redMaxHSV = (3, 255, 255)
 
-    redMinRobot = (225, 180, 80)
-    redMaxRobot = (2, 255, 255)
+    redMinRobot = (0, 0, 130)
+    redMaxRobot = (100, 60, 255)
 
     redMinRGB = (10, 10, 100)
     redMaxRGB = (50, 50, 255)

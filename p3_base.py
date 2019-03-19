@@ -27,7 +27,7 @@ def main(args):
         #                   targetSize=??, target??=??, ...)
 
         # robot.startTracker()
-        redMin = (168, 170, 70)
+        redMin = (225, 180, 80)
         redMax = (2, 255, 255)
         res = robot.trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
         # if res:
