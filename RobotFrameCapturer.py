@@ -153,7 +153,7 @@ class RobotFrameCapturer(object):
         #cv2.imshow("images", np.hstack([imgBGR, output]))
 
         # Take images every 100 ms
-        cv2.waitKey(100)
+        cv2.waitKey(50)
 
         return x, y, radius
 

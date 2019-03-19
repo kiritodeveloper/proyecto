@@ -273,9 +273,9 @@ class Robot:
         return w
         """
         if( x > 160):
-            w = -0.8
+            w = -0.5
         else:
-            w = 0.8
+            w = 0.5
         return w
 
     def get_v(self, A, targetSize):
