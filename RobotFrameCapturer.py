@@ -149,11 +149,8 @@ class RobotFrameCapturer(object):
                 cv2.circle(imgBGR, center, 5, (0, 0, 255), -1)
 
         # Show image for debug only
-        im_with_keypoints = cv2.drawKeypoints(imgBGR, np.array([]),
-                                              (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
         output = cv2.bitwise_and(imgBGR, imgBGR, mask=mask)
-        cv2.imshow("images", np.hstack([im_with_keypoints, output]))
+        cv2.imshow("images", np.hstack([imgBGR, output]))
 
         # Take images every 100 ms
         cv2.waitKey(100)
