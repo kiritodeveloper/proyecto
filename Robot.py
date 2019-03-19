@@ -383,6 +383,13 @@ class Robot:
 
                 next_w = self.get_w(x)
 
+                if(size > 120):
+                    self.setSpeed(0,0)
+                    self.catch('down')
+                    targetPositionReached = True
+                    finished = True
+
+
                 """
                 if abs(recognised_orientation) < 0.2:  # TODO: Change
                     next_w *= 0.1  # TODO: Change
