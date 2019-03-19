@@ -2,6 +2,7 @@ import time
 
 from multiprocessing import Process, Value, Array, Lock
 
+import imutils
 import numpy as np
 
 from config_file import is_debug
@@ -105,7 +106,7 @@ class RobotFrameCapturer(object):
             minRange1[0] = minRange[0]
 
             maxRange1 = list(maxRange)
-            maxRange1[0] = 255
+            maxRange1[0] = 180
 
             mask0 = cv2.inRange(hsv, np.asarray(minRange0), np.asarray(maxRange0))
 
@@ -119,33 +120,36 @@ class RobotFrameCapturer(object):
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 
-        keypoints = detector.detect(255 - mask)
+        # find contours in the mask and initialize the current
+        # (x, y) center of the ball
+        cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+                                cv2.CHAIN_APPROX_SIMPLE)
+        cnts = imutils.grab_contours(cnts)
 
-        # documentation of SimpleBlobDetector is not clear on what kp.size is exactly,
-        # but it looks like the diameter of the blob.
-
-        bestKP = None
-        if len(keypoints) != 0:
-            bestKP = keypoints[0]
-            for actualKP in keypoints:
-                if actualKP.size > bestKP.size:
-                    bestKP = actualKP
-
-        # Update X, Y and size
         x = 0
         y = 0
-        size = 0
+        radius = 0
 
-        bkpa = []
+        # only proceed if at least one contour was found
+        if len(cnts) > 0:
+            # find the largest contour in the mask, then use
+            # it to compute the minimum enclosing circle and
+            # centroid
+            c = max(cnts, key=cv2.contourArea)
+            ((x, y), radius) = cv2.minEnclosingCircle(c)
+            M = cv2.moments(c)
+            center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
-        if bestKP is not None:
-            x = bestKP.pt[0]
-            y = bestKP.pt[1]
-            size = bestKP.size
-            bkpa = [bestKP]
+            # only proceed if the radius meets a minimum size
+            if radius > 10:
+                # draw the circle and centroid on the frame,
+                # then update the list of tracked points
+                cv2.circle(imgBGR, (int(x), int(y)), int(radius),
+                           (0, 255, 255), 2)
+                cv2.circle(imgBGR, center, 5, (0, 0, 255), -1)
 
         # Show image for debug only
-        im_with_keypoints = cv2.drawKeypoints(imgBGR, bkpa, np.array([]),
+        im_with_keypoints = cv2.drawKeypoints(imgBGR, np.array([]),
                                               (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         output = cv2.bitwise_and(imgBGR, imgBGR, mask=mask)
@@ -154,7 +158,7 @@ class RobotFrameCapturer(object):
         # Take images every 100 ms
         cv2.waitKey(100)
 
-        return x, y, size
+        return x, y, radius
 
     def loop_frame_capturer(self):
         detector = self.getDetector()
