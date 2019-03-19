@@ -339,6 +339,7 @@ class Robot:
         while not finished:
             print("No he acabado y busco cosas")
             x, y, size = frame_capturer.getPosition()
+            print(x, y, size)
 
             # 1. search the most promising blob ..
             # Find promising blob
@@ -348,6 +349,7 @@ class Robot:
                 print("Estoy buscando la pelota mientras giro")
                 time.sleep(recognition_sample_period)
                 x, y, size = frame_capturer.getPosition()
+                print(x, y, size)
 
             # When promising blob is found, stop robot
             self.setSpeed(0, 0)
