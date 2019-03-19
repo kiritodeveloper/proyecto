@@ -270,9 +270,9 @@ class Robot:
         return w
         """
         if( x > 160):
-            w = -0.8
+            w = -0.4
         else:
-            w = 0.8
+            w = 0.4
         return w
 
     def get_v(self, A, targetSize):
@@ -343,7 +343,7 @@ class Robot:
 
         recognition_sample_period = 0.2  # TODO: Change
 
-        next_w = 0
+        last_x = 0
 
         while not finished:
             print("No he acabado y busco cosas")
@@ -352,10 +352,10 @@ class Robot:
 
             # 1. search the most promising blob ..
             # Find promising blob
-            if(next_w < 0):
-                self.setSpeed(recognition_v, -recognition_w)
-            else:
+            if(last_x < 160):
                 self.setSpeed(recognition_v, recognition_w)
+            else:
+                self.setSpeed(recognition_v, -recognition_w)
 
             while size == 0:
                 # While not promising blob found
