@@ -79,9 +79,6 @@ class Robot:
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
-        # Frame capture
-        self.camera = RobotFrameCapturer()
-        self.frame = None
 
     def setSpeed(self, v, w):
         '''
