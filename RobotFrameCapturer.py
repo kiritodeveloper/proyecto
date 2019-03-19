@@ -41,8 +41,8 @@ class RobotFrameCapturer(object):
 
         # Filter by Area
         params.filterByArea = True
-        params.minArea = 200
-        params.maxArea = 10000
+        params.minArea = 1000
+        params.maxArea = 70000
 
         # Filter by Circularity
         params.filterByCircularity = True
@@ -94,7 +94,28 @@ class RobotFrameCapturer(object):
         #hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
         hsv = blurred
 
-        mask = cv2.inRange(hsv, minRange, maxRange)
+        if minRange[0] > maxRange[0]:
+            minRange0 = list(minRange)
+            minRange0[0] = 0
+
+            maxRange0 = list(maxRange)
+            maxRange0[0] = maxRange[0]
+
+            minRange1 = list(minRange)
+            minRange1[0] = minRange[0]
+
+            maxRange1 = list(maxRange)
+            maxRange1[0] = 255
+
+            mask0 = cv2.inRange(hsv, np.asarray(minRange0), np.asarray(maxRange0))
+
+            mask1 = cv2.inRange(hsv, np.asarray(minRange1), np.asarray(maxRange1))
+
+            mask = cv2.bitwise_or(mask1, mask0)
+
+        else:
+            mask = cv2.inRange(hsv, minRange, maxRange)
+
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 
