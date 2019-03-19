@@ -149,8 +149,8 @@ class RobotFrameCapturer(object):
                 cv2.circle(imgBGR, center, 5, (0, 0, 255), -1)
 
         # Show image for debug only
-        output = cv2.bitwise_and(imgBGR, imgBGR, mask=mask)
-        cv2.imshow("images", np.hstack([imgBGR, output]))
+        #output = cv2.bitwise_and(imgBGR, imgBGR, mask=mask)
+        #cv2.imshow("images", np.hstack([imgBGR, output]))
 
         # Take images every 100 ms
         cv2.waitKey(50)
