@@ -92,6 +92,7 @@ class RobotFrameCapturer(object):
         # Next lines copied from https://www.pyimagesearch.com/2015/09/14/ball-tracking-with-opencv/
         blurred = cv2.GaussianBlur(imgBGR, (11, 11), 0)
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+        hsv = blurred
 
         if minRange[0] > maxRange[0]:
             minRange0 = list(minRange)

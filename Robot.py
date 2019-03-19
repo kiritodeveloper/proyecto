@@ -327,7 +327,6 @@ class Robot:
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         # Start the process who update the vision values
-        last_x = 0 # last time where I see the ball
         frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
         print(colorRangeMin)
         frame_capturer.start()
@@ -351,10 +350,10 @@ class Robot:
 
             # 1. search the most promising blob ..
             # Find promising blob
-            if(last_x < 160):
-                self.setSpeed(recognition_v, recognition_w)
-            else:
+            if(next_w < 0):
                 self.setSpeed(recognition_v, -recognition_w)
+            else:
+                self.setSpeed(recognition_v, recognition_w)
 
             while size == 0:
                 # While not promising blob found
