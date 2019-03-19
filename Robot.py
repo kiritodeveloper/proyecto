@@ -322,7 +322,9 @@ class Robot:
         return frame_capturer.getPosition()
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+        # Start the process who update the vision values
         frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
+        print(colorRangeMin)
         frame_capturer.start()
 
         finished = False
@@ -338,20 +340,15 @@ class Robot:
         recognition_sample_period = 0.2  # TODO: Change
 
         while not finished:
-
-            promising_blob = self.searchForPromisingBlob(frame_capturer, colorRangeMin, colorRangeMax)
-            print(promising_blob)
-            time.sleep(1)
-            print("Pasado primero ---------------------------------------------------------------------")
+            x, y, size = frame_capturer.getPosition()
 
             # 1. search the most promising blob ..
             # Find promising blob
             self.setSpeed(recognition_v, recognition_w)
-            while promising_blob is None:
+            while size == 0:
                 # While not promising blob found
                 time.sleep(recognition_sample_period)
-                promising_blob = self.searchForPromisingBlob(frame_capturer, colorRangeMin, colorRangeMax)
-                time.sleep(1)
+                x, y, size = frame_capturer.getPosition()
 
             # When promising blob is found, stop robot
             self.setSpeed(0, 0)
