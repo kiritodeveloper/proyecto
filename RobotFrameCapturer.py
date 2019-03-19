@@ -16,9 +16,9 @@ if not is_debug:
 class RobotFrameCapturer(object):
     def __init__(self, minRange, maxRange):
         # Store X, Y and size
-        self.x_object = Value('d', 1)
-        self.y_object = Value('d', 1)
-        self.size_object = Value('d', 1)
+        self.x_object = Value('d', 0)
+        self.y_object = Value('d', 0)
+        self.size_object = Value('d', 0)
 
         # Check if finished
         self.finished = Value('b', False)
