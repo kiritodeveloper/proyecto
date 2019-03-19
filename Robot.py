@@ -344,6 +344,7 @@ class Robot:
             self.setSpeed(recognition_v, recognition_w)
             while size == 0:
                 # While not promising blob found
+                print("Estoy buscando la pelota mientras giro")
                 time.sleep(recognition_sample_period)
                 x, y, size = frame_capturer.getPosition()
 
