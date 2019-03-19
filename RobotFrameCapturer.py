@@ -41,7 +41,7 @@ class RobotFrameCapturer(object):
 
         # Filter by Area
         params.filterByArea = True
-        params.minArea = 1000
+        params.minArea = 500
         params.maxArea = 70000
 
         # Filter by Circularity
