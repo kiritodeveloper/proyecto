@@ -27,9 +27,12 @@ def main():
     redMinHSV = (0, 160, 105)
     redMaxHSV = (3, 255, 255)
 
+    redMinRobot = (235, 180, 90)
+    redMaxRobot = (2, 255, 255)
+
     redMinRGB = (10, 10, 100)
     redMaxRGB = (50, 50, 255)
-    trackObject(colorRangeMin=redMinHSV, colorRangeMax=redMaxHSV)
+    trackObject(colorRangeMin=redMinRobot, colorRangeMax=redMaxRobot)
 
 
 if __name__ == "__main__":
