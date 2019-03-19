@@ -419,10 +419,14 @@ class Robot:
     def catch(self, movement):
         if(movement != self.basket_state):
             if(movement == 'up'):
-                self.BP.motorRotateDegree([255], [-85], [self.motor_port_basket])
+                self.BP.set_motor_dps(self.motor_port_basket, -85)
+                time.sleep(1)
+                self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
             elif(movement == 'down'):
-                self.BP.motorRotateDegree([255], [85], [self.motor_port_basket])
+                self.BP.set_motor_dps(self.motor_port_basket, 85)
+                time.sleep(1)
+                self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
 
