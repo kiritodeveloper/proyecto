@@ -364,6 +364,8 @@ class Robot:
 
             while not targetPositionReached:
                 x, y, size = frame_capturer.getPosition()
+                if(size == 0):
+                    break
                 print(x, y, size)
 
                 next_w = self.get_w(x)
@@ -395,7 +397,7 @@ class Robot:
                 
                 time.sleep(trackObjectPeriod)
                 """
-                self.setSpeed(0, next_w)
+                self.setSpeed(0.1, next_w)
                 print("ME PILLE EN EL BUCLE")
 
         frame_capturer.stop()
