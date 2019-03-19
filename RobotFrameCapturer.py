@@ -128,7 +128,7 @@ class RobotFrameCapturer(object):
                                               (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         output = cv2.bitwise_and(imgBGR, imgBGR, mask=mask)
-        cv2.imshow("images", np.hstack([im_with_keypoints, output]))
+        #cv2.imshow("images", np.hstack([im_with_keypoints, output]))
 
         # Take images every 100 ms
         cv2.waitKey(100)
