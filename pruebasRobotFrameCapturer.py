@@ -24,11 +24,18 @@ def main():
     orangeMinHSV = (10, 180, 50)
     orangeMaxHSV = (26, 255, 255)
 
-    redMinHSV = (0, 160, 105)
-    redMaxHSV = (3, 255, 255)
+    #redMinHSV = (0, 160, 105)
+    #redMaxHSV = (3, 255, 255)
+    redMinHSV = (0, 217, 68)
+    redMaxHSV = (6, 240, 144)
 
     redMinRGB = (10, 10, 100)
     redMaxRGB = (50, 50, 255)
+
+    # 0 240 68
+    # 233 217 144
+    # 236 240 89
+
     trackObject(colorRangeMin=redMinHSV, colorRangeMax=redMaxHSV)
 
 
