@@ -71,6 +71,9 @@ class Robot:
         # Set motors ports
         self.motor_port_left = self.BP.PORT_C
         self.motor_port_right = self.BP.PORT_B
+        self.motor_port_basket = self.BP.PORT_A
+
+        self.basket_state = 'up'
 
         # Encoder timer
         self.encoder_timer = 0
@@ -412,3 +415,14 @@ class Robot:
 
         frame_capturer.stop()
         return finished
+
+    def catch(self, movement):
+        if(movement != self.basket_state):
+            if(movement == 'up'):
+                self.BP.motorRotateDegree(255, -85, self.motor_port_basket)
+                self.basket_state = 'up'
+            elif(movement == 'down'):
+                self.BP.motorRotateDegree(255, 85, self.motor_port_basket)
+                self.basket_state = 'down'
+
+
