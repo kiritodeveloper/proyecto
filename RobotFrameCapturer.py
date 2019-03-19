@@ -104,7 +104,7 @@ class RobotFrameCapturer(object):
             minRange1[0] = minRange[0]
 
             maxRange1 = list(maxRange)
-            maxRange1[0] = 255
+            maxRange1[0] = 180
 
             mask0 = cv2.inRange(hsv, np.asarray(minRange0), np.asarray(maxRange0))
 
