@@ -30,9 +30,12 @@ def main():
     redMinRobot = (0, 0, 130)
     redMaxRobot = (100, 60, 255)
 
+    redMin = (225, 180, 80)
+    redMax = (2, 255, 255)
+
     redMinRGB = (10, 10, 100)
     redMaxRGB = (50, 50, 255)
-    trackObject(colorRangeMin=redMinRobot, colorRangeMax=redMaxRobot)
+    trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
 
 
 if __name__ == "__main__":
