@@ -337,6 +337,7 @@ class Robot:
         recognition_sample_period = 0.2  # TODO: Change
 
         while not finished:
+            print("No he acabado y busco cosas")
             x, y, size = frame_capturer.getPosition()
 
             # 1. search the most promising blob ..
