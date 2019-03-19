@@ -30,7 +30,7 @@ def main():
     redMinRobot = (0, 0, 130)
     redMaxRobot = (100, 60, 255)
 
-    redMin = (225, 180, 80)
+    redMin = (168, 180, 80)
     redMax = (2, 255, 255)
 
     redMinRGB = (10, 10, 100)
