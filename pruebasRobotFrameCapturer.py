@@ -24,7 +24,7 @@ def main():
     orangeMinHSV = (10, 180, 50)
     orangeMaxHSV = (26, 255, 255)
 
-    redMinHSV = (235, 160, 105)
+    redMinHSV = (0, 160, 105)
     redMaxHSV = (3, 255, 255)
 
     redMinRGB = (10, 10, 100)

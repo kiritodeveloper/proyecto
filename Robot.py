@@ -79,9 +79,6 @@ class Robot:
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
-        # Frame capture
-        self.camera = RobotFrameCapturer()
-        self.frame = None
 
     def setSpeed(self, v, w):
         '''
@@ -254,6 +251,7 @@ class Robot:
         :param x: horizontal position in the picture
         :return: w speed
         """
+        """
         far_position = 200
         medium_position = 100
         near_position = 50
@@ -269,6 +267,12 @@ class Robot:
             w = np.sign(x) * medium_w
         else:
             w = np.sign(x) * near_w
+        return w
+        """
+        if( x > 160):
+            w = -0.8
+        else:
+            w = 0.8
         return w
 
     def get_v(self, A, targetSize):
@@ -333,35 +337,40 @@ class Robot:
 
         trackObjectPeriod = 0.2
 
-        recognition_w = 0.2  # TODO: Change
+        recognition_w = 0.8  # TODO: Change
 
         recognition_v = 0  # TODO: Change
 
         recognition_sample_period = 0.2  # TODO: Change
 
         while not finished:
+            print("No he acabado y busco cosas")
             x, y, size = frame_capturer.getPosition()
+            print(x, y, size)
 
             # 1. search the most promising blob ..
             # Find promising blob
             self.setSpeed(recognition_v, recognition_w)
             while size == 0:
                 # While not promising blob found
+                print("Estoy buscando la pelota mientras giro")
                 time.sleep(recognition_sample_period)
                 x, y, size = frame_capturer.getPosition()
+                print(x, y, size)
 
             # When promising blob is found, stop robot
             self.setSpeed(0, 0)
             print("Ya no es none")
-            finished = True
-            """
-            while not targetPositionReached:
-                recognised_orientation = self.getRecognisedBlobOrientation(promising_blob)
-                recognised_size = self.getRecognisedBlobSize(promising_blob)
-                # 2. decide v and w for the robot to get closer to target position
-                next_w = 1
-                next_v = 1
 
+            while not targetPositionReached:
+                x, y, size = frame_capturer.getPosition()
+                if(size == 0):
+                    break
+                print(x, y, size)
+
+                next_w = self.get_w(x)
+
+                """
                 if abs(recognised_orientation) < 0.2:  # TODO: Change
                     next_w *= 0.1  # TODO: Change
                 else:
@@ -385,10 +394,11 @@ class Robot:
                     next_v = 0
                     next_w = 0
 
-                self.setSpeed(next_v, next_w)
-                time.sleep(trackObjectPeriod)
                 
-                print("ME PILLE EN EL BUCLE")
+                time.sleep(trackObjectPeriod)
                 """
+                self.setSpeed(0.1, next_w)
+                print("ME PILLE EN EL BUCLE")
+
         frame_capturer.stop()
         return finished
