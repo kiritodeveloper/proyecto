@@ -270,9 +270,9 @@ class Robot:
         return w
         """
         if( x > 160):
-            w = -0.4
+            w = -0.8
         else:
-            w = 0.4
+            w = 0.8
         return w
 
     def get_v(self, A, targetSize):
@@ -370,8 +370,11 @@ class Robot:
 
             while not targetPositionReached:
                 x, y, size = frame_capturer.getPosition()
-                last_x = x
-                if(size == 0):
+
+                if x > 10:
+                    last_x = x
+
+                if size == 0:
                     break
                 print(x, y, size)
 
