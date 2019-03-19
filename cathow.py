@@ -7,7 +7,7 @@ import time
 from Robot import Robot
 
 
-def main(args):
+def main():
     try:
         # if args.radioD < 0:
         #    print('d must be a positive value')
