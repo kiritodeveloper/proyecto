@@ -343,6 +343,8 @@ class Robot:
 
         recognition_sample_period = 0.2  # TODO: Change
 
+        next_w = 0
+
         while not finished:
             print("No he acabado y busco cosas")
             x, y, size = frame_capturer.getPosition()
