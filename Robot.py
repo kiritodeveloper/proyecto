@@ -364,7 +364,7 @@ class Robot:
                     self.setSpeed(0, 0)
                     self.catch('down')
 
-                    self.setSpeed(0, 0.2)
+                    self.setSpeed(0, 0.4)
                     time.sleep(5)
 
                     self.setSpeed(0, 0)
