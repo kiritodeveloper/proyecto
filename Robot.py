@@ -325,9 +325,9 @@ class Robot:
         if size < 40:
             v = 0.25
         elif size < 80:
-            v = 0.2
+            v = 0.15
         else:
-            v = 0.05
+            v = 0.08
 
         return v, w
 
