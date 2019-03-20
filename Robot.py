@@ -9,6 +9,7 @@ import sys
 from multiprocessing import Process, Value, Array, Lock
 import numpy as np
 
+from RobotFrameCapturer import RobotFrameCapturer
 from config_file import *
 from utils import delay_until
 
@@ -71,6 +72,9 @@ class Robot:
         # Set motors ports
         self.motor_port_left = self.BP.PORT_C
         self.motor_port_right = self.BP.PORT_B
+        self.motor_port_basket = self.BP.PORT_A
+
+        self.basket_state = 'up'
 
         # Encoder timer
         self.encoder_timer = 0
@@ -104,17 +108,6 @@ class Robot:
         self.v.value = v
         self.w.value = w
         self.lock_odometry.release()
-
-    def test_encoders(self):
-        """
-        Read the wheels speed from the encoders and print it
-        """
-        [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
-                                self.BP.get_motor_encoder(self.motor_port_right)]
-        rad_izq = math.radians(grad_izq)
-        rad_der = math.radians(grad_der)
-
-        print("Rueda izquierda: ", rad_izq, " | Rueda derecha: ", rad_der)
 
     def readSpeed(self):
         """
@@ -269,3 +262,138 @@ class Robot:
         elif angle > math.pi:
             angle = angle - 2 * math.pi
         return angle
+
+    # ------------------- -------- -------------------
+    # ------------------- TRACKING -------------------
+    # ------------------- -------- -------------------
+    def obtainTrackObjectSpeed(self, x, size):
+        """
+        Return the speed to track an object
+        :param x:
+        :param size:
+        :return:
+        """
+        if x > 160:
+            x = 320 - x
+            w = -1
+        else:
+            w = 1
+
+        # Split the screen in 7 parts, depending where it is the ball, the robot will turn with higher or lower speed
+        if x < 60:
+            w = 0.8 * w
+        elif x < 100:
+            w = 0.5 * w
+        elif x < 140:
+            w = 0.2 * w
+        else:
+            w = 0
+
+        # Depending how far is the ball, the robot will follow it faster or slower
+        if size < 40:
+            v = 0.25
+        elif size < 80:
+            v = 0.15
+        else:
+            v = 0.08
+
+        return v, w
+
+    def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+        """
+        Track object in range (colorRangeMin, colorRangeMax)
+        :param colorRangeMin:
+        :param colorRangeMax:
+        :return:
+        """
+        # Start the process who update the vision values
+        frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
+        print(colorRangeMin)
+        frame_capturer.start()
+
+        finished = False
+
+        recognition_w = 0.8
+
+        recognition_v = 0
+
+        recognition_sample_period = 0.2
+
+        last_x = 0
+
+        while not finished:
+            x, y, size = frame_capturer.getPosition()
+
+            # 1. search the most promising blob ..
+            # Find promising blob
+            if last_x < 160:
+                self.setSpeed(recognition_v, recognition_w)
+            else:
+                self.setSpeed(recognition_v, -recognition_w)
+
+            while size == 0:
+                # While not promising blob found
+                time.sleep(recognition_sample_period)
+                x, y, size = frame_capturer.getPosition()
+
+            # When promising blob is found, stop robot
+            self.setSpeed(0, 0)
+
+            # Set ball not reached for now
+            followBallRecognised = True
+
+            while followBallRecognised:
+                x, y, size = frame_capturer.getPosition()
+
+                # Save last ball recognised position to guess by which side it slided
+                if x > 10:
+                    last_x = x
+
+                # Only if ball is still in image, track it
+                if size > 0:
+                    next_v, next_w = self.obtainTrackObjectSpeed(x, size)
+
+                    # If we think ball is in basket, catch it and rotate the robot to ensure the supposition
+                    if size > 110:
+                        self.setSpeed(0, 0)
+                        self.catch('down')
+
+                        self.setSpeed(0, 0.4)
+                        time.sleep(5)
+
+                        self.setSpeed(0, 0)
+                        _, _, size = frame_capturer.getPosition()
+
+                        # If ball is in the basket, finish, else lift the basket
+                        if size > 70:
+                            followBallRecognised = False
+                            finished = True
+
+                        else:
+                            self.catch('up')
+                            self.setSpeed(next_v, next_w)
+                    else:
+                        self.setSpeed(next_v, next_w)
+                else:
+                    followBallRecognised = False
+
+        frame_capturer.stop()
+        return finished
+
+    def catch(self, movement):
+        """
+        Lift and low the basket
+        :param movement:
+        :return:
+        """
+        if movement != self.basket_state:
+            if movement == 'up':
+                self.BP.set_motor_dps(self.motor_port_basket, -85)
+                time.sleep(1)
+                self.BP.set_motor_dps(self.motor_port_basket, 0)
+                self.basket_state = 'up'
+            elif movement == 'down':
+                self.BP.set_motor_dps(self.motor_port_basket, 85)
+                time.sleep(1)
+                self.BP.set_motor_dps(self.motor_port_basket, 0)
+                self.basket_state = 'down'
