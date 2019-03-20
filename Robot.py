@@ -306,10 +306,22 @@ class Robot:
         return v
 
     def obtainTrackObjectSpeed(self, x, y, size):
-        if (x > 160):
-            w = -0.5
-        else:
+        x_aux = x
+        if x_aux > 160:
+            x_aux = 320 - x_aux
+
+        if x_aux < 60:
+            w = 0.8
+        elif x_aux < 100:
             w = 0.5
+        elif x_aux < 140:
+            w = 0.2
+        else:
+            w = 0
+
+        if x > 160:
+            w = -w
+
         v = 0.1
 
         return v, w
