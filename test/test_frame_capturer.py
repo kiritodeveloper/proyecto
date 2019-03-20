@@ -1,5 +1,4 @@
 import time
-import cv2
 
 from RobotFrameCapturer import RobotFrameCapturer
 
@@ -24,18 +23,18 @@ def main():
     orangeMinHSV = (10, 180, 50)
     orangeMaxHSV = (26, 255, 255)
 
-    redMinHSV = (0, 160, 105)
-    redMaxHSV = (3, 255, 255)
+    redMinHSV2 = (0, 160, 105)
+    redMaxHSV2 = (3, 255, 255)
 
     redMinRobot = (0, 0, 130)
     redMaxRobot = (100, 60, 255)
 
-    redMin = (168, 180, 80)
-    redMax = (2, 255, 255)
+    redMinHSV = (168, 180, 80)
+    redMaxHSV = (2, 255, 255)
 
     redMinRGB = (10, 10, 100)
     redMaxRGB = (50, 50, 255)
-    trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
+    trackObject(colorRangeMin=redMinHSV, colorRangeMax=redMaxHSV)
 
 
 if __name__ == "__main__":

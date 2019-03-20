@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import argparse
-import cv2
-import numpy as np
-import time
 from Robot import Robot
 
 
