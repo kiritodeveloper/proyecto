@@ -362,12 +362,10 @@ class Robot:
 
                 if size > 120:
                     self.setSpeed(0, 0)
-                    print("Downnnnnnnnnnnnnnnnnnnnnnnnnnnnnantesn")
                     self.catch('down')
-                    print("Downnnnnnnnnnnnnnnnnnnnnnnnnnnnnn")
 
                     self.setSpeed(0, 0.2)
-                    time.sleep(3)
+                    time.sleep(5)
 
                     self.setSpeed(0, 0)
                     _, _, size = frame_capturer.getPosition()

@@ -71,7 +71,6 @@ class RobotFrameCapturer(object):
 
     def stop(self):
         self.finished.value = False
-        self.p.close()
 
     def getPosition(self):
         self.lock_frame_capturer.acquire()
