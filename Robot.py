@@ -82,7 +82,6 @@ class Robot:
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
-
     def setSpeed(self, v, w):
         '''
         Set the speed of the robot
@@ -272,7 +271,7 @@ class Robot:
             w = np.sign(x) * near_w
         return w
         """
-        if( x > 160):
+        if (x > 160):
             w = -0.5
         else:
             w = 0.5
@@ -355,7 +354,7 @@ class Robot:
 
             # 1. search the most promising blob ..
             # Find promising blob
-            if(last_x < 160):
+            if (last_x < 160):
                 self.setSpeed(recognition_v, recognition_w)
             else:
                 self.setSpeed(recognition_v, -recognition_w)
@@ -383,57 +382,26 @@ class Robot:
 
                 next_w = self.get_w(x)
 
-                if(size > 120):
-                    self.setSpeed(0,0)
+                if size > 120:
+                    self.setSpeed(0, 0)
                     self.catch('down')
                     targetPositionReached = True
                     finished = True
-
-
-                """
-                if abs(recognised_orientation) < 0.2:  # TODO: Change
-                    next_w *= 0.1  # TODO: Change
                 else:
-                    next_w *= 0.4  # TODO: Change
-
-                if recognised_orientation < 0:
-                    next_w = -next_w
-
-                # decide v
-                if recognised_size == 0:
-                    # Not blob recognised
-                    next_w = recognition_w
-                    next_v = 0
-                elif recognised_size < 0.5:  # TODO: Change
-                    next_v *= 0.1  # TODO: Change
-                elif recognised_size < 0.9:  # TODO: Change
-                    next_v *= 0.04  # TODO: Change
-                else:
-                    targetPositionReached = True
-                    finished = True
-                    next_v = 0
-                    next_w = 0
-
-                
-                time.sleep(trackObjectPeriod)
-                """
-                self.setSpeed(0.1, next_w)
-                print("ME PILLE EN EL BUCLE")
+                    self.setSpeed(0.1, next_w)
 
         frame_capturer.stop()
         return finished
 
     def catch(self, movement):
-        if(movement != self.basket_state):
-            if(movement == 'up'):
+        if (movement != self.basket_state):
+            if (movement == 'up'):
                 self.BP.set_motor_dps(self.motor_port_basket, -85)
                 time.sleep(1)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
-            elif(movement == 'down'):
+            elif (movement == 'down'):
                 self.BP.set_motor_dps(self.motor_port_basket, 85)
                 time.sleep(1)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
-
-
