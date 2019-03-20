@@ -73,7 +73,7 @@ class Robot:
         self.motor_port_right = self.BP.PORT_B
         self.motor_port_basket = self.BP.PORT_A
 
-        self.basket_state = 'up'
+        self.basket_state = 'down'
 
         # Encoder timer
         self.encoder_timer = 0
@@ -328,6 +328,7 @@ class Robot:
         return frame_capturer.getPosition()
 
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+        self.catch('up')
         # Start the process who update the vision values
         frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
         print(colorRangeMin)
