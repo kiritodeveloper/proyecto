@@ -305,6 +305,15 @@ class Robot:
 
         return v
 
+    def obtainTrackObjectSpeed(self, x, y, size):
+        if (x > 160):
+            w = -0.5
+        else:
+            w = 0.5
+        v = 0.1
+
+        return v, w
+
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         # Start the process who update the vision values
         frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
@@ -346,7 +355,6 @@ class Robot:
 
             # When promising blob is found, stop robot
             self.setSpeed(0, 0)
-            print("Ya no es none")
 
             while not targetPositionReached:
                 x, y, size = frame_capturer.getPosition()
@@ -358,7 +366,7 @@ class Robot:
                     break
                 print(x, y, size)
 
-                next_w = self.get_w(x)
+                next_v, next_w = self.obtainTrackObjectSpeed(x, y, size)
 
                 if size > 120:
                     self.setSpeed(0, 0)
@@ -376,9 +384,9 @@ class Robot:
 
                     else:
                         self.catch('up')
-                        self.setSpeed(0.1, next_w)
+                        self.setSpeed(next_v, next_w)
                 else:
-                    self.setSpeed(0.1, next_w)
+                    self.setSpeed(next_v, next_w)
 
         frame_capturer.stop()
         return finished
