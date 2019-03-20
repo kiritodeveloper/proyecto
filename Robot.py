@@ -354,7 +354,7 @@ class Robot:
 
             # 1. search the most promising blob ..
             # Find promising blob
-            if (last_x < 160):
+            if last_x < 160:
                 self.setSpeed(recognition_v, recognition_w)
             else:
                 self.setSpeed(recognition_v, -recognition_w)
@@ -385,23 +385,34 @@ class Robot:
                 if size > 120:
                     self.setSpeed(0, 0)
                     self.catch('down')
-                    targetPositionReached = True
-                    finished = True
+
+                    self.setSpeed(0, 0.1)
+                    time.sleep(0.3)
+
+                    self.setSpeed(0, 0)
+                    _, _, size = frame_capturer.getPosition()
+
+                    if size > 70:
+                        targetPositionReached = True
+                        finished = True
+
+                    else:
+                        self.catch('up')
+                        self.setSpeed(0.1, next_w)
                 else:
                     self.setSpeed(0.1, next_w)
 
         frame_capturer.stop()
-        self.catch('up')
         return finished
 
     def catch(self, movement):
-        if (movement != self.basket_state):
-            if (movement == 'up'):
+        if movement != self.basket_state:
+            if movement == 'up':
                 self.BP.set_motor_dps(self.motor_port_basket, -85)
                 time.sleep(1)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
-            elif (movement == 'down'):
+            elif movement == 'down':
                 self.BP.set_motor_dps(self.motor_port_basket, 85)
                 time.sleep(1)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
