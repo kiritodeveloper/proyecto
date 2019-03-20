@@ -367,7 +367,7 @@ class Robot:
                     print("Downnnnnnnnnnnnnnnnnnnnnnnnnnnnnn")
 
                     self.setSpeed(0, 0.2)
-                    time.sleep(0.3)
+                    time.sleep(3)
 
                     self.setSpeed(0, 0)
                     _, _, size = frame_capturer.getPosition()
