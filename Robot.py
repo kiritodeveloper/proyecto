@@ -323,7 +323,7 @@ class Robot:
             w = -w
 
         if size < 40:
-            v = 0.3
+            v = 0.25
         elif size < 80:
             v = 0.2
         else:
@@ -385,7 +385,7 @@ class Robot:
 
                 next_v, next_w = self.obtainTrackObjectSpeed(x, y, size)
 
-                if size > 120:
+                if size > 110:
                     self.setSpeed(0, 0)
                     self.catch('down')
 
