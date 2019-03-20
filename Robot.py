@@ -236,7 +236,8 @@ class Robot:
 
     # Write message in the log
     def logWrite(self, message):
-        print(message)
+        # print(message)
+        pass
 
     # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
@@ -304,29 +305,6 @@ class Robot:
 
         return v
 
-    def getRecognisedBlobOrientation(self, trackedObject):
-        """
-        Return recognised blob orientation based on actual position in range [pi, -pi]
-        """
-        # TODO:
-        return - math.pi
-
-    def getRecognisedBlobSize(self, trackedObject):
-        """
-        Return recognised blob size/ real size, return range [0, 1]. If 0 not blob is recognised, if 1 blob is in correct position to catch
-        """
-        # TODO:
-        return 0.5
-
-    def searchForPromisingBlob(self, frame_capturer, colorRangeMin, colorRangeMax):
-        """
-        Search promising blob and return an identification of it, None if not detected
-        :param colorRangeMin:
-        :param colorRangeMax:
-        :return:
-        """
-        return frame_capturer.getPosition()
-
     def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         # Start the process who update the vision values
         frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
@@ -384,9 +362,11 @@ class Robot:
 
                 if size > 120:
                     self.setSpeed(0, 0)
+                    print("Downnnnnnnnnnnnnnnnnnnnnnnnnnnnnantesn")
                     self.catch('down')
+                    print("Downnnnnnnnnnnnnnnnnnnnnnnnnnnnnn")
 
-                    self.setSpeed(0, 0.1)
+                    self.setSpeed(0, 0.2)
                     time.sleep(0.3)
 
                     self.setSpeed(0, 0)
