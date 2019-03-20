@@ -322,7 +322,12 @@ class Robot:
         if x > 160:
             w = -w
 
-        v = 0.1
+        if size < 40:
+            v = 0.3
+        elif size < 80:
+            v = 0.2
+        else:
+            v = 0.05
 
         return v, w
 
