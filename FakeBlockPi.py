@@ -12,7 +12,15 @@ class FakeBlockPi(object):
         self.PORT_D = 0x08
 
     def set_motor_dps(self, motor_port_left, speed_dps_left):
+        """
+        Fake function to set motors dps and avoid execution errors
+        :param motor_port_left: Not used
+        :param speed_dps_left: Not used
+        """
         pass
 
     def reset_all(self):
+        """
+        Fake function to reset motors and avoid execution errors
+        """
         pass

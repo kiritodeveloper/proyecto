@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import argparse
 import math
 
 import time
@@ -16,6 +15,10 @@ from utils import delay_until
 
 # Timed paths
 def path_1_timed(robot):
+    """
+    Instructions to do the path 1 based on times
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, -math.pi / 8)
     time.sleep(4)
 
@@ -31,17 +34,29 @@ def path_1_timed(robot):
 
 # Odometry paths tests
 def path_90_degree_odometry(robot):
+    """
+    Instructions to do a 90 degrees turn based on odometry
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, -math.pi / 8)
     wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
 
 def path_1_m_odometry(robot):
+    """
+    Odometry test
+    :param robot: robot configuration
+    """
     robot.setSpeed(0.1, 0)
     wait_for_position(0.8, 0, 0, robot, 0.2, 0.02)
 
 
 # Odometry paths
 def path_1_odometry(robot):
+    """
+    Instructions to do the path 1 based on odometry
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, -math.pi / 8)
     wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
@@ -58,6 +73,10 @@ def path_1_odometry(robot):
 
 
 def path_2_odometry(robot):
+    """
+    Instructions to do the path 2 based on odometry
+    :param robot: robot configuration
+    """
     robot.setSpeed(0, math.pi / 8)
     wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
 
@@ -82,6 +101,14 @@ def path_2_odometry(robot):
 
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
+    """
+    Wait until the robot reaches the position
+    :param x: x position to be reached
+    :param y: y position to be reached
+    :param robot: robot configuration
+    :param position_error_margin: error allowed in the position
+    :param th_error_margin: error allowed in the orientation
+    """
     [x_odo, y_odo, th_odo] = robot.readOdometry()
 
     print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
@@ -105,20 +132,19 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     print([x_odo, y_odo, th_odo])
 
 
-def main(args):
+def main():
+    """
+    Main function
+    """
     try:
-        '''  if args.radioD < 0:
-            print 'd must be a positive value'
-            exit(1)
-        '''
-        # Instantiate Odometry. Default value will be 0,0,0
+        # Instantiate odometry. Default value will be 0,0,0
         # robot = Robot(init_position=args.pos_ini)
         robot = Robot()
 
         if is_debug:
             start_robot_drawer(robot.finished, robot)
-
-        start_robot_logger(robot.finished, robot, "/home/pi/trayectoria_1.csv")
+        else:
+            start_robot_logger(robot.finished, robot, "./out/trayectoria_1.csv")
 
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
@@ -133,9 +159,6 @@ def main(args):
         # and restore the LED to the control of the BrickPi3 firmware.
         robot.stopOdometry()
 
-        # Wait until all print is done
-        print("Printeando final")
-
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
@@ -143,11 +166,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    # get and parse arguments passed to main
-    # Add as many args as you need ...
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--radioD", help="Radio to perform the 8-trajectory (mm)",
-                        type=float, default=40.0)
-    args = parser.parse_args()
-
-    main(args)
+    main()

@@ -2,8 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# Dibuja robot en location_eje con color (c) y tamano (p/g)
 def dibrobot(loc_eje, c, tamano):
+    """
+    Plot robot in loc_eje in some color c and with size tamano (p/g)
+    :param loc_eje: Location
+    :param c: Color
+    :param tamano: Size
+    """
     if tamano == 'p':
         largo = 0.1
         corto = 0.05

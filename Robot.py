@@ -13,6 +13,7 @@ from RobotFrameCapturer import RobotFrameCapturer
 from config_file import *
 from utils import delay_until
 
+# Only import original drivers if it isn't in debug mode
 if not is_debug:
     import brickpi3  # import the BrickPi3 drivers
 else:
@@ -83,11 +84,11 @@ class Robot:
         self.r_prev_encoder_right = 0
 
     def setSpeed(self, v, w):
-        '''
+        """
         Set the speed of the robot
         :param v: lineal speed in m/s
         :param w: angular speed in rad/s
-        '''
+        """
 
         print("setting speed to %.2f %.2f" % (v, w))
 
@@ -109,10 +110,10 @@ class Robot:
         self.lock_odometry.release()
 
     def readSpeed(self):
-        '''
+        """
         Read the robot speed
         :return: robot speed
-        '''
+        """
 
         self.lock_odometry.acquire()
         if is_debug:
@@ -180,6 +181,13 @@ class Robot:
 
     # You may want to pass additional shared variables besides the odometry values and stop flag
     def updateOdometry(self, x_odo, y_odo, th_odo, finished):
+        """
+        Update odometry every period
+        :param x_odo: value where x coordinate must be stored
+        :param y_odo: value where y coordinate must be stored
+        :param th_odo: value where angle must be stored
+        :param finished: if finish is true, odometry must stop updating
+        """
 
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
@@ -229,18 +237,26 @@ class Robot:
         sys.stdout.write("Stopping odometry ... X=  %d, \
                 Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
 
-    # Stop the odometry thread.
     def stopOdometry(self):
+        """
+        Stop the odometry thread.
+        """
         self.finished.value = True
         self.BP.reset_all()
 
-    # Write message in the log
     def logWrite(self, message):
-        # print(message)
-        pass
+        """
+        Write message in the log (screen)
+        :param message: message to write
+        """
+        print(message)
 
-    # Normalize angle between -pi and pi
     def normalizeAngle(self, angle):
+        """
+        Normalize angle between -pi and pi
+        :param angle: angle to normalize
+        :return:
+        """
         if angle < -math.pi:  # To positive
             angle = angle + 2 * math.pi
         elif angle > math.pi:
