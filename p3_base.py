@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import argparse
+from config_file import is_debug
 from Robot import Robot
+from RobotDrawer import start_robot_drawer
+from RobotLogger import start_robot_logger
 
 
 def main(args):
@@ -12,6 +15,12 @@ def main(args):
 
         # Initialize Odometry. Default value will be 0,0,0
         robot = Robot()
+
+        if is_debug:
+            start_robot_drawer(robot.finished, robot)
+        else:
+            start_robot_logger(robot.finished, robot, "trayectoria_tracking.csv")
+
         # 1. launch updateOdometry thread()
         robot.startOdometry()
 
