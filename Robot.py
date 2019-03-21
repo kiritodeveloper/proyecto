@@ -308,8 +308,10 @@ class Robot:
         """
         # Start the process who update the vision values
         frame_capturer = RobotFrameCapturer(colorRangeMin, colorRangeMax)
-        print(colorRangeMin)
         frame_capturer.start()
+
+        # Give camara time to wake up
+        time.sleep(1)
 
         finished = False
 
