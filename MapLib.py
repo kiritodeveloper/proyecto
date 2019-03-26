@@ -335,11 +335,10 @@ class Map2D:
     # METHODS to IMPLEMENT in P4
     # ############################################################
 
-
     def getNumberObstacles(self):
         n = 0
-        for i in range(0, 2*self.sizeX+1):
-            for j in range(0, 2*self.sizeY+1):
+        for i in range(0, 2 * self.sizeX + 1):
+            for j in range(0, 2 * self.sizeY + 1):
                 if self.connectionMatrix[i][j] == 1:
                     n += 1
         return n
@@ -349,10 +348,10 @@ class Map2D:
         cellsUpdated = []
         for i in range(0, 8):
             x, y = origin + (self.neighbor[0][i], self.neighbor[1][i])
-            if x >= 0 and x < 2*self.sizeX+1 and y >= 0 and y <2*self.sizeY+1:
+            if 0 <= x < 2 * self.sizeX + 1 and 0 <= y < 2 * self.sizeY + 1:
                 if grid[x, y] == -2:
-                    grid[x, y] = grid[origin[0],origin[1]] + 1
-                elif grid[x, y] > (grid[origin[0],origin[1]] + 1):
+                    grid[x, y] = grid[origin[0], origin[1]] + 1
+                elif grid[x, y] > (grid[origin[0], origin[1]] + 1):
                     grid[x, y] = grid[origin[0], origin[1]] + 1
 
                 numberUpdates += 1
@@ -360,12 +359,12 @@ class Map2D:
 
         return numberUpdates
 
-    def incrementWavefront(self, cellsUpdated):
-
+    def incrementWavefront(self, cells_updated):
+        pass
 
     def fillCostMatrix(self, goal):
-        grid = -2 * np.ones(2*self.sizeX+1, 2*self.sizeY+1)
-        matrixSize = (2*self.sizeX+1,2*self.sizeY+1)
+        grid = -2 * np.ones(2 * self.sizeX + 1, 2 * self.sizeY + 1)
+        matrixSize = (2 * self.sizeX + 1, 2 * self.sizeY + 1)
         for i in matrixSize[0]:
             for j in matrixSize[1]:
                 if self.connectionMatrix[i][j] == 1:
@@ -382,8 +381,6 @@ class Map2D:
 
             if numberUpdates == 0:
                 finished = True
-
-
 
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
