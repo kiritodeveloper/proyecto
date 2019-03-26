@@ -45,6 +45,9 @@ class Map2D:
         self.costMatrix = None
         self.currentPath = None
 
+        self.neighbor = np.array([[1, 1, 0, -1, -1, 0, 1],  # row index
+                                  [0, 1, 1, 1, 0, -1, -1, -1]])  # column index
+
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
         else:
@@ -330,10 +333,58 @@ class Map2D:
 
     # ############################################################
     # METHODS to IMPLEMENT in P4
-    # ############################################################ 
+    # ############################################################
 
-    # def fillCostMatrix(self, ??):
-    # """ 
+
+    def getNumberObstacles(self):
+        n = 0
+        for i in range(0, 2*self.sizeX+1):
+            for j in range(0, 2*self.sizeY+1):
+                if self.connectionMatrix[i][j] == 1:
+                    n += 1
+        return n
+
+    def propagateWavefront(self, grid, origin):
+        numberUpdates = 0
+        cellsUpdated = []
+        for i in range(0, 8):
+            x, y = origin + (self.neighbor[0][i], self.neighbor[1][i])
+            if x >= 0 and x < 2*self.sizeX+1 and y >= 0 and y <2*self.sizeY+1:
+                if grid[x, y] == -2:
+                    grid[x, y] = grid[origin[0],origin[1]] + 1
+                elif grid[x, y] > (grid[origin[0],origin[1]] + 1):
+                    grid[x, y] = grid[origin[0], origin[1]] + 1
+
+                numberUpdates += 1
+                cellsUpdated.append([x, y])
+
+        return numberUpdates
+
+    def incrementWavefront(self, cellsUpdated):
+
+
+    def fillCostMatrix(self, goal):
+        grid = -2 * np.ones(2*self.sizeX+1, 2*self.sizeY+1)
+        matrixSize = (2*self.sizeX+1,2*self.sizeY+1)
+        for i in matrixSize[0]:
+            for j in matrixSize[1]:
+                if self.connectionMatrix[i][j] == 1:
+                    grid[i][j] = -1
+
+        grid[goal[0]][goal[1]] = 0
+
+        finished = False
+        wavefront = [goal]
+        while not finished:
+            numberUpdates = 0
+            for cell in wavefront:
+                numberUpdates += self.propagateWavefront(grid, cell)
+
+            if numberUpdates == 0:
+                finished = True
+
+
+
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
     # """
