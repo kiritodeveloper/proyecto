@@ -323,9 +323,9 @@ class Map2D:
 
         return current_fig
 
-    def findPath(self, point_ini, point_end):
+    def planPath(self, point_ini, point_end):
         """ overloaded call to planPath (x_ini,  y_ini, x_end, y_end) """
-        return self.planPath(point_ini[0], point_ini[1],
+        return self.findPath(point_ini[0], point_ini[1],
                              point_end[0], point_end[1])
 
     # ############################################################
@@ -348,12 +348,20 @@ class Map2D:
         ...  TO-DO  ....
         """
         # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
-        self.currentPath = np.array([[0, 0]] * num_steps)
-        pathFound = True
+        self.currentPath = np.concatenate((self.currentPath, np.array([x_ini, y_ini])))
 
-        # ????
+        if self.costMatrix[x_ini, y_ini] == -1:
+            # Never should go into
+            return False
+        elif x_ini == x_end and y_ini == y_end:
+            return True
 
-        return pathFound
+        available_movements_ordered = [[1, 2], [2, 3]]  # TODO: Fill
+
+
+
+
+
 
     # def replanPath(self, ??):
     # """ TO-DO """
