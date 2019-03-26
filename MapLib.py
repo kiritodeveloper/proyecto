@@ -355,13 +355,27 @@ class Map2D:
             return False
         elif x_ini == x_end and y_ini == y_end:
             return True
+        else:
+            best_step = None
+            low_path = 10000000  # If we increase the map we should change this value
+            for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
+                # 4 neighbours
+                next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
 
-        available_movements_ordered = [[1, 2], [2, 3]]  # TODO: Fill
+                if low_path > self.costMatrix[next_mov_x, next_mov_y]:
+                    best_step = [next_mov_x, next_mov_y]
+                    low_path = self.costMatrix[next_mov_x, next_mov_y]
 
+            for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
+                if (self.costMatrix[x_ini + i[0], y_ini] != -1) and (self.costMatrix[x_ini, y_ini + i[1]] != -1):
+                    # 8 neighbours
+                    next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
 
+                    if low_path > self.costMatrix[next_mov_x, next_mov_y]:
+                        best_step = [next_mov_x, next_mov_y]
+                        low_path = self.costMatrix[next_mov_x, next_mov_y]
 
-
-
+            return self.findPath(best_step[0], best_step[1], x_end, y_end)
 
     # def replanPath(self, ??):
     # """ TO-DO """
