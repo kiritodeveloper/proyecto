@@ -38,6 +38,9 @@ def main(args):
         # 1. load map and compute costs and path
         myMap = Map2D(map_file)
 
+        # debugging
+        myMap.fillCostMatrix([2, 0])
+
         # sample commands to see how to draw the map
         sampleRobotLocations = [[0, 0, 0], [600, 600, 3.14]]
         # this will save a .png with the current map visualization,
