@@ -45,8 +45,10 @@ class Map2D:
         self.costMatrix = None
         self.currentPath = None
 
-        self.neighbor = np.array([[1, 1, 0, -1, -1, 0, 1],  # row index
+        self.neighbor = np.array([[1, 1, 0, -1, -1, -1, 0, 1],  # row index
                                   [0, 1, 1, 1, 0, -1, -1, -1]])  # column index
+        self.sizeXExtended = 0
+        self.sizeYExtended = 0
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -347,27 +349,44 @@ class Map2D:
         numberUpdates = 0
         cellsUpdated = []
         for i in range(0, 8):
-            x, y = origin + (self.neighbor[0][i], self.neighbor[1][i])
+            x, y = (origin[0] + self.neighbor[0][i], origin[1] + self.neighbor[1][i])
             if 0 <= x < 2 * self.sizeX + 1 and 0 <= y < 2 * self.sizeY + 1:
+                updated = False
                 if grid[x, y] == -2:
                     grid[x, y] = grid[origin[0], origin[1]] + 1
-                elif grid[x, y] > (grid[origin[0], origin[1]] + 1):
+                    updated = True
+                elif grid[x, y] > (grid[origin[0], origin[1]] + 1) and grid[x, y] != -1:
                     grid[x, y] = grid[origin[0], origin[1]] + 1
+                    updated = True
 
-                numberUpdates += 1
-                cellsUpdated.append([x, y])
+                if updated:
+                    numberUpdates += 1
+                    cellsUpdated.append([x, y])
 
         return numberUpdates
 
-    def incrementWavefront(self, cells_updated):
-        pass
+    def incrementWavefront(self, cells_updated, grid):
+        new_wavefront = []
+        for cell in cells_updated:
+            for i in range(0, 8):
+                x, y = (cell[0] + self.neighbor[0][i], cell[1] + self.neighbor[1][i])
+                if 0 <= x < 2 * self.sizeX + 1 and 0 <= y < 2 * self.sizeY + 1 and grid[x, y] != -1:
+                    if grid[x, y] == grid[cell[0]][cell[1]] + 1:
+                        new_wavefront.append((x, y))
+        return new_wavefront
 
-    def fillCostMatrix(self, goal):
-        grid = -2 * np.ones(2 * self.sizeX + 1, 2 * self.sizeY + 1)
-        matrixSize = (2 * self.sizeX + 1, 2 * self.sizeY + 1)
-        for i in matrixSize[0]:
-            for j in matrixSize[1]:
-                if self.connectionMatrix[i][j] == 1:
+    def fillCostMatrix(self, goalCell):
+        self.sizeXExtended = 2 * self.sizeX + 1
+        self.sizeYExtended = 2 * self.sizeY + 1
+
+        goalX = 2 * goalCell[0] + 1
+        goalY = 2 * goalCell[1] + 1
+        goal = [goalX, goalY]
+
+        grid = -2 * np.ones((self.sizeXExtended, self.sizeYExtended))
+        for i in range(0, self.sizeXExtended):
+            for j in range(0, self.sizeYExtended):
+                if self.connectionMatrix[i][j] == 0:
                     grid[i][j] = -1
 
         grid[goal[0]][goal[1]] = 0
@@ -381,6 +400,7 @@ class Map2D:
 
             if numberUpdates == 0:
                 finished = True
+            wavefront = self.incrementWavefront(wavefront, grid)
 
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
