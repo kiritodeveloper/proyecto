@@ -50,8 +50,8 @@ def main(args):
 
         # this will open a window with the results, but does not work well remotely
         myMap.verbose = True
-        sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
-        myMap.drawMapWithRobotLocations(sampleRobotLocations)
+      #  sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
+       # myMap.drawMapWithRobotLocations(sampleRobotLocations)
 
         # 2. launch updateOdometry thread()
         # robot.startOdometry()

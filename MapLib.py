@@ -56,7 +56,7 @@ class Map2D:
     # from python docs: https://docs.python.org/3/tutorial/classes.html#private-variables
     # “Private” instance variables that cannot be accessed except from inside an object don’t exist in Python. 
     # However, there is a convention that is followed by most Python code: a name prefixed with an underscore \
-    # (e.g. _spam) should be treated as a non-public part of the API (whether it is a function, a method or a data member). 
+    # (e.g. _spam) should be treated as a non-public part of the API (whether it is a function, a method or a data member).
 
     # ############################################################
     # private methods 
