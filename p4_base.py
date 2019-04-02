@@ -57,6 +57,28 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
         while True:
+            # Arriba
+            robot.setSpeed(0, math.pi / 8)
+            time.sleep(4)
+            robot.setSpeed(0, 0)
+            myMap.detectObstacle(robot)
+            time.sleep(4)
+
+            # Izquierda
+            robot.setSpeed(0, math.pi / 8)
+            time.sleep(4)
+            robot.setSpeed(0, 0)
+            myMap.detectObstacle(robot)
+            time.sleep(4)
+
+            # Abajo
+            robot.setSpeed(0, math.pi / 8)
+            time.sleep(4)
+            robot.setSpeed(0, 0)
+            myMap.detectObstacle(robot)
+            time.sleep(4)
+
+            # Derecha
             robot.setSpeed(0, math.pi / 8)
             time.sleep(4)
             robot.setSpeed(0, 0)
