@@ -8,6 +8,14 @@ from matplotlib import animation
 import numpy as np
 import time
 import os
+from config_file import *
+import math
+
+# Only import original drivers if it isn't in debug mode
+if not is_debug:
+    import brickpi3  # import the BrickPi3 drivers
+else:
+    from FakeBlockPi import FakeBlockPi
 
 
 class Map2D:
@@ -49,6 +57,18 @@ class Map2D:
                                   [0, 1, 1, 1, 0, -1, -1, -1]])  # column index
         self.sizeXExtended = 0
         self.sizeYExtended = 0
+
+        if not is_debug:
+            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+        else:
+            self.BP = FakeBlockPi()
+
+        # Ultrasonic
+        self.motor_port_ultrasonic = self.BP.PORT_1
+        self.min_distance = 20 # in cm
+
+        self.cell_size = 0.4 # in m
+
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -458,3 +478,38 @@ class Map2D:
 
     # def replanPath(self, ??):
     # """ TO-DO """
+
+    def odometry2Cells(self, odometry):
+        x = odometry[0]
+        y = odometry[1]
+        th = odometry[2]
+
+        x = x // self.cell_size
+        y = y // self.cell_size
+
+        return [x, y, th]
+
+    def rad2Dir(self, th):
+        desviation = math.pi / 4
+
+        if th < desviation and th > -desviation:
+            return 2
+        elif th < (math.pi/2 + desviation) and th > (math.pi/2 -desviation):
+            return 0
+        elif th < (-math.pi + desviation) and th > (math.pi -desviation):
+            return 6
+        elif th < (-math.pi/2 + desviation) and th > (-math.pi/2 -desviation):
+            return 4
+        else:
+            return -1
+
+
+
+    def detectObstacle(self, robot):
+        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+        odometry = robot.readOdometry()
+        odometry = self.odometry2Cells(odometry)
+
+        if sensor_value < self.min_distance:
+            print('Miro hacia: ', self.rad2Dir(odometry[2]))
+            self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
