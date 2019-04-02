@@ -59,6 +59,7 @@ def main(args):
         while True:
             robot.setSpeed(0, math.pi / 8)
             time.sleep(4)
+            robot.setSpeed(0, 0)
             myMap.detectObstacle(robot)
             time.sleep(4)
 
