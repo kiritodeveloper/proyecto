@@ -4,6 +4,7 @@ import argparse
 import os
 import numpy as np
 import time
+import math
 
 import matplotlib
 
@@ -57,7 +58,9 @@ def main(args):
         robot.startOdometry()
         while True:
             myMap.detectObstacle(robot)
-            time.sleep(1)
+            time.sleep(2)
+            robot.setSpeed(0, -math.pi / 8)
+            time.sleep(4)
         # ...
 
         # 3. perform trajectory
