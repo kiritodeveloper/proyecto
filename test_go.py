@@ -33,7 +33,7 @@ def main():
         robot.startOdometry()
 
         # 2. perform trajectory
-        robot.go(1.5, 2.5)
+        robot.go(2.5, 1)
 
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
