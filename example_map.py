@@ -52,9 +52,7 @@ def main(args):
         #myMap.deleteConnection(0, 0, 0)
         myMap.drawMap(saveSnapshot=True)
 
-        path_to_gucci = myMap.findPath(0, 0, 2, 2)
-
-        print (path_to_gucci)
+        path_map_1 = myMap.findPath(0, 0, 2, 2)
 
         # this will open a window with the results, but does not work well remotely
 
