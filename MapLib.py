@@ -63,11 +63,11 @@ class Map2D:
 
         # Ultrasonic
         self.motor_port_ultrasonic = self.BP.PORT_1
-        self.min_distance = 20 # in cm
+        self.min_distance = 20  # in cm
 
         self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
 
-        self.cell_size = 0.4 # in m
+        self.cell_size = 0.4  # in m
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -427,7 +427,6 @@ class Map2D:
     # """
     # self.costMatrix = ....
 
-
     def findPath(self, x_ini, y_ini, x_end, y_end):
         """ 
         x_ini, y_ini, x_end, y_end: integer values that indicate \ 
@@ -464,14 +463,14 @@ class Map2D:
                     best_step = [next_mov_x, next_mov_y]
                     low_path = self.costMatrix[next_mov_x, next_mov_y]
 
-            for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
-                if (self.costMatrix[x_ini + i[0], y_ini] != -1) and (self.costMatrix[x_ini, y_ini + i[1]] != -1):
-                    # 8 neighbours
-                    next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
-
-                    if low_path > self.costMatrix[next_mov_x, next_mov_y]:
-                        best_step = [next_mov_x, next_mov_y]
-                        low_path = self.costMatrix[next_mov_x, next_mov_y]
+            # for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
+            #    if (self.costMatrix[x_ini + i[0], y_ini] != -1) and (self.costMatrix[x_ini, y_ini + i[1]] != -1):
+            #        # 8 neighbours
+            #        next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
+            #
+            #        if low_path > self.costMatrix[next_mov_x, next_mov_y]:
+            #            best_step = [next_mov_x, next_mov_y]
+            #            low_path = self.costMatrix[next_mov_x, next_mov_y]
 
             return self.findPath(best_step[0], best_step[1], x_end, y_end)
 
@@ -491,13 +490,13 @@ class Map2D:
     def rad2Dir(self, th):
         desviation = math.pi / 4
 
-        if th < desviation and th > -desviation:
+        if desviation > th > -desviation:
             return 2
-        elif th < (math.pi/2 + desviation) and th > (math.pi/2 -desviation):
+        elif (math.pi / 2 + desviation) > th > (math.pi / 2 - desviation):
             return 0
-        elif th < (-math.pi + desviation) and th > (math.pi -desviation):
+        elif (-math.pi + desviation) > th > (math.pi - desviation):
             return 6
-        elif th < (-math.pi/2 + desviation) and th > (-math.pi/2 -desviation):
+        elif (-math.pi / 2 + desviation) > th > (-math.pi / 2 - desviation):
             return 4
         else:
             return -1
