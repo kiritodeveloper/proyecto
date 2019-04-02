@@ -56,35 +56,29 @@ def main(args):
 
         # 2. launch updateOdometry thread()
         robot.startOdometry()
-        while True:
-            # Arriba
-            robot.setSpeed(0, math.pi / 8)
-            time.sleep(4)
-            robot.setSpeed(0, 0)
-            myMap.detectObstacle(robot)
-            time.sleep(4)
 
-            # Izquierda
-            robot.setSpeed(0, math.pi / 8)
-            time.sleep(4)
-            robot.setSpeed(0, 0)
-            myMap.detectObstacle(robot)
-            time.sleep(4)
+        goal_x = 2
+        goal_y = 2
 
-            # Abajo
-            robot.setSpeed(0, math.pi / 8)
-            time.sleep(4)
-            robot.setSpeed(0, 0)
-            myMap.detectObstacle(robot)
-            time.sleep(4)
 
-            # Derecha
-            robot.setSpeed(0, math.pi / 8)
-            time.sleep(4)
-            robot.setSpeed(0, 0)
-            myMap.detectObstacle(robot)
-            time.sleep(4)
+        myMap.fillCostMatrix([goal_x, goal_y])
+        route = myMap.planPath([0, 0], [goal_x, goal_y])
 
+        RobotLocations = []
+
+        finished = False
+        while not finished:
+            for goal in route:
+                reached = myMap.go((goal[0] + 1) * myMap.sizeCell, (goal[1] + 1) * myMap.sizeCell)
+                if not reached:
+                    route = myMap.replanPath()
+                    break
+                else:
+                    RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_theta])
+            if myMap.pos_x == goal_x and myMap.pos_y == goal_y:
+                finished = True
+
+        myMap.drawMapWithRobotLocations(RobotLocations)
         # ...
 
         # 3. perform trajectory

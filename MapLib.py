@@ -58,18 +58,24 @@ class Map2D:
         self.sizeXExtended = 0
         self.sizeYExtended = 0
 
+        # Ultrasonic
+        self.min_distance = 20  # in cm
+
         if not is_debug:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+            self.motor_port_ultrasonic = self.BP.PORT_1
+            self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
         else:
             self.BP = FakeBlockPi()
 
-        # Ultrasonic
-        self.motor_port_ultrasonic = self.BP.PORT_1
-        self.min_distance = 20 # in cm
-
-        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-
         self.cell_size = 0.4 # in m
+
+        self.pos_x = -1
+        self.pos_y = -1
+        self.pos_th = 0
+
+        self.goal_x = -1
+        self.goal_y = -1
 
 
         if self._loadMap(map_description_file):
@@ -439,6 +445,9 @@ class Map2D:
         NOTE: Make sure self.currentPath is a 2D numpy array
         ...  TO-DO  ....
         """
+        self.goal_x = x_end
+        self.goal_y = y_end
+
         x_ini = 2 * x_ini + 1
         y_ini = 2 * y_ini + 1
 
@@ -478,8 +487,6 @@ class Map2D:
 
             return self.findPath(best_step[0], best_step[1], x_end, y_end)
 
-    # def replanPath(self, ??):
-    # """ TO-DO """
 
     def odometry2Cells(self, odometry):
         x = odometry[0]
@@ -508,13 +515,27 @@ class Map2D:
 
 
     def detectObstacle(self, robot):
+        if is_debug:
+            return False
+
         sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
         odometry = robot.readOdometry()
+        self.pos_x = odometry[0]
+        self.pos_y = odometry[1]
+        self.pos_th = odometry[2]
         print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
         odometry = self.odometry2Cells(odometry)
         if sensor_value < self.min_distance:
             print('Miro hacia: ', self.rad2Dir(odometry[2]))
             self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
+            return True
+        else:
+            return False
+
+    def  replanPath(self):
+        self.fillCostMatrix(self, (self.goal_x, self.goal_y))
+        return self.planPath(self.pos_x, self.pos_y, self.goal_x, self.goal_y)
+
 
     def stopMap(self):
         """
