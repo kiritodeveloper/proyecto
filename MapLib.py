@@ -6,6 +6,15 @@ from __future__ import division  # ''
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import os
+from config_file import *
+import math
+
+# Only import original drivers if it isn't in debug mode
+if not is_debug:
+    import brickpi3  # import the BrickPi3 drivers
+else:
+    from FakeBlockPi import FakeBlockPi
 
 
 class Map2D:
@@ -47,6 +56,20 @@ class Map2D:
                                   [0, 1, 1, 1, 0, -1, -1, -1]])  # column index
         self.sizeXExtended = 0
         self.sizeYExtended = 0
+
+        if not is_debug:
+            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+        else:
+            self.BP = FakeBlockPi()
+
+        # Ultrasonic
+        self.motor_port_ultrasonic = self.BP.PORT_1
+        self.min_distance = 20 # in cm
+
+        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+
+        self.cell_size = 0.4 # in m
+
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -399,76 +422,101 @@ class Map2D:
             if numberUpdates == 0:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
-        self.costMatrix = grid
+        print(wavefront)
 
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
     # """
     # self.costMatrix = ....
 
+
     def findPath(self, x_ini, y_ini, x_end, y_end):
-        def findPath_recursive(cost_matrix, x_ini_ext, y_ini_ext):
-            """
-            x_ini, y_ini, x_end, y_end: integer values that indicate \
-                the x and y coordinates of the starting (ini) and ending (end) cell
+        """ 
+        x_ini, y_ini, x_end, y_end: integer values that indicate \ 
+            the x and y coordinates of the starting (ini) and ending (end) cell
 
-            NOTE: Make sure self.currentPath is a 2D numpy array
-            ...  TO-DO  ....
-            """
-            if cost_matrix[x_ini_ext, y_ini_ext] == -1:
-                # Never should go into
-                return None
-            elif cost_matrix[x_ini_ext, y_ini_ext] == 0:
-                return [(x_ini_ext, y_ini_ext)]
-            else:
-                best_step = None
-                low_path = 10000000  # If we increase the map we should change this value
-                for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
-                    # 4 neighbours
-                    next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
+        NOTE: Make sure self.currentPath is a 2D numpy array
+        ...  TO-DO  ....
+        """
+        x_ini = 2 * x_ini + 1
+        y_ini = 2 * y_ini + 1
 
-                    if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
-                            and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
+        x_end = 2 * x_end + 1
+        y_end = 2 * y_end + 1
+
+        # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
+        if self.currentPath is None:
+            self.currentPath = np.array([x_ini, y_ini])
+        else:
+            self.currentPath = np.concatenate((self.currentPath, np.array([x_ini, y_ini])))
+
+        if self.costMatrix[x_ini, y_ini] == -1:
+            # Never should go into
+            return False
+        elif x_ini == x_end and y_ini == y_end:
+            return True
+        else:
+            best_step = None
+            low_path = 10000000  # If we increase the map we should change this value
+            for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
+                # 4 neighbours
+                next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
+
+                if low_path > self.costMatrix[next_mov_x, next_mov_y]:
+                    best_step = [next_mov_x, next_mov_y]
+                    low_path = self.costMatrix[next_mov_x, next_mov_y]
+
+            for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
+                if (self.costMatrix[x_ini + i[0], y_ini] != -1) and (self.costMatrix[x_ini, y_ini + i[1]] != -1):
+                    # 8 neighbours
+                    next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
+
+                    if low_path > self.costMatrix[next_mov_x, next_mov_y]:
                         best_step = [next_mov_x, next_mov_y]
-                        low_path = cost_matrix[next_mov_x, next_mov_y]
+                        low_path = self.costMatrix[next_mov_x, next_mov_y]
 
-                for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
-                    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
-                            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
-                        # 8 neighbours
-                        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
-
-                        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
-                                and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
-                            best_step = [next_mov_x, next_mov_y]
-                            low_path = cost_matrix[next_mov_x, next_mov_y]
-
-                next_steps = findPath_recursive(cost_matrix, best_step[0], best_step[1])
-
-                if next_steps is None:
-                    return None
-                else:
-                    return [(x_ini_ext, y_ini_ext)] + next_steps
-
-        self.fillCostMatrix([x_end, y_end])
-
-        x_ini_ext = 2 * x_ini + 1
-        y_ini_ext = 2 * y_ini + 1
-
-        # x_end_ext = 2 * x_end_inner + 1
-        # y_end_ext = 2 * y_end_inner + 1
-
-        path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext)
-        path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
-
-        last = None
-        path_to_return = []
-
-        for i in path:
-            if last != i:
-                path_to_return += [i]
-                last = i
-        return path_to_return
+            return self.findPath(best_step[0], best_step[1], x_end, y_end)
 
     # def replanPath(self, ??):
     # """ TO-DO """
+
+    def odometry2Cells(self, odometry):
+        x = odometry[0]
+        y = odometry[1]
+        th = odometry[2]
+
+        x = x // self.cell_size
+        y = y // self.cell_size
+
+        return [x, y, th]
+
+    def rad2Dir(self, th):
+        desviation = math.pi / 4
+
+        if th < desviation and th > -desviation:
+            return 2
+        elif th < (math.pi/2 + desviation) and th > (math.pi/2 -desviation):
+            return 0
+        elif th < (-math.pi + desviation) and th > (math.pi -desviation):
+            return 6
+        elif th < (-math.pi/2 + desviation) and th > (-math.pi/2 -desviation):
+            return 4
+        else:
+            return -1
+
+
+
+    def detectObstacle(self, robot):
+        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+        odometry = robot.readOdometry()
+        print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
+        odometry = self.odometry2Cells(odometry)
+        if sensor_value < self.min_distance:
+            print('Miro hacia: ', self.rad2Dir(odometry[2]))
+            self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
+
+    def stopMap(self):
+        """
+        Stop the map (ultrasonic sensor)
+        """
+        self.BP.reset_all()
