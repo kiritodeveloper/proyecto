@@ -401,11 +401,13 @@ class Map2D:
             if numberUpdates == 0:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
+        print(wavefront)
 
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
     # """
     # self.costMatrix = ....
+
 
     def findPath(self, x_ini, y_ini, x_end, y_end):
         """ 
@@ -415,8 +417,17 @@ class Map2D:
         NOTE: Make sure self.currentPath is a 2D numpy array
         ...  TO-DO  ....
         """
+        x_ini = 2 * x_ini + 1
+        y_ini = 2 * y_ini + 1
+
+        x_end = 2 * x_end + 1
+        y_end = 2 * y_end + 1
+
         # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
-        self.currentPath = np.concatenate((self.currentPath, np.array([x_ini, y_ini])))
+        if self.currentPath is None:
+            self.currentPath = np.array([x_ini, y_ini])
+        else:
+            self.currentPath = np.concatenate((self.currentPath, np.array([x_ini, y_ini])))
 
         if self.costMatrix[x_ini, y_ini] == -1:
             # Never should go into

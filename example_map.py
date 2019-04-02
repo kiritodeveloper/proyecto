@@ -48,13 +48,19 @@ def main(args):
         myMap.drawMapWithRobotLocations(sampleRobotLocations)
 
         # this shows the current, and empty, map and an additionally closed connection
+        #myMap.verbose = True
         myMap.deleteConnection(0, 0, 0)
         myMap.drawMap(saveSnapshot=True)
 
+        myMap.fillCostMatrix([2, 2])
+        path_to_gucci = myMap.findPath(0, 0, 2, 2)
+
+        print (path_to_gucci)
+
         # this will open a window with the results, but does not work well remotely
-        myMap.verbose = True
-      #  sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
-       # myMap.drawMapWithRobotLocations(sampleRobotLocations)
+
+        #  sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
+        # myMap.drawMapWithRobotLocations(sampleRobotLocations)
 
         # 2. launch updateOdometry thread()
         # robot.startOdometry()
