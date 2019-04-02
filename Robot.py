@@ -249,8 +249,7 @@ class Robot:
         Write message in the log (screen)
         :param message: message to write
         """
-        # print(message)
-        kk = 0
+        print(message)
 
     def normalizeAngle(self, angle):
         """
@@ -430,8 +429,8 @@ class Robot:
                     [x_odo, y_odo, th_odo] = robot.readOdometry()
                     t_next_period += robot.P
                     delay_until(t_next_period)
-                    print([x_odo, y_odo, th_odo])
-            print([x_odo, y_odo, th_odo])
+                    #print([x_odo, y_odo, th_odo])
+            #print([x_odo, y_odo, th_odo])
 
         [x_actual, y_actual, _] = self.readOdometry()
 
@@ -455,3 +454,5 @@ class Robot:
 
         # Stop robot
         self.setSpeed(0, 0)
+
+        return True

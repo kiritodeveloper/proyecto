@@ -68,8 +68,6 @@ class Map2D:
         else:
             self.BP = FakeBlockPi()
 
-        self.cell_size = 0.4 # in m
-
         self.pos_x = -1
         self.pos_y = -1
         self.pos_th = 0
@@ -430,44 +428,33 @@ class Map2D:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
         print(wavefront)
+        self.costMatrix = grid
 
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
     # """
     # self.costMatrix = ....
 
-
     def findPath(self, x_ini, y_ini, x_end, y_end):
-        """ 
-        x_ini, y_ini, x_end, y_end: integer values that indicate \ 
-            the x and y coordinates of the starting (ini) and ending (end) cell
+        def findPath_recursive(cost_matrix, x_ini_ext, y_ini_ext):
+            """
+            x_ini, y_ini, x_end, y_end: integer values that indicate \
+                the x and y coordinates of the starting (ini) and ending (end) cell
 
-        NOTE: Make sure self.currentPath is a 2D numpy array
-        ...  TO-DO  ....
-        """
-        x_ini = 2 * x_ini + 1
-        y_ini = 2 * y_ini + 1
-
-        x_end = 2 * x_end + 1
-        y_end = 2 * y_end + 1
-
-        # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
-        if self.currentPath is None:
-            self.currentPath = np.array([x_ini, y_ini])
-        else:
-            self.currentPath = np.concatenate((self.currentPath, np.array([x_ini, y_ini])))
-
-        if self.costMatrix[x_ini, y_ini] == -1:
-            # Never should go into
-            return False
-        elif x_ini == x_end and y_ini == y_end:
-            return True
-        else:
-            best_step = None
-            low_path = 10000000  # If we increase the map we should change this value
-            for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
-                # 4 neighbours
-                next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
+            NOTE: Make sure self.currentPath is a 2D numpy array
+            ...  TO-DO  ....
+            """
+            if cost_matrix[x_ini_ext, y_ini_ext] == -1:
+                # Never should go into
+                return None
+            elif cost_matrix[x_ini_ext, y_ini_ext] == 0:
+                return [(x_ini_ext, y_ini_ext)]
+            else:
+                best_step = None
+                low_path = 10000000  # If we increase the map we should change this value
+                for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
+                    # 4 neighbours
+                    next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
 
                     if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
                             and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
@@ -520,8 +507,8 @@ class Map2D:
         y = odometry[1]
         th = odometry[2]
 
-        x = x // self.cell_size
-        y = y // self.cell_size
+        x = x // self.sizeCell
+        y = y // self.sizeCell
 
         return [x, y, th]
 

@@ -19,6 +19,7 @@ from Robot import Robot
 from RobotDrawer import start_robot_drawer
 from RobotLogger import start_robot_logger
 import time
+from RobotDrawer import *
 
 from utils import delay_until
 
@@ -66,15 +67,26 @@ def main(args):
 
         RobotLocations = []
 
+        #myMap.drawMap(saveSnapshot=False)
+        #plt.show()
+        start_robot_drawer(robot.finished, robot)
+
         finished = False
         while not finished:
             for goal in route:
-                reached = myMap.go((goal[0] + 1) * myMap.sizeCell, (goal[1] + 1) * myMap.sizeCell)
+                print('Ruta', route)
+                partial_goal_x = (goal[0] + 1) * myMap.sizeCell/1000
+                partial_goal_y = (goal[1] + 1) * myMap.sizeCell/1000
+                print('Partials: ', partial_goal_x, partial_goal_y)
+                print('El goal: ', goal)
+                print('Estoy: ', robot.readOdometry())
+                reached = robot.go(partial_goal_x, partial_goal_y)
                 if not reached:
+                    print('NO HA ALCANZADO EL OBJETIVO')
                     route = myMap.replanPath()
                     break
                 else:
-                    RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_theta])
+                    RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
             if myMap.pos_x == goal_x and myMap.pos_y == goal_y:
                 finished = True
 
