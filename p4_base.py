@@ -17,6 +17,8 @@ from config_file import is_debug
 from Robot import Robot
 from RobotDrawer import start_robot_drawer
 from RobotLogger import start_robot_logger
+import time
+
 
 
 # NOTES ABOUT TASKS to DO in P4:
@@ -55,6 +57,7 @@ def main(args):
         robot.startOdometry()
         while True:
             myMap.detectObstacle(robot)
+            time.sleep(1)
         # ...
 
         # 3. perform trajectory

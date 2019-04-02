@@ -510,8 +510,8 @@ class Map2D:
     def detectObstacle(self, robot):
         sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
         odometry = robot.readOdometry()
+        print("Distancia: ", sensor_value, ' Theta: ', odometry[3])
         odometry = self.odometry2Cells(odometry)
-        print("Distancia: ", sensor_value)
         if sensor_value < self.min_distance:
             print('Miro hacia: ', self.rad2Dir(odometry[2]))
             self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
