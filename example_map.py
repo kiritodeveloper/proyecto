@@ -49,10 +49,9 @@ def main(args):
 
         # this shows the current, and empty, map and an additionally closed connection
         #myMap.verbose = True
-        myMap.deleteConnection(0, 0, 0)
+        #myMap.deleteConnection(0, 0, 0)
         myMap.drawMap(saveSnapshot=True)
 
-        myMap.fillCostMatrix([2, 2])
         path_to_gucci = myMap.findPath(0, 0, 2, 2)
 
         print (path_to_gucci)

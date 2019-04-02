@@ -4,10 +4,8 @@ from __future__ import print_function  # use python 3 syntax but make it compati
 from __future__ import division  # ''
 
 import matplotlib.pyplot as plt
-from matplotlib import animation
 import numpy as np
 import time
-import os
 
 
 class Map2D:
@@ -401,60 +399,76 @@ class Map2D:
             if numberUpdates == 0:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
-        print(wavefront)
+        self.costMatrix = grid
 
     # NOTE: Make sure self.costMatrix is a 2D numpy array
     # TO-DO
     # """
     # self.costMatrix = ....
 
-
     def findPath(self, x_ini, y_ini, x_end, y_end):
-        """ 
-        x_ini, y_ini, x_end, y_end: integer values that indicate \ 
-            the x and y coordinates of the starting (ini) and ending (end) cell
+        def findPath_recursive(cost_matrix, x_ini_ext, y_ini_ext):
+            """
+            x_ini, y_ini, x_end, y_end: integer values that indicate \
+                the x and y coordinates of the starting (ini) and ending (end) cell
 
-        NOTE: Make sure self.currentPath is a 2D numpy array
-        ...  TO-DO  ....
-        """
-        x_ini = 2 * x_ini + 1
-        y_ini = 2 * y_ini + 1
+            NOTE: Make sure self.currentPath is a 2D numpy array
+            ...  TO-DO  ....
+            """
+            if cost_matrix[x_ini_ext, y_ini_ext] == -1:
+                # Never should go into
+                return None
+            elif cost_matrix[x_ini_ext, y_ini_ext] == 0:
+                return [(x_ini_ext, y_ini_ext)]
+            else:
+                best_step = None
+                low_path = 10000000  # If we increase the map we should change this value
+                for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
+                    # 4 neighbours
+                    next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
 
-        x_end = 2 * x_end + 1
-        y_end = 2 * y_end + 1
-
-        # FAKE sample path: [ [0,0], [0,0], [0,0], ...., [0,0]  ]
-        if self.currentPath is None:
-            self.currentPath = np.array([x_ini, y_ini])
-        else:
-            self.currentPath = np.concatenate((self.currentPath, np.array([x_ini, y_ini])))
-
-        if self.costMatrix[x_ini, y_ini] == -1:
-            # Never should go into
-            return False
-        elif x_ini == x_end and y_ini == y_end:
-            return True
-        else:
-            best_step = None
-            low_path = 10000000  # If we increase the map we should change this value
-            for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
-                # 4 neighbours
-                next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
-
-                if low_path > self.costMatrix[next_mov_x, next_mov_y]:
-                    best_step = [next_mov_x, next_mov_y]
-                    low_path = self.costMatrix[next_mov_x, next_mov_y]
-
-            for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
-                if (self.costMatrix[x_ini + i[0], y_ini] != -1) and (self.costMatrix[x_ini, y_ini + i[1]] != -1):
-                    # 8 neighbours
-                    next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
-
-                    if low_path > self.costMatrix[next_mov_x, next_mov_y]:
+                    if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
+                            and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
                         best_step = [next_mov_x, next_mov_y]
-                        low_path = self.costMatrix[next_mov_x, next_mov_y]
+                        low_path = cost_matrix[next_mov_x, next_mov_y]
 
-            return self.findPath(best_step[0], best_step[1], x_end, y_end)
+                for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
+                    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
+                            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
+                        # 8 neighbours
+                        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
+
+                        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
+                                and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
+                            best_step = [next_mov_x, next_mov_y]
+                            low_path = cost_matrix[next_mov_x, next_mov_y]
+
+                next_steps = findPath_recursive(cost_matrix, best_step[0], best_step[1])
+
+                if next_steps is None:
+                    return None
+                else:
+                    return [(x_ini_ext, y_ini_ext)] + next_steps
+
+        self.fillCostMatrix([x_end, y_end])
+
+        x_ini_ext = 2 * x_ini + 1
+        y_ini_ext = 2 * y_ini + 1
+
+        # x_end_ext = 2 * x_end_inner + 1
+        # y_end_ext = 2 * y_end_inner + 1
+
+        path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext)
+        path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
+
+        last = None
+        path_to_return = []
+
+        for i in path:
+            if last != i:
+                path_to_return += [i]
+                last = i
+        return path_to_return
 
     # def replanPath(self, ??):
     # """ TO-DO """
