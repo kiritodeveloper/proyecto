@@ -441,12 +441,17 @@ class Robot:
         aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
 
         # Turn
-        self.setSpeed(0, math.pi / 8)
+        turn_speed = math.pi / 16
+
+        if aligned_angle < 0:
+            turn_speed = -turn_speed
+
+        self.setSpeed(0, turn_speed)
         wait_for_position(x_actual, y_actual, aligned_angle, self, 0.01, 0.02)
 
         # Go forward
         self.setSpeed(0.2, 0)
-        wait_for_position(final_x, final_y, aligned_angle, self, 0.1, 0.02)
+        wait_for_position(final_x, final_y, aligned_angle, self, 0.1, 0.08)
 
         # Stop robot
         self.setSpeed(0, 0)
