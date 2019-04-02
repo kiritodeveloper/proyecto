@@ -445,9 +445,6 @@ class Map2D:
         NOTE: Make sure self.currentPath is a 2D numpy array
         ...  TO-DO  ....
         """
-        self.goal_x = x_end
-        self.goal_y = y_end
-
         x_ini = 2 * x_ini + 1
         y_ini = 2 * y_ini + 1
 
@@ -472,20 +469,48 @@ class Map2D:
                 # 4 neighbours
                 next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
 
-                if low_path > self.costMatrix[next_mov_x, next_mov_y]:
-                    best_step = [next_mov_x, next_mov_y]
-                    low_path = self.costMatrix[next_mov_x, next_mov_y]
+                    if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
+                            and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
+                        best_step = [next_mov_x, next_mov_y]
+                        low_path = cost_matrix[next_mov_x, next_mov_y]
 
-            # for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
-            #    if (self.costMatrix[x_ini + i[0], y_ini] != -1) and (self.costMatrix[x_ini, y_ini + i[1]] != -1):
-            #        # 8 neighbours
-            #        next_mov_x, next_mov_y = [i[0] + x_ini, i[1] + y_ini]
-            #
-            #        if low_path > self.costMatrix[next_mov_x, next_mov_y]:
-            #            best_step = [next_mov_x, next_mov_y]
-            #            low_path = self.costMatrix[next_mov_x, next_mov_y]
+                for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
+                    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
+                            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
+                        # 8 neighbours
+                        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
 
-            return self.findPath(best_step[0], best_step[1], x_end, y_end)
+                        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
+                                and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
+                            best_step = [next_mov_x, next_mov_y]
+                            low_path = cost_matrix[next_mov_x, next_mov_y]
+
+                next_steps = findPath_recursive(cost_matrix, best_step[0], best_step[1])
+
+                if next_steps is None:
+                    return None
+                else:
+                    return [(x_ini_ext, y_ini_ext)] + next_steps
+
+        self.fillCostMatrix([x_end, y_end])
+
+        x_ini_ext = 2 * x_ini + 1
+        y_ini_ext = 2 * y_ini + 1
+
+        # x_end_ext = 2 * x_end_inner + 1
+        # y_end_ext = 2 * y_end_inner + 1
+
+        path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext)
+        path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
+
+        last = None
+        path_to_return = []
+
+        for i in path:
+            if last != i:
+                path_to_return += [i]
+                last = i
+        return path_to_return
 
     # def replanPath(self, ??):
     # """ TO-DO """
