@@ -78,8 +78,8 @@ def main(args):
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
-        print
-        'do something to stop Robot when we Ctrl+C ...'
+        robot.stopOdometry()
+        myMap.stopMap()
 
 
 if __name__ == "__main__":

@@ -515,3 +515,9 @@ class Map2D:
         if sensor_value < self.min_distance:
             print('Miro hacia: ', self.rad2Dir(odometry[2]))
             self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
+
+    def stopMap(self):
+        """
+        Stop the map (ultrasonic sensor)
+        """
+        self.BP.reset_all()
