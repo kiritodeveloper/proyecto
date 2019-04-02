@@ -28,46 +28,6 @@ from utils import delay_until
 # 3) you can change the method signatures if you need, depending how you have implemented things
 
 
-def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
-    """
-    Wait until the robot reaches the position
-    :param x: x position to be reached
-    :param y: y position to be reached
-    :param robot: robot configuration
-    :param position_error_margin: error allowed in the position
-    :param th_error_margin: error allowed in the orientation
-    """
-    [x_odo, y_odo, th_odo] = robot.readOdometry()
-
-    print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
-
-    t_next_period = time.time()
-
-    if th is None:
-        print("TH none")
-        # None th provided
-        while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
-            [x_odo, y_odo, th_odo] = robot.readOdometry()
-            t_next_period += robot.P
-            delay_until(t_next_period)
-    else:
-        while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
-                th_error_margin < abs(th - th_odo)):
-            [x_odo, y_odo, th_odo] = robot.readOdometry()
-            t_next_period += robot.P
-            delay_until(t_next_period)
-            print ([x_odo, y_odo, th_odo])
-    print([x_odo, y_odo, th_odo])
-
-def path_2_odometry(robot):
-    """
-    Instructions to do the path 2 based on odometry
-    :param robot: robot configuration
-    """
-    robot.setSpeed(0, math.pi / 8)
-    wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
-
-
 def main(args):
     """
     Example to load "mapa1.txt"
@@ -97,9 +57,11 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
         while True:
-            myMap.detectObstacle(robot)
-            path_2_odometry(robot)
+            robot.setSpeed(0, math.pi / 8)
             time.sleep(4)
+            myMap.detectObstacle(robot)
+            time.sleep(4)
+
         # ...
 
         # 3. perform trajectory
