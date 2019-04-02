@@ -249,7 +249,7 @@ class Robot:
         Write message in the log (screen)
         :param message: message to write
         """
-        #print(message)
+        # print(message)
         kk = 0
 
     def normalizeAngle(self, angle):
@@ -400,3 +400,53 @@ class Robot:
                 time.sleep(1)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
+
+    def go(self, x_goal, y_goal):
+        def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
+            """
+            Wait until the robot reaches the position
+            :param x: x position to be reached
+            :param y: y position to be reached
+            :param robot: robot configuration
+            :param position_error_margin: error allowed in the position
+            :param th_error_margin: error allowed in the orientation
+            """
+            [x_odo, y_odo, th_odo] = robot.readOdometry()
+
+            print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
+
+            t_next_period = time.time()
+
+            if th is None:
+                print("TH none")
+                # None th provided
+                while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
+                    [x_odo, y_odo, th_odo] = robot.readOdometry()
+                    t_next_period += robot.P
+                    delay_until(t_next_period)
+            else:
+                while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
+                        th_error_margin < abs(th - th_odo)):
+                    [x_odo, y_odo, th_odo] = robot.readOdometry()
+                    t_next_period += robot.P
+                    delay_until(t_next_period)
+                    print([x_odo, y_odo, th_odo])
+            print([x_odo, y_odo, th_odo])
+
+        [x_actual, y_actual, _] = self.readOdometry()
+
+        # Obtain positions
+        final_x = x_goal
+        final_y = y_goal
+        aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
+
+        # Turn
+        self.setSpeed(0, math.pi / 8)
+        wait_for_position(x_actual, y_actual, aligned_angle, self, 0.01, 0.02)
+
+        # Go forward
+        self.setSpeed(0.2, 0)
+        wait_for_position(final_x, final_y, aligned_angle, self, 0.08, 0.02)
+
+        # Stop robot
+        self.setSpeed(0, 0)
