@@ -93,6 +93,7 @@ def main(args):
             time.sleep(2)
             robot.setSpeed(0, -math.pi / 8)
             wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
+            robot.setSpeed(0, 0)
         # ...
 
         # 3. perform trajectory
