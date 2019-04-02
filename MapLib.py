@@ -6,7 +6,6 @@ from __future__ import division  # ''
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-import os
 from config_file import *
 import math
 
@@ -69,7 +68,6 @@ class Map2D:
         self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
 
         self.cell_size = 0.4 # in m
-
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -503,8 +501,6 @@ class Map2D:
             return 4
         else:
             return -1
-
-
 
     def detectObstacle(self, robot):
         sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
