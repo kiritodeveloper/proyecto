@@ -432,7 +432,7 @@ class Robot:
                     #print([x_odo, y_odo, th_odo])
             #print([x_odo, y_odo, th_odo])
 
-        [x_actual, y_actual, _] = self.readOdometry()
+        [x_actual, y_actual, th_actual] = self.readOdometry()
 
         # Obtain positions
         final_x = x_goal
@@ -442,7 +442,7 @@ class Robot:
         # Turn
         turn_speed = math.pi / 16
 
-        if aligned_angle < 0:
+        if aligned_angle < th_actual:
             turn_speed = -turn_speed
 
         self.setSpeed(0, turn_speed)

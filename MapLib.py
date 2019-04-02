@@ -529,14 +529,14 @@ class Map2D:
 
 
     def detectObstacle(self, robot):
-        if is_debug:
-            return False
-
-        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
         odometry = robot.readOdometry()
         self.pos_x = odometry[0]
         self.pos_y = odometry[1]
         self.pos_th = odometry[2]
+        if is_debug:
+            return False
+
+        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
         print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
         odometry = self.odometry2Cells(odometry)
         if sensor_value < self.min_distance:
