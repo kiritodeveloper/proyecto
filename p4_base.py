@@ -98,7 +98,7 @@ def main(args):
         robot.startOdometry()
         while True:
             myMap.detectObstacle(robot)
-            path_2_odometry()
+            path_2_odometry(robot)
             time.sleep(4)
         # ...
 
