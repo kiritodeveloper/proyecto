@@ -59,6 +59,14 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
             print ([x_odo, y_odo, th_odo])
     print([x_odo, y_odo, th_odo])
 
+def path_2_odometry(robot):
+    """
+    Instructions to do the path 2 based on odometry
+    :param robot: robot configuration
+    """
+    robot.setSpeed(0, math.pi / 8)
+    wait_for_position(0, 0, math.pi / 2, robot, 0.01, 0.02)
+
 
 def main(args):
     """
@@ -90,10 +98,8 @@ def main(args):
         robot.startOdometry()
         while True:
             myMap.detectObstacle(robot)
-            time.sleep(2)
-            robot.setSpeed(0, -math.pi / 8)
-            wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
-            robot.setSpeed(0, 0)
+            path_2_odometry()
+            time.sleep(4)
         # ...
 
         # 3. perform trajectory
