@@ -249,7 +249,8 @@ class Robot:
         Write message in the log (screen)
         :param message: message to write
         """
-        print(message)
+        #print(message)
+        kk = 0
 
     def normalizeAngle(self, angle):
         """
