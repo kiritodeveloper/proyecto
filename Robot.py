@@ -400,7 +400,7 @@ class Robot:
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
-    def go(self, x_goal, y_goal):
+    def go(self, x_goal, y_goal, myMap):
         def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
             """
             Wait until the robot reaches the position
@@ -447,6 +447,15 @@ class Robot:
 
         self.setSpeed(0, turn_speed)
         wait_for_position(x_actual, y_actual, aligned_angle, self, 0.01, 0.02)
+
+        # Stop robot
+        self.setSpeed(0, 0)
+
+        # Detect wall
+
+        wall = myMap.detectObstacle(self)
+        if wall:
+            return False
 
         # Go forward
         self.setSpeed(0.1, 0)

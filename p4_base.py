@@ -82,7 +82,7 @@ def main(args):
                 print('Partials: ', partial_goal_x, partial_goal_y)
                 print('El goal: ', goal)
                 print('Estoy: ', robot.readOdometry())
-                reached = robot.go(partial_goal_x, partial_goal_y)
+                reached = robot.go(partial_goal_x, partial_goal_y, myMap)
                 if not reached:
                     print('NO HA ALCANZADO EL OBJETIVO')
                     route = myMap.replanPath()
