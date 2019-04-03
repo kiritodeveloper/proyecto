@@ -59,7 +59,7 @@ class Map2D:
         self.sizeYExtended = 0
 
         # Ultrasonic
-        self.min_distance = 20  # in cm
+        self.min_distance = 30  # in cm
 
         if not is_debug:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
