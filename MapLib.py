@@ -444,7 +444,6 @@ class Map2D:
             NOTE: Make sure self.currentPath is a 2D numpy array
             ...  TO-DO  ....
             """
-            print('Me llaman con: ', x_ini_ext, y_ini_ext)
             if cost_matrix[x_ini_ext, y_ini_ext] == -1:
                 # Never should go into
                 return None
