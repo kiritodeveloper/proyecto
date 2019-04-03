@@ -9,8 +9,11 @@ import sys
 from multiprocessing import Process, Value, Array, Lock
 import numpy as np
 
-from RobotFrameCapturer import RobotFrameCapturer
 from config_file import *
+
+if not is_debug and disable_open_cv:
+    from RobotFrameCapturer import RobotFrameCapturer
+
 from utils import delay_until
 
 # Only import original drivers if it isn't in debug mode

@@ -75,7 +75,6 @@ class Map2D:
         self.goal_x = -1
         self.goal_y = -1
 
-
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
         else:
@@ -526,8 +525,6 @@ class Map2D:
         else:
             return -1
 
-
-
     def detectObstacle(self, robot):
         odometry = robot.readOdometry()
         self.pos_x = odometry[0]
@@ -546,10 +543,9 @@ class Map2D:
         else:
             return False
 
-    def  replanPath(self):
+    def replanPath(self):
         self.fillCostMatrix(self, (self.goal_x, self.goal_y))
         return self.planPath(self.pos_x, self.pos_y, self.goal_x, self.goal_y)
-
 
     def stopMap(self):
         """
