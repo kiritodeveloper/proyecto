@@ -72,7 +72,7 @@ def main(args):
 
         #myMap.drawMap(saveSnapshot=False)
         #plt.show()
-        start_robot_drawer(robot.finished, robot)
+        #start_robot_drawer(robot.finished, robot)
         last_reached_pos = [0, 0]
 
         finished = False
