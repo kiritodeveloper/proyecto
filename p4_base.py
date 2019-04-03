@@ -84,6 +84,22 @@ def main(args):
                 print('Estoy: ', robot.readOdometry())
                 reached = robot.go(partial_goal_x, partial_goal_y, myMap)
                 if not reached:
+                    # TODO: Poner el sitio correcto
+                    '''
+                            if is_debug:
+            return False
+        else:
+            pos_x, pos_y, pos_th = self.readOdometry()
+            sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+            print("Distancia: ", sensor_value, ' Theta: ', pos_th)
+            odometry = self.odometry2Cells(pos_x, pos_y)
+            if sensor_value < self.min_distance:
+                print('Miro hacia: ', self.rad2Dir(odometry[2]))
+                self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
+                return True
+            else:
+                return False
+                    '''
                     print('NO HA ALCANZADO EL OBJETIVO')
                     route = myMap.replanPath(goal_x, goal_y)
                     break

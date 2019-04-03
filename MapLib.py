@@ -11,13 +11,6 @@ import os
 from config_file import *
 import math
 
-# Only import original drivers if it isn't in debug mode
-if not is_debug:
-    import brickpi3  # import the BrickPi3 drivers
-else:
-    from FakeBlockPi import FakeBlockPi
-
-
 class Map2D:
     def __init__(self, map_description_file):
         """
@@ -57,16 +50,6 @@ class Map2D:
                                   [0, 1, 1, 1, 0, -1, -1, -1]])  # column index
         self.sizeXExtended = 0
         self.sizeYExtended = 0
-
-        # Ultrasonic
-        self.min_distance = 30  # in cm
-
-        if not is_debug:
-            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-            self.motor_port_ultrasonic = self.BP.PORT_1
-            self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-        else:
-            self.BP = FakeBlockPi()
 
         self.pos_x = -1
         self.pos_y = -1
@@ -525,24 +508,6 @@ class Map2D:
             return 4
         else:
             return -1
-
-    def detectObstacle(self, robot):
-        odometry = robot.readOdometry()
-        self.pos_x = odometry[0]
-        self.pos_y = odometry[1]
-        self.pos_th = odometry[2]
-        if is_debug:
-            return False
-
-        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
-        print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
-        odometry = self.odometry2Cells(odometry)
-        if sensor_value < self.min_distance:
-            print('Miro hacia: ', self.rad2Dir(odometry[2]))
-            self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
-            return True
-        else:
-            return False
 
     def  replanPath(self, goal_x, goal_y):
         pos_x = (self.pos_x * 1000) / self.sizeCell + 1

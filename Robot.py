@@ -86,6 +86,11 @@ class Robot:
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
+        # Sonar config
+        self.motor_port_ultrasonic = self.BP.PORT_1
+        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+        self.min_distance_obstacle_detection = 30  # cm
+
     def setSpeed(self, v, w):
         """
         Set the speed of the robot
@@ -404,7 +409,18 @@ class Robot:
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
-    def go(self, x_goal, y_goal, myMap):
+    def detectObstacle(self):
+        if is_debug:
+            return False
+        else:
+            sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+            print("Distancia: ", sensor_value)
+            if sensor_value < self.min_distance_obstacle_detection:
+                return True
+            else:
+                return False
+
+    def go(self, x_goal, y_goal):
         def wait_for_position(x, y, robot, position_error_margin):
             """
             Wait until the robot reaches the position
@@ -481,15 +497,14 @@ class Robot:
         self.setSpeed(0, 0)
 
         # Detect wall
-        wall = myMap.detectObstacle(self)
-        if wall:
+        if self.detectObstacle():
             return False
+        else:
+            # Go forward
+            self.setSpeed(0.1, 0)
+            wait_for_position(final_x, final_y, self, 0.05)
 
-        # Go forward
-        self.setSpeed(0.1, 0)
-        wait_for_position(final_x, final_y, self, 0.05)
+            # Stop robot
+            self.setSpeed(0, 0)
 
-        # Stop robot
-        self.setSpeed(0, 0)
-
-        return True
+            return True
