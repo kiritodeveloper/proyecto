@@ -416,21 +416,22 @@ class Robot:
 
             t_next_period = time.time()
 
-            if th is None:
-                print("TH none")
-                # None th provided
-                while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
-                    [x_odo, y_odo, th_odo] = robot.readOdometry()
-                    t_next_period += robot.P
-                    delay_until(t_next_period)
-            else:
-                while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
-                        th_error_margin < abs(th - th_odo)):
-                    [x_odo, y_odo, th_odo] = robot.readOdometry()
-                    t_next_period += robot.P
-                    delay_until(t_next_period)
-                    #print([x_odo, y_odo, th_odo])
-            #print([x_odo, y_odo, th_odo])
+            # Wait to enter in confidence area
+            while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
+                    th_error_margin < abs(th - th_odo)):
+                [x_odo, y_odo, th_odo] = robot.readOdometry()
+                t_next_period += robot.P
+                delay_until(t_next_period)
+
+            # Repeat while error decrease
+            last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2) + abs(th - th_odo)
+            actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2) + abs(th - th_odo)
+            while last_error >= actual_error:
+                [x_odo, y_odo, th_odo] = robot.readOdometry()
+                last_error = actual_error
+                actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2) + abs(th - th_odo)
+                t_next_period += robot.P
+                delay_until(t_next_period)
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
 
