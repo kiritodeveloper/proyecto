@@ -59,7 +59,7 @@ class Map2D:
         self.sizeYExtended = 0
 
         # Ultrasonic
-        self.min_distance = 20  # in cm
+        self.min_distance = 30  # in cm
 
         if not is_debug:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
@@ -74,6 +74,7 @@ class Map2D:
 
         self.goal_x = -1
         self.goal_y = -1
+
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -543,9 +544,11 @@ class Map2D:
         else:
             return False
 
-    def replanPath(self):
-        self.fillCostMatrix(self, (self.goal_x, self.goal_y))
-        return self.planPath(self.pos_x, self.pos_y, self.goal_x, self.goal_y)
+    def  replanPath(self, goal_x, goal_y):
+        pos_x = (self.pos_x * 1000) / self.sizeCell + 1
+        pos_y = (self.pos_y * 1000) / self.sizeCell + 1
+        self.fillCostMatrix((goal_x, goal_y))
+        return self.planPath((int(pos_x), int(pos_y)), (goal_x, goal_y))
 
     def stopMap(self):
         """

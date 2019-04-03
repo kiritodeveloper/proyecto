@@ -70,7 +70,7 @@ def main(args):
 
         #myMap.drawMap(saveSnapshot=False)
         #plt.show()
-        start_robot_drawer(robot.finished, robot)
+        #start_robot_drawer(robot.finished, robot)
         last_reached_pos = None
 
         finished = False
@@ -82,10 +82,10 @@ def main(args):
                 print('Partials: ', partial_goal_x, partial_goal_y)
                 print('El goal: ', goal)
                 print('Estoy: ', robot.readOdometry())
-                reached = robot.go(partial_goal_x, partial_goal_y)
+                reached = robot.go(partial_goal_x, partial_goal_y, myMap)
                 if not reached:
                     print('NO HA ALCANZADO EL OBJETIVO')
-                    route = myMap.replanPath()
+                    route = myMap.replanPath(goal_x, goal_y)
                     break
                 else:
                     RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
