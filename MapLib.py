@@ -544,9 +544,7 @@ class Map2D:
         else:
             return False
 
-    def  replanPath(self, goal_x, goal_y):
-        pos_x = (self.pos_x * 1000) / self.sizeCell + 1
-        pos_y = (self.pos_y * 1000) / self.sizeCell + 1
+    def  replanPath(self, pos_x, pos_y, goal_x, goal_y):
         self.fillCostMatrix((goal_x, goal_y))
         print('ESTOY EN: ', pos_x, pos_y)
         return self.planPath((int(pos_x), int(pos_y)), (goal_x, goal_y))

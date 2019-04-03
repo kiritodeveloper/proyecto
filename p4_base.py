@@ -48,7 +48,8 @@ def main(args):
         myMap = Map2D(map_file)
 
         # Initialize Odometry. Default value will be 0,0,0
-        initial_pos = [0.4, 0.4, 0]
+        initial_pos = [0.2, 0.2, 0]
+        pos = [0, 0]
         robot = Robot(initial_pos)
 
         # this will open a window with the results, but does not work well remotely
@@ -66,12 +67,13 @@ def main(args):
         myMap.fillCostMatrix([goal_x, goal_y])
         route = myMap.planPath([0, 0], [goal_x, goal_y])
 
+
         RobotLocations = []
 
         #myMap.drawMap(saveSnapshot=False)
         #plt.show()
         start_robot_drawer(robot.finished, robot)
-        last_reached_pos = None
+        last_reached_pos = [0, 0]
 
         finished = False
         while not finished:
@@ -85,7 +87,7 @@ def main(args):
                 reached = robot.go(partial_goal_x, partial_goal_y, myMap)
                 if not reached:
                     print('NO HA ALCANZADO EL OBJETIVO')
-                    route = myMap.replanPath(goal_x, goal_y)
+                    route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
                     break
                 else:
                     RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
