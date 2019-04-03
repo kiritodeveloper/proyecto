@@ -486,7 +486,7 @@ class Robot:
         aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
 
         # Turn
-        turn_speed = math.pi / 8
+        turn_speed = math.pi / 10
 
         if aligned_angle < th_actual:
             turn_speed = -turn_speed

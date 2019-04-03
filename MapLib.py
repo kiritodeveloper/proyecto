@@ -480,6 +480,7 @@ class Map2D:
             if last != i:
                 path_to_return += [i]
                 last = i
+        path_to_return.pop(0) # Delete the first one because we are there
         return path_to_return
 
     # def replanPath(self, ??):
@@ -489,9 +490,9 @@ class Map2D:
         x = odometry[0]
         y = odometry[1]
         th = odometry[2]
-
-        x = x // self.sizeCell
-        y = y // self.sizeCell
+        print('Convierto: ', x, y)
+        x = x // (self.sizeCell/1000)
+        y = y // (self.sizeCell/1000)
 
         return [x, y, th]
 

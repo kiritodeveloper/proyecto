@@ -48,7 +48,8 @@ def main(args):
         myMap = Map2D(map_file)
 
         # Initialize Odometry. Default value will be 0,0,0
-        initial_pos = [0.4, 0.4, 0]
+        initial_pos = [0.2, 0.2, 0]
+        pos = [0, 0]
         robot = Robot(initial_pos)
 
         # this will open a window with the results, but does not work well remotely
@@ -59,7 +60,7 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 2
+        goal_x = 3
         goal_y = 0
 
 
@@ -71,7 +72,10 @@ def main(args):
         #myMap.drawMap(saveSnapshot=False)
         #plt.show()
         start_robot_drawer(robot.finished, robot)
-        last_reached_pos = None
+        last_reached_pos = [0, 0]
+
+        #myMap.drawMap(saveSnapshot=True)
+
 
         finished = False
         while not finished:
@@ -82,26 +86,11 @@ def main(args):
                 print('Partials: ', partial_goal_x, partial_goal_y)
                 print('El goal: ', goal)
                 print('Estoy: ', robot.readOdometry())
-                reached = robot.go(partial_goal_x, partial_goal_y)
+                reached = robot.go(partial_goal_x, partial_goal_y, myMap)
                 if not reached:
-                    # TODO: Poner el sitio correcto
-                    '''
-                            if is_debug:
-            return False
-        else:
-            pos_x, pos_y, pos_th = self.readOdometry()
-            sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
-            print("Distancia: ", sensor_value, ' Theta: ', pos_th)
-            odometry = self.odometry2Cells(pos_x, pos_y)
-            if sensor_value < self.min_distance:
-                print('Miro hacia: ', self.rad2Dir(odometry[2]))
-                self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
-                return True
-            else:
-                return False
-                    '''
                     print('NO HA ALCANZADO EL OBJETIVO')
-                    route = myMap.replanPath(goal_x, goal_y)
+                    route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
+                    #myMap.drawMap(saveSnapshot=True)
                     break
                 else:
                     RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
@@ -110,7 +99,7 @@ def main(args):
             if last_reached_pos[0] == goal_x and last_reached_pos[1] == goal_y:
                 finished = True
 
-        myMap.drawMapWithRobotLocations(RobotLocations)
+        #myMap.drawMapWithRobotLocations(RobotLocations)
         # ...
 
         # 3. perform trajectory
