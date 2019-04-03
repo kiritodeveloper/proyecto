@@ -82,7 +82,7 @@ def main(args):
                 print('Partials: ', partial_goal_x, partial_goal_y)
                 print('El goal: ', goal)
                 print('Estoy: ', robot.readOdometry())
-                reached = robot.go(partial_goal_x, partial_goal_y, myMap)
+                reached = robot.go(partial_goal_x, partial_goal_y)
                 if not reached:
                     # TODO: Poner el sitio correcto
                     '''

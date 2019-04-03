@@ -67,16 +67,22 @@ class Robot:
         self.v = Value('d', 0.0)
         self.w = Value('d', 0.0)
 
-        if not is_debug:
-            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-        else:
+        if is_debug:
             self.BP = FakeBlockPi()
 
-        # Set motors ports
-        self.motor_port_left = self.BP.PORT_C
-        self.motor_port_right = self.BP.PORT_B
-        self.motor_port_basket = self.BP.PORT_A
+        else:
+            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+            # Set motors ports
+            self.motor_port_left = self.BP.PORT_C
+            self.motor_port_right = self.BP.PORT_B
+            self.motor_port_basket = self.BP.PORT_A
 
+            # Sonar config
+            self.motor_port_ultrasonic = self.BP.PORT_1
+            self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+            self.min_distance_obstacle_detection = 30  # cm
+
+        # Basket state
         self.basket_state = 'up'
 
         # Encoder timer
@@ -85,11 +91,6 @@ class Robot:
         # Previous values of encoders in rads
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
-
-        # Sonar config
-        self.motor_port_ultrasonic = self.BP.PORT_1
-        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-        self.min_distance_obstacle_detection = 30  # cm
 
     def setSpeed(self, v, w):
         """
@@ -106,11 +107,12 @@ class Robot:
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors speed
-        speed_dps_left = math.degrees(w_motors[1])
-        speed_dps_right = math.degrees(w_motors[0])
+        if not is_debug:
+            speed_dps_left = math.degrees(w_motors[1])
+            speed_dps_right = math.degrees(w_motors[0])
 
-        self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
-        self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
+            self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
+            self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
 
         self.lock_odometry.acquire()
         self.v.value = v
