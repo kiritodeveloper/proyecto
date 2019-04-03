@@ -507,8 +507,8 @@ class Map2D:
         y = odometry[1]
         th = odometry[2]
 
-        x = x // self.sizeCell
-        y = y // self.sizeCell
+        x = (x - 0.2) // self.sizeCell
+        y = (y - 0.2) // self.sizeCell
 
         return [x, y, th]
 

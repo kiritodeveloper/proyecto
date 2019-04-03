@@ -48,7 +48,7 @@ def main(args):
         myMap = Map2D(map_file)
 
         # Initialize Odometry. Default value will be 0,0,0
-        initial_pos = [0.4, 0.4, 0]
+        initial_pos = [0.2, 0.2, 0]
         pos = [0, 0]
         robot = Robot(initial_pos)
 
@@ -79,8 +79,8 @@ def main(args):
         while not finished:
             for goal in route:
                 print('Ruta', route)
-                partial_goal_x = (goal[0] + 1.0) * myMap.sizeCell/1000.0
-                partial_goal_y = (goal[1] + 1.0) * myMap.sizeCell/1000.0
+                partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell/1000.0
+                partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell/1000.0
                 print('Partials: ', partial_goal_x, partial_goal_y)
                 print('El goal: ', goal)
                 print('Estoy: ', robot.readOdometry())
