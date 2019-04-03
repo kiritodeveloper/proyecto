@@ -11,8 +11,8 @@ import numpy as np
 
 from config_file import *
 
-if not is_debug and disable_open_cv:
-    from RobotFrameCapturer import RobotFrameCapturer
+
+from RobotFrameCapturer import RobotFrameCapturer
 
 from utils import delay_until
 
