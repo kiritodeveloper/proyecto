@@ -446,11 +446,11 @@ class Robot:
             turn_speed = -turn_speed
 
         self.setSpeed(0, turn_speed)
-        wait_for_position(x_actual, y_actual, aligned_angle, self, 0.01, 0.02)
+        wait_for_position(x_actual, y_actual, aligned_angle, self, 0.01, 0.01)
 
         # Go forward
         self.setSpeed(0.1, 0)
-        wait_for_position(final_x, final_y, aligned_angle, self, 0.05, 0.08)
+        wait_for_position(final_x, final_y, aligned_angle, self, 0.05, 0.05)
 
         # Stop robot
         self.setSpeed(0, 0)
