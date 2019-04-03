@@ -450,7 +450,7 @@ class Robot:
 
         # Go forward
         self.setSpeed(0.1, 0)
-        wait_for_position(final_x, final_y, aligned_angle, self, 0.1, 0.08)
+        wait_for_position(final_x, final_y, aligned_angle, self, 0.05, 0.08)
 
         # Stop robot
         self.setSpeed(0, 0)
