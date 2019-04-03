@@ -506,7 +506,7 @@ class Map2D:
         x = odometry[0]
         y = odometry[1]
         th = odometry[2]
-
+        print('Convierto: ', x, y)
         x = (x - 0.2) // self.sizeCell
         y = (y - 0.2) // self.sizeCell
 
