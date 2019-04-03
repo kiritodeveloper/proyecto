@@ -497,6 +497,7 @@ class Map2D:
             if last != i:
                 path_to_return += [i]
                 last = i
+        path_to_return.pop(0) # Delete the first one because we are there
         return path_to_return
 
     # def replanPath(self, ??):
@@ -534,8 +535,8 @@ class Map2D:
         #if is_debug:
             #return False
 
-        #sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
-        sensor_value = 40
+        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+        #sensor_value = 40
         print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
         odometry = self.odometry2Cells(odometry)
         if sensor_value < self.min_distance:
