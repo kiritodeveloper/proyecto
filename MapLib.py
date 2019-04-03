@@ -548,7 +548,7 @@ class Map2D:
 
     def  replanPath(self):
         self.fillCostMatrix((self.goal_x, self.goal_y))
-        return self.planPath(self.pos_x, self.pos_y, self.goal_x, self.goal_y)
+        return self.planPath((self.pos_x, self.pos_y), (self.goal_x, self.goal_y))
 
 
     def stopMap(self):
