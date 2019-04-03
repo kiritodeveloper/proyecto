@@ -11,7 +11,7 @@ import numpy as np
 
 from config_file import *
 
-if not is_debug and disable_open_cv:
+if not is_debug and not disable_open_cv:
     from RobotFrameCapturer import RobotFrameCapturer
 
 from utils import delay_until
@@ -252,7 +252,7 @@ class Robot:
         Write message in the log (screen)
         :param message: message to write
         """
-        #print(message)
+        # print(message)
         kk = 0
 
     def normalizeAngle(self, angle):
@@ -405,7 +405,7 @@ class Robot:
                 self.basket_state = 'down'
 
     def go(self, x_goal, y_goal, myMap):
-        def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
+        def wait_for_position(x, y, robot, position_error_margin):
             """
             Wait until the robot reaches the position
             :param x: x position to be reached
@@ -414,26 +414,49 @@ class Robot:
             :param position_error_margin: error allowed in the position
             :param th_error_margin: error allowed in the orientation
             """
-            [x_odo, y_odo, th_odo] = robot.readOdometry()
-
-            print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
+            [x_odo, y_odo, _] = robot.readOdometry()
 
             t_next_period = time.time()
 
             # Wait to enter in confidence area
-            while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
-                    th_error_margin < abs(th - th_odo)):
-                [x_odo, y_odo, th_odo] = robot.readOdometry()
+            while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
+                [x_odo, y_odo, _] = robot.readOdometry()
                 t_next_period += robot.P
                 delay_until(t_next_period)
 
             # Repeat while error decrease
-            last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2) + abs(th - th_odo)
-            actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2) + abs(th - th_odo)
+            last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+            actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
             while last_error >= actual_error:
-                [x_odo, y_odo, th_odo] = robot.readOdometry()
+                [x_odo, y_odo, _] = robot.readOdometry()
                 last_error = actual_error
-                actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2) + abs(th - th_odo)
+                actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+                t_next_period += robot.P
+                delay_until(t_next_period)
+
+        def wait_for_th(th, robot, th_error_margin):
+            """
+            Wait until the robot reaches the position
+            :param robot: robot configuration
+            :param th_error_margin: error allowed in the orientation
+            """
+            [_, _, th_odo] = robot.readOdometry()
+
+            t_next_period = time.time()
+
+            # Wait to enter in confidence area
+            while th_error_margin < abs(th - th_odo):
+                [_, _, th_odo] = robot.readOdometry()
+                t_next_period += robot.P
+                delay_until(t_next_period)
+
+            # Repeat while error decrease
+            last_error = abs(th - th_odo)
+            actual_error = abs(th - th_odo)
+            while last_error >= actual_error:
+                [_, _, th_odo] = robot.readOdometry()
+                last_error = actual_error
+                actual_error = abs(th - th_odo)
                 t_next_period += robot.P
                 delay_until(t_next_period)
 
@@ -450,21 +473,21 @@ class Robot:
         if aligned_angle < th_actual:
             turn_speed = -turn_speed
 
-        self.setSpeed(0, turn_speed)
-        wait_for_position(x_actual, y_actual, aligned_angle, self, 0.01, 0.02)
+        if 0.02 < abs(aligned_angle - th_actual):
+            self.setSpeed(0, turn_speed)
+            wait_for_th(aligned_angle, self, 0.02)
 
         # Stop robot
         self.setSpeed(0, 0)
 
         # Detect wall
-
         wall = myMap.detectObstacle(self)
         if wall:
             return False
 
         # Go forward
         self.setSpeed(0.1, 0)
-        wait_for_position(final_x, final_y, aligned_angle, self, 0.05, 0.08)
+        wait_for_position(final_x, final_y, self, 0.05)
 
         # Stop robot
         self.setSpeed(0, 0)
