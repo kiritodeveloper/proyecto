@@ -59,8 +59,8 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 2
-        goal_y = 1
+        goal_x = 3
+        goal_y = 0
 
 
         myMap.fillCostMatrix([goal_x, goal_y])
@@ -70,7 +70,7 @@ def main(args):
 
         #myMap.drawMap(saveSnapshot=False)
         #plt.show()
-        #start_robot_drawer(robot.finished, robot)
+        start_robot_drawer(robot.finished, robot)
         last_reached_pos = None
 
         finished = False
@@ -124,6 +124,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa1.txt")
+                        default="./maps/mapa2.txt")
     args = parser.parse_args()
     main(args)
