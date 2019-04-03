@@ -57,7 +57,7 @@ class Robot:
         self.lock_odometry = Lock()
 
         # odometry update period
-        self.P = 0.015
+        self.P = 0.01
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
@@ -464,7 +464,7 @@ class Robot:
             return False
 
         # Go forward
-        self.setSpeed(0.1, 0)
+        self.setSpeed(0.05, 0)
         wait_for_position(final_x, final_y, aligned_angle, self, 0.05, 0.08)
 
         # Stop robot
