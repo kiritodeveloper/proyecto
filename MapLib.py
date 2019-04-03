@@ -531,15 +531,18 @@ class Map2D:
         self.pos_x = odometry[0]
         self.pos_y = odometry[1]
         self.pos_th = odometry[2]
-        if is_debug:
-            return False
+        #if is_debug:
+            #return False
 
-        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+        #sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+        sensor_value = 40
         print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
         odometry = self.odometry2Cells(odometry)
         if sensor_value < self.min_distance:
             print('Miro hacia: ', odometry[0], odometry[1], self.rad2Dir(odometry[2]))
-            self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
+            self.deleteConnection(int(odometry[0]), int(odometry[1]), self.rad2Dir(odometry[2]))
+            self.deleteConnection(int(odometry[0]), int(odometry[1]), (self.rad2Dir(odometry[2]) + 1) % 8)
+            self.deleteConnection(int(odometry[0]), int(odometry[1]), (self.rad2Dir(odometry[2]) - 1) % 8)
             return True
         else:
             return False
