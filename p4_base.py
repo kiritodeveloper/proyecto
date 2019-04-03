@@ -85,7 +85,7 @@ def main(args):
                 reached = robot.go(partial_goal_x, partial_goal_y, myMap)
                 if not reached:
                     print('NO HA ALCANZADO EL OBJETIVO')
-                    route = myMap.replanPath()
+                    route = myMap.replanPath(goal_x, goal_y)
                     break
                 else:
                     RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
