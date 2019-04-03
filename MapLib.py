@@ -11,6 +11,7 @@ import os
 from config_file import *
 import math
 
+
 class Map2D:
     def __init__(self, map_description_file):
         """
@@ -57,7 +58,6 @@ class Map2D:
 
         self.goal_x = -1
         self.goal_y = -1
-
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -480,19 +480,16 @@ class Map2D:
             if last != i:
                 path_to_return += [i]
                 last = i
-        path_to_return.pop(0) # Delete the first one because we are there
+        path_to_return.pop(0)  # Delete the first one because we are there
         return path_to_return
 
     # def replanPath(self, ??):
     # """ TO-DO """
 
-    def odometry2Cells(self, odometry):
-        x = odometry[0]
-        y = odometry[1]
-        th = odometry[2]
+    def odometry2Cells(self, x, y, th):
         print('Convierto: ', x, y)
-        x = x // (self.sizeCell/1000)
-        y = y // (self.sizeCell/1000)
+        x = x // (self.sizeCell / 1000)
+        y = y // (self.sizeCell / 1000)
 
         return [x, y, th]
 
@@ -510,7 +507,7 @@ class Map2D:
         else:
             return -1
 
-    def  replanPath(self, goal_x, goal_y):
+    def replanPath(self, goal_x, goal_y):
         pos_x = (self.pos_x * 1000) / self.sizeCell + 1
         pos_y = (self.pos_y * 1000) / self.sizeCell + 1
         self.fillCostMatrix((goal_x, goal_y))

@@ -436,21 +436,16 @@ class Robot:
 
             t_next_period = time.time()
 
-            # Wait to enter in confidence area
-            while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
-                [x_odo, y_odo, _] = robot.readOdometry()
-                t_next_period += robot.P
-                delay_until(t_next_period)
-
             # Repeat while error decrease
             last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-            actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-            while last_error >= actual_error:
-                [x_odo, y_odo, _] = robot.readOdometry()
-                last_error = actual_error
-                actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-                t_next_period += robot.P
-                delay_until(t_next_period)
+            actual_error = last_error
+            while position_error_margin < actual_error:
+                while last_error >= actual_error:
+                    [x_odo, y_odo, _] = robot.readOdometry()
+                    last_error = actual_error
+                    actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+                    t_next_period += robot.P
+                    delay_until(t_next_period)
 
         def wait_for_th(th, robot, th_error_margin):
             """
@@ -462,21 +457,16 @@ class Robot:
 
             t_next_period = time.time()
 
-            # Wait to enter in confidence area
-            while th_error_margin < abs(th - th_odo):
-                [_, _, th_odo] = robot.readOdometry()
-                t_next_period += robot.P
-                delay_until(t_next_period)
-
             # Repeat while error decrease
             last_error = abs(th - th_odo)
-            actual_error = abs(th - th_odo)
-            while last_error >= actual_error:
-                [_, _, th_odo] = robot.readOdometry()
-                last_error = actual_error
-                actual_error = abs(th - th_odo)
-                t_next_period += robot.P
-                delay_until(t_next_period)
+            actual_error = last_error
+            while th_error_margin < actual_error:
+                while last_error >= actual_error:
+                    [_, _, th_odo] = robot.readOdometry()
+                    last_error = actual_error
+                    actual_error = abs(th - th_odo)
+                    t_next_period += robot.P
+                    delay_until(t_next_period)
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
 
@@ -491,9 +481,8 @@ class Robot:
         if aligned_angle < th_actual:
             turn_speed = -turn_speed
 
-        if 0.02 < abs(aligned_angle - th_actual):
-            self.setSpeed(0, turn_speed)
-            wait_for_th(aligned_angle, self, 0.02)
+        self.setSpeed(0, turn_speed)
+        wait_for_th(aligned_angle, self, 0.02)
 
         # Stop robot
         self.setSpeed(0, 0)

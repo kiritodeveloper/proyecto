@@ -14,14 +14,10 @@ matplotlib.use("TkAgg")
 # from Robot import Robot
 from MapLib import Map2D
 import argparse
-from config_file import is_debug
 from Robot import Robot
-from RobotDrawer import start_robot_drawer
 from RobotLogger import start_robot_logger
-import time
 from RobotDrawer import *
 
-from utils import delay_until
 
 # NOTES ABOUT TASKS to DO in P4:
 # 1)findPath(x1,y1, x2,y2),   fillCostMatrix(), replanPath () --> should be methods from the new Map2D class
@@ -40,75 +36,64 @@ def main(args):
             exit(1)
 
         map_file = args.mapfile
-        # Instantiate Odometry with your own files from P2/P3
-        # robot = Robot()
-        # ...
 
         # 1. load map and compute costs and path
         myMap = Map2D(map_file)
 
-        # Initialize Odometry. Default value will be 0,0,0
+        # Initialize Odometry
         initial_pos = [0.2, 0.2, 0]
-        pos = [0, 0]
         robot = Robot(initial_pos)
 
-        # this will open a window with the results, but does not work well remotely
-
-        #  sampleRobotLocations = [[200, 200, 3.14 / 2.0], [200, 600, 3.14 / 4.0], [200, 1000, -3.14 / 2.0], ]
-        # myMap.drawMapWithRobotLocations(sampleRobotLocations)
+        # Robot logger
+        start_robot_logger(robot.finished, robot, "./out/trayectoria_1.csv")
 
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 2
-        goal_y = 2
+        goal_x = 7
+        goal_y = 1
 
         myMap.fillCostMatrix([goal_x, goal_y])
         route = myMap.planPath([0, 0], [goal_x, goal_y])
 
-        RobotLocations = []
+        robot_locations = []
 
-        start_robot_drawer(robot.finished, robot, myMap)
+        start_robot_drawer(robot.finished, robot)
         last_reached_pos = [0, 0]
 
-        finished = False
-        while not finished:
-            for goal in route:
-                print('Ruta', route)
-                partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell/1000.0
-                partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell/1000.0
-                print('Partials: ', partial_goal_x, partial_goal_y)
-                print('El goal: ', goal)
-                print('Estoy: ', robot.readOdometry())
-                reached = robot.go(partial_goal_x, partial_goal_y)
-                if not reached:
-                    print('NO HA ALCANZADO EL OBJETIVO')
-                    route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
-                    break
-                else:
-                    RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
-                    last_reached_pos = goal
+        while len(route) > 0:
+            goal = route.pop(0)
+            print('Ruta', route)
+            partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell / 1000.0
+            partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell / 1000.0
+            print('Partials: ', partial_goal_x, partial_goal_y)
+            print('El goal: ', goal)
+            print('Estoy: ', robot.readOdometry())
+            no_obstacle = robot.go(partial_goal_x, partial_goal_y)
+            x_odo, y_odo, th_odo = robot.readOdometry()
+            if not no_obstacle:
+                # There are a obstacle
+                print('Obstacle detected')
+                x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
 
-            if last_reached_pos[0] == goal_x and last_reached_pos[1] == goal_y:
-                finished = True
+                # Delete connections from detected wall
+                myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
+                myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
+                myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) - 1) % 8)
 
-        #myMap.drawMapWithRobotLocations(RobotLocations)
+                route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1])
+            else:
+                robot_locations.append([int(x_odo * 1000), int(y_odo * 1000), int(th_odo * 1000)])
+                last_reached_pos = goal
 
-        # ...
+        if last_reached_pos[0] == goal_x and last_reached_pos[1] == goal_y:
+            print('The goal has been reached')
+        else:
+            print('Can\'t reached the goal')
 
-        # 3. perform trajectory
-    # robot.setSpeed(1,1) ...
-    # while (notfinished){
+        myMap.drawMapWithRobotLocations(robot_locations)
 
-    # robot.go(pathX[i],pathY[i]);
-    # check if there are close obstacles
-    # deal with them...
-    # Avoid_obstacle(...) OR RePlanPath(...)
-
-    # 4. wrap up and close stuff ...
-    # This currently unconfigure the sensors, disable the motors,
-    # and restore the LED to the control of the BrickPi3 firmware.
-    # robot.stopOdometry()
+        robot.stopOdometry()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
@@ -123,6 +108,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa1.txt")
+                        default="./maps/mapa3.txt")
     args = parser.parse_args()
     main(args)

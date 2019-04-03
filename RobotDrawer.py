@@ -1,6 +1,7 @@
 import csv
 from multiprocessing import Process
 
+from MapLib import Map2D
 from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
@@ -17,68 +18,39 @@ def plot_log(file_path):
     plt.show()
 
 
-def start_robot_drawer(finished, robot, initial_map):
+def plot_log_with_map(file_path, map_path):
+    """
+    Read a path log file and plot it
+    :param file_path: Path log file path
+    """
+    myMap = Map2D(map_path)
+
+    robot_locations = []
+
+    with open(file_path) as log:
+        i = csv.reader(log)
+        for line in i:
+            x = float(line[0])
+            y = float(line[1])
+            th = float(line[2])
+            robot_locations = robot_locations + [[int(x* 1000), int(y * 1000), int(th * 1000)]]
+
+    myMap.drawMapWithRobotLocations(robot_locations)
+
+    myMap.stopMap()
+
+
+def start_robot_drawer(finished, robot):
     """
     Start robot drawer process, it should be loaded only in debug mode to watch the robot track simulation
     :param finished: if finish is true, must stop updating position
     :param robot: Robot object
     """
-    p = Process(target=loop_robot_drawer, args=(finished, robot, initial_map))
+    p = Process(target=loop_robot_drawer, args=(finished, robot))
     p.start()
 
 
-def draw_grid(initial_map):
-    """
-    aux function to create a grid with map lines
-    """
-    if not initial_map.current_ax:
-        print("Error plotting: do not call this function directly, \
-            call drawMap first to create a plot where to draw")
-        return False
-
-    plt.rc('grid', linestyle="--", color='gray')
-    plt.grid(True)
-    plt.tight_layout()
-
-    x_t = range(0, (initial_map.sizeX + 1) * 400, 400)
-    y_t = range(0, (initial_map.sizeY + 1) * 400, 400)
-    x_labels = [str(n) for n in x_t]
-    y_labels = [str(n) for n in y_t]
-    plt.xticks(x_t, x_labels)
-    plt.yticks(y_t, y_labels)
-
-    # Main rectangle
-    X = np.array([0, initial_map.sizeX, initial_map.sizeX, 0, 0]) * initial_map.sizeCell
-    Y = np.array([0, 0, initial_map.sizeY, initial_map.sizeY, 0]) * initial_map.sizeCell
-    initial_map.current_ax.plot(X, Y, initial_map.mapLineStyle)
-
-    # "vertical" walls
-    for i in range(2, 2 * initial_map.sizeX, 2):
-        for j in range(1, 2 * initial_map.sizeY, 2):
-            if not initial_map.connectionMatrix[i, j]:
-                # paint "right" wall from cell (i-1)/2, (j-1)/2
-                cx = np.floor((i - 1) / 2)
-                cy = np.floor((j - 1) / 2)
-                X = np.array([cx + 1, cx + 1]) * initial_map.sizeCell
-                Y = np.array([cy, cy + 1]) * initial_map.sizeCell
-                initial_map.current_ax.plot(X, Y, initial_map.mapLineStyle)
-
-    # "horizontal" walls
-    for j in range(2, 2 * initial_map.sizeY, 2):
-        for i in range(1, 2 * initial_map.sizeX, 2):
-            if not initial_map.connectionMatrix[i, j]:
-                # paint "top" wall from cell (i-1)/2, (j-1)/2
-                cx = np.floor((i - 1) / 2)
-                cy = np.floor((j - 1) / 2)
-                X = np.array([cx, cx + 1]) * initial_map.sizeCell
-                Y = np.array([cy + 1, cy + 1]) * initial_map.sizeCell
-                initial_map.current_ax.plot(X, Y, initial_map.mapLineStyle)
-    plt.axis('equal')
-
-    return True
-
-
-def loop_robot_drawer(finished, robot, initial_map):
+def loop_robot_drawer(finished, robot):
     """
     Loop that plot the robot position every 0.3 seconds
     :param finished: if finish is true, must stop updating position
@@ -86,8 +58,6 @@ def loop_robot_drawer(finished, robot, initial_map):
     """
     print("Drawer started")
     plt.ion()
-
-    initial_map._drawGrid()
 
     # Wait until update odometry start
     plt.pause(0.5)
