@@ -60,7 +60,7 @@ def main(args):
         robot.startOdometry()
 
         goal_x = 2
-        goal_y = 0
+        goal_y = 2
 
 
         myMap.fillCostMatrix([goal_x, goal_y])
