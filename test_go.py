@@ -35,6 +35,10 @@ def main():
         # 2. perform trajectory
         robot.go(0, 0.4)
 
+        robot.go(0, 0.8)
+
+        robot.go(0, 0.12)
+
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.

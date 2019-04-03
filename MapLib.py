@@ -11,12 +11,6 @@ import os
 from config_file import *
 import math
 
-# Only import original drivers if it isn't in debug mode
-if not is_debug:
-    import brickpi3  # import the BrickPi3 drivers
-else:
-    from FakeBlockPi import FakeBlockPi
-
 
 class Map2D:
     def __init__(self, map_description_file):
@@ -58,23 +52,12 @@ class Map2D:
         self.sizeXExtended = 0
         self.sizeYExtended = 0
 
-        # Ultrasonic
-        self.min_distance = 30  # in cm
-
-        if not is_debug:
-            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-            self.motor_port_ultrasonic = self.BP.PORT_1
-            self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-        else:
-            self.BP = FakeBlockPi()
-
         self.pos_x = -1
         self.pos_y = -1
         self.pos_th = 0
 
         self.goal_x = -1
         self.goal_y = -1
-
 
         if self._loadMap(map_description_file):
             print("Map %s loaded ok" % map_description_file)
@@ -497,19 +480,16 @@ class Map2D:
             if last != i:
                 path_to_return += [i]
                 last = i
-        path_to_return.pop(0) # Delete the first one because we are there
+        path_to_return.pop(0)  # Delete the first one because we are there
         return path_to_return
 
     # def replanPath(self, ??):
     # """ TO-DO """
 
-    def odometry2Cells(self, odometry):
-        x = odometry[0]
-        y = odometry[1]
-        th = odometry[2]
+    def odometry2Cells(self, x, y, th):
         print('Convierto: ', x, y)
-        x = x // (self.sizeCell/1000)
-        y = y // (self.sizeCell/1000)
+        x = x // (self.sizeCell / 1000)
+        y = y // (self.sizeCell / 1000)
 
         return [x, y, th]
 
@@ -527,30 +507,10 @@ class Map2D:
         else:
             return -1
 
-    def detectObstacle(self, robot):
-        odometry = robot.readOdometry()
-        self.pos_x = odometry[0]
-        self.pos_y = odometry[1]
-        self.pos_th = odometry[2]
-        #if is_debug:
-            #return False
-
-        sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
-        #sensor_value = 40
-        print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
-        odometry = self.odometry2Cells(odometry)
-        if sensor_value < self.min_distance:
-            print('Miro hacia: ', odometry[0], odometry[1], self.rad2Dir(odometry[2]))
-            self.deleteConnection(int(odometry[0]), int(odometry[1]), self.rad2Dir(odometry[2]))
-            self.deleteConnection(int(odometry[0]), int(odometry[1]), (self.rad2Dir(odometry[2]) + 1) % 8)
-            self.deleteConnection(int(odometry[0]), int(odometry[1]), (self.rad2Dir(odometry[2]) - 1) % 8)
-            return True
-        else:
-            return False
-
-    def  replanPath(self, pos_x, pos_y, goal_x, goal_y):
+    def replanPath(self, goal_x, goal_y):
+        pos_x = (self.pos_x * 1000) / self.sizeCell + 1
+        pos_y = (self.pos_y * 1000) / self.sizeCell + 1
         self.fillCostMatrix((goal_x, goal_y))
-        print('ESTOY EN: ', pos_x, pos_y, ' Y VOY A: ', goal_x, goal_y)
         return self.planPath((int(pos_x), int(pos_y)), (goal_x, goal_y))
 
     def stopMap(self):

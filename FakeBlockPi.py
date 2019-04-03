@@ -24,3 +24,6 @@ class FakeBlockPi(object):
         Fake function to reset motors and avoid execution errors
         """
         pass
+
+    def set_sensor_type(self, a, b):
+        pass

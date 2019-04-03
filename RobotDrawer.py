@@ -1,6 +1,7 @@
 import csv
 from multiprocessing import Process
 
+from MapLib import Map2D
 from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
@@ -15,6 +16,28 @@ def plot_log(file_path):
         for line in i:
             dibrobot([float(line[0]), float(line[1]), float(line[2])], 'r', 'p')
     plt.show()
+
+
+def plot_log_with_map(file_path, map_path):
+    """
+    Read a path log file and plot it
+    :param file_path: Path log file path
+    """
+    myMap = Map2D(map_path)
+
+    robot_locations = []
+
+    with open(file_path) as log:
+        i = csv.reader(log)
+        for line in i:
+            x = float(line[0])
+            y = float(line[1])
+            th = float(line[2])
+            robot_locations = robot_locations + [[int(x* 1000), int(y * 1000), int(th * 1000)]]
+
+    myMap.drawMapWithRobotLocations(robot_locations)
+
+    myMap.stopMap()
 
 
 def start_robot_drawer(finished, robot):
@@ -34,7 +57,6 @@ def loop_robot_drawer(finished, robot):
     :param robot: Robot object
     """
     print("Drawer started")
-    dibrobot([0, 0, 0], 'r', 'p')
     plt.ion()
 
     # Wait until update odometry start
