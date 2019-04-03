@@ -48,7 +48,7 @@ def main(args):
         myMap = Map2D(map_file)
 
         # Initialize Odometry. Default value will be 0,0,0
-        initial_pos = [0.2, 0.2, 0]
+        initial_pos = [0.4, 0.4, 0]
         pos = [0, 0]
         robot = Robot(initial_pos)
 
