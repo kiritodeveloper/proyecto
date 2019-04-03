@@ -461,16 +461,16 @@ class Map2D:
                         best_step = [next_mov_x, next_mov_y]
                         low_path = cost_matrix[next_mov_x, next_mov_y]
 
-                for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
-                    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
-                            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
-                        # 8 neighbours
-                        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
-
-                        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
-                                and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
-                            best_step = [next_mov_x, next_mov_y]
-                            low_path = cost_matrix[next_mov_x, next_mov_y]
+                # for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
+                #    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
+                #            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
+                #        # 8 neighbours
+                #        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
+                #
+                #        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
+                #                and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
+                #            best_step = [next_mov_x, next_mov_y]
+                #            low_path = cost_matrix[next_mov_x, next_mov_y]
 
                 next_steps = findPath_recursive(cost_matrix, best_step[0], best_step[1])
 
