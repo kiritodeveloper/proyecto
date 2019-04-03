@@ -538,7 +538,7 @@ class Map2D:
         print("Distancia: ", sensor_value, ' Theta: ', odometry[2])
         odometry = self.odometry2Cells(odometry)
         if sensor_value < self.min_distance:
-            print('Miro hacia: ', self.rad2Dir(odometry[2]))
+            print('Miro hacia: ', odometry[0], odometry[1], self.rad2Dir(odometry[2]))
             self.deleteConnection(odometry[0], odometry[1], self.rad2Dir(odometry[2]))
             return True
         else:
