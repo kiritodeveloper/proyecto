@@ -458,8 +458,8 @@ class Robot:
 
         # Detect wall
 
-        #wall = myMap.detectObstacle(self)
-        wall = False
+        wall = myMap.detectObstacle(self)
+        #wall = False
         if wall:
             return False
 

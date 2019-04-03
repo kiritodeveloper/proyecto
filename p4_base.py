@@ -94,7 +94,7 @@ def main(args):
             if last_reached_pos[0] == goal_x and last_reached_pos[1] == goal_y:
                 finished = True
 
-        myMap.drawMapWithRobotLocations(RobotLocations)
+        #myMap.drawMapWithRobotLocations(RobotLocations)
         # ...
 
         # 3. perform trajectory
