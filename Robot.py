@@ -57,7 +57,7 @@ class Robot:
         self.lock_odometry = Lock()
 
         # odometry update period
-        self.P = 0.005
+        self.P = 0.01
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
@@ -445,7 +445,7 @@ class Robot:
         aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
 
         # Turn
-        turn_speed = math.pi / 8
+        turn_speed = math.pi / 10
 
         if aligned_angle < th_actual:
             turn_speed = -turn_speed
@@ -464,7 +464,7 @@ class Robot:
             return False
 
         # Go forward
-        self.setSpeed(0.15, 0)
+        self.setSpeed(0.12, 0)
         wait_for_position(final_x, final_y, aligned_angle, self, 0.05, 0.08)
 
         # Stop robot
