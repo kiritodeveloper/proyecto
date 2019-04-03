@@ -453,9 +453,9 @@ class Robot:
 
         # Detect wall
 
-        wall = myMap.detectObstacle(self)
-        if wall:
-            return False
+        #wall = myMap.detectObstacle(self)
+        #if wall:
+        #    return False
 
         # Go forward
         self.setSpeed(0.1, 0)
