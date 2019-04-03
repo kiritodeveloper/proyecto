@@ -548,6 +548,7 @@ class Map2D:
         pos_x = (self.pos_x * 1000) / self.sizeCell + 1
         pos_y = (self.pos_y * 1000) / self.sizeCell + 1
         self.fillCostMatrix((goal_x, goal_y))
+        print('ESTOY EN: ', pos_x, pos_y)
         return self.planPath((int(pos_x), int(pos_y)), (goal_x, goal_y))
 
     def stopMap(self):
