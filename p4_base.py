@@ -75,7 +75,7 @@ def main(args):
         start_robot_drawer(robot.finished, robot)
         last_reached_pos = [0, 0]
 
-        myMap.drawMap(saveSnapshot=True)
+        #myMap.drawMap(saveSnapshot=True)
 
 
         finished = False
@@ -91,7 +91,7 @@ def main(args):
                 if not reached:
                     print('NO HA ALCANZADO EL OBJETIVO')
                     route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
-                    myMap.drawMap(saveSnapshot=True)
+                    #myMap.drawMap(saveSnapshot=True)
                     break
                 else:
                     RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
