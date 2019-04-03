@@ -547,7 +547,7 @@ class Map2D:
             return False
 
     def  replanPath(self):
-        self.fillCostMatrix(self, (self.goal_x, self.goal_y))
+        self.fillCostMatrix((self.goal_x, self.goal_y))
         return self.planPath(self.pos_x, self.pos_y, self.goal_x, self.goal_y)
 
 
