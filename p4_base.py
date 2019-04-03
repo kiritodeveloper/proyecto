@@ -60,37 +60,30 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 3
-        goal_y = 0
-
+        goal_x = 2
+        goal_y = 2
 
         myMap.fillCostMatrix([goal_x, goal_y])
         route = myMap.planPath([0, 0], [goal_x, goal_y])
 
         RobotLocations = []
 
-        #myMap.drawMap(saveSnapshot=False)
-        #plt.show()
-        start_robot_drawer(robot.finished, robot)
+        start_robot_drawer(robot.finished, robot, myMap)
         last_reached_pos = [0, 0]
-
-        #myMap.drawMap(saveSnapshot=True)
-
 
         finished = False
         while not finished:
             for goal in route:
                 print('Ruta', route)
-                partial_goal_x = (goal[0] + 1.0) * myMap.sizeCell/1000.0
-                partial_goal_y = (goal[1] + 1.0) * myMap.sizeCell/1000.0
+                partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell/1000.0
+                partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell/1000.0
                 print('Partials: ', partial_goal_x, partial_goal_y)
                 print('El goal: ', goal)
                 print('Estoy: ', robot.readOdometry())
-                reached = robot.go(partial_goal_x, partial_goal_y, myMap)
+                reached = robot.go(partial_goal_x, partial_goal_y)
                 if not reached:
                     print('NO HA ALCANZADO EL OBJETIVO')
                     route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
-                    #myMap.drawMap(saveSnapshot=True)
                     break
                 else:
                     RobotLocations.append([myMap.pos_x, myMap.pos_y, myMap.pos_th])
@@ -100,6 +93,7 @@ def main(args):
                 finished = True
 
         #myMap.drawMapWithRobotLocations(RobotLocations)
+
         # ...
 
         # 3. perform trajectory
@@ -129,6 +123,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa0.txt")
+                        default="./maps/mapa1.txt")
     args = parser.parse_args()
     main(args)
