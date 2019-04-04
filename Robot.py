@@ -440,6 +440,7 @@ class Robot:
             last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
             actual_error = last_error
             while position_error_margin < actual_error:
+                actual_error = last_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = robot.readOdometry()
                     last_error = actual_error
@@ -461,6 +462,7 @@ class Robot:
             last_error = abs(self.normalizeAngle(th - th_odo))
             actual_error = last_error
             while th_error_margin < actual_error:
+                actual_error = last_error
                 while last_error >= actual_error:
                     [_, _, th_odo] = robot.readOdometry()
                     last_error = actual_error
