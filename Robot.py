@@ -47,6 +47,8 @@ class Robot:
         #    self.BP.get_motor_encoder(self.BP.PORT_C))
 
         ##################################################
+
+
         # odometry shared memory values
         self.x = Value('d', init_position[0])
         self.y = Value('d', init_position[1])
@@ -73,6 +75,9 @@ class Robot:
         else:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
             # Set motors ports
+
+            self.BP.reset_all()
+
             self.motor_port_left = self.BP.PORT_C
             self.motor_port_right = self.BP.PORT_B
             self.motor_port_basket = self.BP.PORT_A
