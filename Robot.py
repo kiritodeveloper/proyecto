@@ -482,7 +482,7 @@ class Robot:
             turn_speed = -turn_speed
 
         self.setSpeed(0, turn_speed)
-        wait_for_th(aligned_angle, self, 0.02)
+        wait_for_th(aligned_angle, self, 0.08)
 
         # Stop robot
         self.setSpeed(0, 0)
