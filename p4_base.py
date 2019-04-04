@@ -58,7 +58,7 @@ def main(args):
 
         robot_locations = []
 
-        start_robot_drawer(robot.finished, robot)
+        #start_robot_drawer(robot.finished, robot)
         last_reached_pos = [0, 0]
 
         while len(route) > 0:
