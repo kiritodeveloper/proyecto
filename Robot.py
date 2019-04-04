@@ -57,11 +57,11 @@ class Robot:
         self.lock_odometry = Lock()
 
         # odometry update period
-        self.P = 0.02
+        self.P = 0.015
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
-        self.axis_length = 0.115  # m
+        self.axis_length = 0.113  # m
 
         # Set initial speed
         self.v = Value('d', 0.0)
