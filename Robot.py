@@ -440,6 +440,7 @@ class Robot:
             last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
             actual_error = last_error
             while position_error_margin < actual_error:
+                last_error = actual_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = robot.readOdometry()
                     last_error = actual_error
@@ -458,13 +459,14 @@ class Robot:
             t_next_period = time.time()
 
             # Repeat while error decrease
-            last_error = abs(th - th_odo)
+            last_error = abs(self.normalizeAngle(th - th_odo))
             actual_error = last_error
             while th_error_margin < actual_error:
+                last_error = actual_error
                 while last_error >= actual_error:
                     [_, _, th_odo] = robot.readOdometry()
                     last_error = actual_error
-                    actual_error = abs(th - th_odo)
+                    actual_error = abs(self.normalizeAngle(th - th_odo))
                     t_next_period += robot.P
                     delay_until(t_next_period)
 
@@ -476,14 +478,15 @@ class Robot:
         aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
 
         # Turn
-        turn_speed = math.pi / 6
+        turn_speed = math.pi / 8
 
         if aligned_angle < th_actual:
             turn_speed = -turn_speed
 
         self.setSpeed(0, turn_speed)
         print('Estoy buscando th ', aligned_angle)
-        wait_for_th(aligned_angle, self, 0.1)
+        wait_for_th(aligned_angle, self, 0.02)
+        print("Ha encontrado th")
 
         # Stop robot
         self.setSpeed(0, 0)
@@ -493,8 +496,8 @@ class Robot:
             return False
         else:
             # Go forward
-            self.setSpeed(0.15, 0)
-            wait_for_position(final_x, final_y, self, 0.1)
+            self.setSpeed(0.1, 0)
+            wait_for_position(final_x, final_y, self, 0.05)
 
             # Stop robot
             self.setSpeed(0, 0)
