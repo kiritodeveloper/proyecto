@@ -468,6 +468,7 @@ class Robot:
                     t_next_period += robot.P
                     print(last_error, actual_error)
                     delay_until(t_next_period)
+                    print("delay_until_acabado")
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
 
