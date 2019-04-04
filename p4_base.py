@@ -103,7 +103,6 @@ def main(args):
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
         robot.stopOdometry()
-        myMap.stopMap()
 
 
 if __name__ == "__main__":
