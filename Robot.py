@@ -61,7 +61,7 @@ class Robot:
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
-        self.axis_length = 0.113  # m
+        self.axis_length = 0.112  # m
 
         # Set initial speed
         self.v = Value('d', 0.0)
@@ -478,7 +478,7 @@ class Robot:
         aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
 
         # Turn
-        turn_speed = math.pi / 16
+        turn_speed = math.pi / 8
 
         if aligned_angle < th_actual:
             turn_speed = -turn_speed
