@@ -57,7 +57,7 @@ class Robot:
         self.lock_odometry = Lock()
 
         # odometry update period
-        self.P = 0.015
+        self.P = 0.01
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
@@ -483,7 +483,7 @@ class Robot:
 
         self.setSpeed(0, turn_speed)
         print('Estoy buscando th ', aligned_angle)
-        wait_for_th(aligned_angle, self, 0.08)
+        wait_for_th(aligned_angle, self, 0.1)
 
         # Stop robot
         self.setSpeed(0, 0)

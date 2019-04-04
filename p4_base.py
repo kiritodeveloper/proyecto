@@ -7,6 +7,8 @@ import time
 import math
 
 import matplotlib
+from config_file import is_debug
+
 
 matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
@@ -58,7 +60,8 @@ def main(args):
 
         robot_locations = []
 
-        #start_robot_drawer(robot.finished, robot)
+        if is_debug:
+            start_robot_drawer(robot.finished, robot)
         last_reached_pos = [0, 0]
 
         while len(route) > 0:
