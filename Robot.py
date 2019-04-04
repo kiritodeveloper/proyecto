@@ -485,6 +485,7 @@ class Robot:
         self.setSpeed(0, turn_speed)
         print('Estoy buscando th ', aligned_angle)
         wait_for_th(aligned_angle, self, 0.05)
+        print("Ha encontrado th")
 
         # Stop robot
         self.setSpeed(0, 0)
