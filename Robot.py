@@ -440,7 +440,7 @@ class Robot:
             last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
             actual_error = last_error
             while position_error_margin < actual_error:
-                actual_error = last_error
+                last_error = actual_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = robot.readOdometry()
                     last_error = actual_error
@@ -462,15 +462,13 @@ class Robot:
             last_error = abs(self.normalizeAngle(th - th_odo))
             actual_error = last_error
             while th_error_margin < actual_error:
-                actual_error = last_error
+                last_error = actual_error
                 while last_error >= actual_error:
                     [_, _, th_odo] = robot.readOdometry()
                     last_error = actual_error
                     actual_error = abs(self.normalizeAngle(th - th_odo))
                     t_next_period += robot.P
-                    print(last_error, actual_error)
                     delay_until(t_next_period)
-                    print("delay_until_acabado")
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
 
@@ -487,7 +485,7 @@ class Robot:
 
         self.setSpeed(0, turn_speed)
         print('Estoy buscando th ', aligned_angle)
-        wait_for_th(aligned_angle, self, 0.05)
+        wait_for_th(aligned_angle, self, 0.02)
         print("Ha encontrado th")
 
         # Stop robot
@@ -499,7 +497,7 @@ class Robot:
         else:
             # Go forward
             self.setSpeed(0.1, 0)
-            wait_for_position(final_x, final_y, self, 0.1)
+            wait_for_position(final_x, final_y, self, 0.05)
 
             # Stop robot
             self.setSpeed(0, 0)
