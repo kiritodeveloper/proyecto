@@ -84,7 +84,7 @@ def main(args):
                 myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
                 myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) - 1) % 8)
 
-                route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1])
+                route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
             else:
                 robot_locations.append([int(x_odo * 1000), int(y_odo * 1000), int(th_odo * 1000)])
                 last_reached_pos = goal

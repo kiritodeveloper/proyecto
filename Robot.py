@@ -418,7 +418,8 @@ class Robot:
 
     def detectObstacle(self):
         if is_debug:
-            return False
+            variable = False
+            return variable
         else:
             sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
             print("Distancia: ", sensor_value)
