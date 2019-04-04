@@ -458,14 +458,15 @@ class Robot:
             t_next_period = time.time()
 
             # Repeat while error decrease
-            last_error = abs(th - th_odo)
+            last_error = abs(self.normalizeAngle(th - th_odo))
             actual_error = last_error
             while th_error_margin < actual_error:
                 while last_error >= actual_error:
                     [_, _, th_odo] = robot.readOdometry()
                     last_error = actual_error
-                    actual_error = abs(th - th_odo)
+                    actual_error = abs(self.normalizeAngle(th - th_odo))
                     t_next_period += robot.P
+                    print(last_error,actual_error)
                     delay_until(t_next_period)
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
