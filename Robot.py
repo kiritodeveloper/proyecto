@@ -466,7 +466,7 @@ class Robot:
                     last_error = actual_error
                     actual_error = abs(self.normalizeAngle(th - th_odo))
                     t_next_period += robot.P
-                    print(last_error,actual_error)
+                    print(last_error, actual_error)
                     delay_until(t_next_period)
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
