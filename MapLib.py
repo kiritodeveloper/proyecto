@@ -471,6 +471,7 @@ class Map2D:
         # y_end_ext = 2 * y_end_inner + 1
 
         path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext)
+        print('El path es: ', path)
         path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
 
         last = None
