@@ -52,8 +52,8 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 7
-        goal_y = 1
+        goal_x = 2
+        goal_y = 2
 
         myMap.fillCostMatrix([goal_x, goal_y])
         route = myMap.planPath([0, 0], [goal_x, goal_y])
@@ -110,6 +110,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa3.txt")
+                        default="./maps/mapa0.txt")
     args = parser.parse_args()
     main(args)
