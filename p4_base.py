@@ -78,7 +78,7 @@ def main(args):
                 # There are a obstacle
                 print('Obstacle detected')
                 x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
-
+                print('ODOMETRIIIA:' ,x,y,th)
                 # Delete connections from detected wall
                 myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
                 myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
