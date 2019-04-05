@@ -47,7 +47,7 @@ def main(args):
         robot = Robot(initial_pos)
 
         # Robot logger
-        start_robot_logger(robot.finished, robot, "./out/trayectoria_1.csv")
+        start_robot_logger(robot.finished, robot, "./out/trayectoria_entrega.csv")
 
         # 2. launch updateOdometry thread()
         robot.startOdometry()
@@ -110,6 +110,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa0.txt")
+                        default="./maps/mapa_debug.txt")
     args = parser.parse_args()
     main(args)
