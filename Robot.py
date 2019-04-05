@@ -485,7 +485,7 @@ class Robot:
 
         # Turn
         turn_speed = math.pi / 8
-
+        print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
         if aligned_angle < th_actual:
             turn_speed = -turn_speed
 
