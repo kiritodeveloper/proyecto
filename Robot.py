@@ -481,7 +481,7 @@ class Robot:
         # Obtain positions
         final_x = x_goal
         final_y = y_goal
-        aligned_angle = math.atan2(final_y - y_actual, final_x - x_actual)
+        aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
 
         # Turn
         turn_speed = math.pi / 8
