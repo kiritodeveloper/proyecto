@@ -1,4 +1,4 @@
-# Práctica 2 Robótica
+# Prácticas Robótica
 ## Organización de ramas
 - master: Último hito conseguido (todo ha de compilar y funcionar)
 - development: Versión en desarrollo (todo ha de compilar pero puede no funcionar correctamente)
