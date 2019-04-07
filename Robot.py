@@ -9,8 +9,11 @@ import sys
 from multiprocessing import Process, Value, Array, Lock
 import numpy as np
 
-from RobotFrameCapturer import RobotFrameCapturer
 from config_file import *
+
+if not is_debug and not disable_open_cv:
+    from RobotFrameCapturer import RobotFrameCapturer
+
 from utils import delay_until
 
 # Only import original drivers if it isn't in debug mode
@@ -44,6 +47,8 @@ class Robot:
         #    self.BP.get_motor_encoder(self.BP.PORT_C))
 
         ##################################################
+
+
         # odometry shared memory values
         self.x = Value('d', init_position[0])
         self.y = Value('d', init_position[1])
@@ -58,22 +63,31 @@ class Robot:
 
         # Set robot physical parameters
         self.wheel_radius = 0.028  # m
-        self.axis_length = 0.115  # m
+        self.axis_length = 0.112  # m
 
         # Set initial speed
         self.v = Value('d', 0.0)
         self.w = Value('d', 0.0)
 
-        if not is_debug:
-            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-        else:
+        if is_debug:
             self.BP = FakeBlockPi()
 
-        # Set motors ports
-        self.motor_port_left = self.BP.PORT_C
-        self.motor_port_right = self.BP.PORT_B
-        self.motor_port_basket = self.BP.PORT_A
+        else:
+            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+            # Set motors ports
 
+            self.BP.reset_all()
+
+            self.motor_port_left = self.BP.PORT_C
+            self.motor_port_right = self.BP.PORT_B
+            self.motor_port_basket = self.BP.PORT_A
+
+            # Sonar config
+            self.motor_port_ultrasonic = self.BP.PORT_1
+            self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+            self.min_distance_obstacle_detection = 30  # cm
+
+        # Basket state
         self.basket_state = 'up'
 
         # Encoder timer
@@ -98,11 +112,12 @@ class Robot:
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors speed
-        speed_dps_left = math.degrees(w_motors[1])
-        speed_dps_right = math.degrees(w_motors[0])
+        if not is_debug:
+            speed_dps_left = math.degrees(w_motors[1])
+            speed_dps_right = math.degrees(w_motors[0])
 
-        self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
-        self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
+            self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
+            self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
 
         self.lock_odometry.acquire()
         self.v.value = v
@@ -249,7 +264,8 @@ class Robot:
         Write message in the log (screen)
         :param message: message to write
         """
-        print(message)
+        # print(message)
+        kk = 0
 
     def normalizeAngle(self, angle):
         """
@@ -399,3 +415,100 @@ class Robot:
                 time.sleep(1)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
+
+    def detectObstacle(self):
+        if is_debug:
+            variable = False
+            return variable
+        else:
+            sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+            print("Distancia: ", sensor_value)
+            if sensor_value < self.min_distance_obstacle_detection:
+                return True
+            else:
+                return False
+
+    def go(self, x_goal, y_goal):
+        def wait_for_position(x, y, robot, position_error_margin):
+            """
+            Wait until the robot reaches the position
+            :param x: x position to be reached
+            :param y: y position to be reached
+            :param robot: robot configuration
+            :param position_error_margin: error allowed in the position
+            :param th_error_margin: error allowed in the orientation
+            """
+            [x_odo, y_odo, _] = robot.readOdometry()
+
+            t_next_period = time.time()
+
+            # Repeat while error decrease
+            last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+            actual_error = last_error
+            while position_error_margin < actual_error:
+                last_error = actual_error
+                while last_error >= actual_error:
+                    [x_odo, y_odo, _] = robot.readOdometry()
+                    last_error = actual_error
+                    actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+                    t_next_period += robot.P
+                    delay_until(t_next_period)
+
+        def wait_for_th(th, robot, th_error_margin):
+            """
+            Wait until the robot reaches the position
+            :param robot: robot configuration
+            :param th_error_margin: error allowed in the orientation
+            """
+            [_, _, th_odo] = robot.readOdometry()
+
+            t_next_period = time.time()
+
+            # Repeat while error decrease
+            last_error = abs(self.normalizeAngle(th - th_odo))
+            actual_error = last_error
+            while th_error_margin < actual_error:
+                last_error = actual_error
+                while last_error >= actual_error:
+                    [_, _, th_odo] = robot.readOdometry()
+                    last_error = actual_error
+                    actual_error = abs(self.normalizeAngle(th - th_odo))
+                    t_next_period += robot.P
+                    delay_until(t_next_period)
+
+        [x_actual, y_actual, th_actual] = self.readOdometry()
+
+        # Obtain positions
+        final_x = x_goal
+        final_y = y_goal
+        aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
+
+        # Turn
+        turn_speed = math.pi / 8
+        print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
+        if aligned_angle < th_actual:
+            if aligned_angle < -3*math.pi/4 and th_actual > math.pi/4 and turn_speed > 0:
+                aligned_angle = -aligned_angle
+            else:
+                turn_speed = -turn_speed
+
+        self.setSpeed(0, turn_speed)
+        print('Estoy buscando th ', aligned_angle)
+        wait_for_th(aligned_angle, self, 0.02)
+        print("Ha encontrado th")
+
+        # Stop robot
+        self.setSpeed(0, 0)
+
+        # Detect wall
+        if self.detectObstacle():
+            return False
+        else:
+            # Go forward
+            self.setSpeed(0.15, 0)
+            wait_for_position(final_x, final_y, self, 0.05)
+
+            # Stop robot
+            self.setSpeed(0, 0)
+
+            return True
