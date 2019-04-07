@@ -413,19 +413,14 @@ class Map2D:
         print(wavefront)
         self.costMatrix = grid
 
-    # NOTE: Make sure self.costMatrix is a 2D numpy array
-    # TO-DO
-    # """
-    # self.costMatrix = ....
-
     def findPath(self, x_ini, y_ini, x_end, y_end):
+        """
+        Return an array with the path is found or None if not
+        """
         def findPath_recursive(cost_matrix, x_ini_ext, y_ini_ext):
             """
             x_ini, y_ini, x_end, y_end: integer values that indicate \
                 the x and y coordinates of the starting (ini) and ending (end) cell
-
-            NOTE: Make sure self.currentPath is a 2D numpy array
-            ...  TO-DO  ....
             """
             if cost_matrix[x_ini_ext, y_ini_ext] == -1:
                 # Never should go into
@@ -444,10 +439,10 @@ class Map2D:
                         best_step = [next_mov_x, next_mov_y]
                         low_path = cost_matrix[next_mov_x, next_mov_y]
 
+                # 8 neighbours
                 # for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
                 #    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
                 #            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
-                #        # 8 neighbours
                 #        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
                 #
                 #        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
@@ -467,9 +462,6 @@ class Map2D:
         x_ini_ext = 2 * x_ini + 1
         y_ini_ext = 2 * y_ini + 1
 
-        # x_end_ext = 2 * x_end_inner + 1
-        # y_end_ext = 2 * y_end_inner + 1
-
         path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext)
         print('El path es: ', path)
         path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
@@ -484,10 +476,10 @@ class Map2D:
         path_to_return.pop(0)  # Delete the first one because we are there
         return path_to_return
 
-    # def replanPath(self, ??):
-    # """ TO-DO """
-
     def odometry2Cells(self, x, y, th):
+        """
+        Transform odometry to cells
+        """
         print('Convierto: ', x, y)
         x = x // (self.sizeCell / 1000)
         y = y // (self.sizeCell / 1000)
@@ -495,6 +487,9 @@ class Map2D:
         return [x, y, th]
 
     def rad2Dir(self, th):
+        """
+        Helper function to browse a direction by an angle
+        """
         desviation = math.pi / 4
 
         if desviation > th > -desviation:
@@ -509,6 +504,9 @@ class Map2D:
             return -1
 
     def replanPath(self, pos_x, pos_y, goal_x, goal_y):
+        """
+        Re-plan the map
+        """
         self.fillCostMatrix((goal_x, goal_y))
         return self.planPath((int(pos_x), int(pos_y)), (goal_x, goal_y))
 
