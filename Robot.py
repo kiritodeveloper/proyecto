@@ -489,6 +489,8 @@ class Robot:
         if aligned_angle < th_actual:
             if aligned_angle < -3*math.pi/4 and th_actual > math.pi/4 and turn_speed > 0:
                 aligned_angle = -aligned_angle
+            elif aligned_angle > 3*math.pi/4 and th_actual < -math.pi/4 and turn_speed < 0:
+                aligned_angle = -aligned_angle
             else:
                 turn_speed = -turn_speed
 
