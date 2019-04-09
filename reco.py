@@ -261,7 +261,7 @@ class Reco:
                 print("time to match %.2f" % (t3 - t2))
 
                 rawCapture.truncate(0)
-                cam.close()
+                #cam.close()
                 return found, dst_points
 
         else:
