@@ -18,7 +18,7 @@ from Robot import Robot
 from RobotLogger import start_robot_logger
 
 # Recognization
-import reco
+from reco import Reco
 
 
 # NOTES ABOUT TASKS to DO in P4:
@@ -39,6 +39,7 @@ def main(args):
             exit(1)
 
         robot = Robot()
+        reco = Reco()
 
         # Robot logger
         start_robot_logger(robot.finished, robot, "./out/trayectoria_entrega.csv")

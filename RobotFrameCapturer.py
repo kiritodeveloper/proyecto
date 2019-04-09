@@ -13,7 +13,6 @@ if not is_debug:
     import picamera
     from picamera.array import PiRGBArray
 
-
 class RobotFrameCapturer(object):
     def __init__(self, minRange, maxRange):
         # Store X, Y and size
