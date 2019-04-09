@@ -238,11 +238,9 @@ class Robot:
                 x = x + (v / w) * (math.sin(th + w * d_t) - math.sin(th))
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
-            th = th + d_t * w
+            w_sensor = np.deg2rad((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * (- 0.25))
 
-            w_sensor = np.deg2rad((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * 0.25)
-
-            print(w, w_sensor)
+            th = th + d_t * w_sensor
 
             # update odometry
             self.lock_odometry.acquire()
