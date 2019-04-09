@@ -6,25 +6,26 @@ import numpy as np
 import time
 import math
 
-import matplotlib
+#import matplotlib
 from config_file import is_debug
 
 
-matplotlib.use("TkAgg")
+#matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 # from Robot import Robot
-from MapLib import Map2D
-import argparse
 from Robot import Robot
 from RobotLogger import start_robot_logger
-from RobotDrawer import *
+
+# Recognization
+import reco
 
 
 # NOTES ABOUT TASKS to DO in P4:
 # 1)findPath(x1,y1, x2,y2),   fillCostMatrix(), replanPath () --> should be methods from the new Map2D class
 # 2) go(x,y) and detectObstacle() could be part of your Robot class (depending how you have implemented things)
 # 3) you can change the method signatures if you need, depending how you have implemented things
+
 
 
 def main(args):
@@ -47,10 +48,19 @@ def main(args):
 
         # ------ RECONOCIMIENTO ------
 
+        R2D2 = "reco/R2-D2_s.png"
+        BB8 = "reco/BB8_s.png"
+        R2D2_detected = False
+        BB8_detected = False
 
+        robot.setSpeed(0, math.pi / 16)
 
+        while not R2D2_detected or not BB8_detected:
+            R2D2_detected, R2D2_points = reco.search_img(R2D2)
+            BB8_detected, BB8_points = reco.search_img(BB8)
+            print(R2D2_detected, BB8_detected)
 
-
+        robot.setSpeed(0, 0)
 
         robot.stopOdometry()
 
