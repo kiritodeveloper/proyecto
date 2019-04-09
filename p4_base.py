@@ -43,7 +43,7 @@ def main(args):
         myMap = Map2D(map_file)
 
         # Initialize Odometry
-        initial_pos = [0.2, 0.2, 0]
+        initial_pos = [1, 1, 0]
         robot = Robot(initial_pos)
 
         # Robot logger
@@ -52,17 +52,17 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 2
-        goal_y = 2
+        goal_x = 0
+        goal_y = 0
 
         myMap.fillCostMatrix([goal_x, goal_y])
-        route = myMap.planPath([0, 0], [goal_x, goal_y])
+        route = myMap.planPath([2, 2], [goal_x, goal_y])
 
         robot_locations = []
 
         if is_debug:
             start_robot_drawer(robot.finished, robot)
-        last_reached_pos = [0, 0]
+        last_reached_pos = [2, 2]
 
         while len(route) > 0:
             goal = route.pop(0)
