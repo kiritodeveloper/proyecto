@@ -5,6 +5,7 @@ import os
 import numpy as np
 import time
 import math
+import cv2
 
 #import matplotlib
 from config_file import is_debug
@@ -58,7 +59,9 @@ def main(args):
 
         while not R2D2_detected or not BB8_detected:
             R2D2_detected, R2D2_points = reco.search_img(R2D2)
+            cv2.waitKey(1)
             BB8_detected, BB8_points = reco.search_img(BB8)
+            cv2.waitKey(1)
             print(R2D2_detected, BB8_detected)
 
         robot.setSpeed(0, 0)
