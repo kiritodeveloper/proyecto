@@ -240,7 +240,7 @@ class Robot:
 
             th = th + d_t * w
 
-            w_sensor = np.rad2deg((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * 0.25)
+            w_sensor = np.deg2rad((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * 0.25)
 
             print(w, w_sensor)
 
