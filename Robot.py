@@ -48,7 +48,6 @@ class Robot:
 
         ##################################################
 
-
         # odometry shared memory values
         self.x = Value('d', init_position[0])
         self.y = Value('d', init_position[1])
@@ -86,6 +85,17 @@ class Robot:
             self.motor_port_ultrasonic = self.BP.PORT_1
             self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
             self.min_distance_obstacle_detection = 30  # cm
+
+            self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
+
+        Continue = False
+        while not Continue:
+            try:
+                self.gyro_offset = self.BP.get_sensor(self.BP.PORT_3)[0]
+                Continue = True
+            except brickpi3.SensorError:
+                pass
+            time.sleep(0.1)
 
         # Basket state
         self.basket_state = 'up'
@@ -229,6 +239,10 @@ class Robot:
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
             th = th + d_t * w
+
+            w_sensor = np.rad2deg((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * 0.25)
+
+            print(w, w_sensor)
 
             # update odometry
             self.lock_odometry.acquire()
@@ -487,7 +501,7 @@ class Robot:
         turn_speed = math.pi / 8
         print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
         if aligned_angle < th_actual:
-            if aligned_angle < -3*math.pi/4 and th_actual > math.pi/4 and turn_speed > 0:
+            if aligned_angle < -3 * math.pi / 4 and th_actual > math.pi / 4 and turn_speed > 0:
                 aligned_angle = -aligned_angle
             else:
                 turn_speed = -turn_speed
