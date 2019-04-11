@@ -70,6 +70,7 @@ def main(args):
                 cv2.waitKey(1)
             print(R2D2_detected, BB8_detected)
 
+        print(R2D2_th, BB8_th)
         R2D2_pos, BB8_pos = reco.get_orientation(R2D2_th, BB8_th)
         print('R2D2: ',R2D2_pos, ' BB8: ', BB8_pos)
 
