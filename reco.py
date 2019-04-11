@@ -10,6 +10,7 @@ import numpy as np
 import os
 import time
 from config_file import is_debug
+import math
 
 # SET TO FALSE when running OUT of the raspberry to use the webcam
 PI = not is_debug
@@ -273,6 +274,23 @@ class Reco:
             total_y_sum += point[1]
         return total_x_sum / len(dst_pts), total_y_sum / len(dst_pts)
 
+    def desnormalize(self, th):
+        if th < 0:
+            th = 2 * math.pi + th
+        return th
+
+    def get_orientation(self, _th1, _th2):
+        th1 = self.desnormalize(_th1)
+        th2 = self.desnormalize(_th2)
+
+        if th1 > math.pi/2 and th2 > 3 * math.pi / 2:
+            return ['left', 'right']
+        elif th2 > math.pi/2 and th1 > 3 * math.pi / 2:
+            return ['right', 'left']
+        elif th1 > th2:
+            return ['right', 'left']
+        else:
+            return ['left', 'right']
 
     def stop_camera(self):
         self.cam.close()
