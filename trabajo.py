@@ -50,8 +50,8 @@ def main(args):
 
         # ------ RECONOCIMIENTO ------
 
-        R2D2 = "reco/R2-D2_s.png"
-        BB8 = "reco/BB8_s.png"
+        R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
+        BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
         R2D2_detected = False
         BB8_detected = False
 
@@ -62,12 +62,12 @@ def main(args):
                 R2D2_detected, R2D2_points = reco.search_img(R2D2)
                 if R2D2_detected:
                     R2D2_th = robot.readOdometry()[2]
-                cv2.waitKey(1) # Time beteween frames
+                #cv2.waitKey(1) # Time beteween frames
             if not BB8_detected:
                 BB8_detected, BB8_points = reco.search_img(BB8)
                 if BB8_detected:
                     BB8_th = robot.readOdometry()[2]
-                cv2.waitKey(1)
+                #cv2.waitKey(1)
             print(R2D2_detected, BB8_detected)
 
         print(R2D2_th, BB8_th)

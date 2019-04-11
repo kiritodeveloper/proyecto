@@ -230,10 +230,7 @@ class Reco:
         cv2.destroyAllWindows()
 
 
-    def search_img(self, refFilename):
-        print("Looking for reference image : ", refFilename)
-        imReference = cv2.imread(refFilename, cv2.IMREAD_COLOR)
-
+    def search_img(self, imReference):
         if PI:
             while True:
                 t1 = time.time()
