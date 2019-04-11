@@ -170,8 +170,8 @@ class Reco:
                                    flags=2)
                 img3 = cv2.drawMatches(img1_bgr, kp1, img2_bgr, kp2, good, None, **draw_params)
             print("Voy a mostrarte lo que tengo")
-            cv2.imshow("INLIERS", img3)
-            cv2.waitKey(0) # WAIT is run outside
+            #cv2.imshow("INLIERS", img3)
+            #cv2.waitKey(0) # WAIT is run outside
 
         return found, dst_pts
 
@@ -240,8 +240,8 @@ class Reco:
                 frame = self.rawCapture.array
 
                 #frame = cv2.flip(frame, -1)  # to rotate 180
-                #cv2.imshow("Lo que veo",frame)
-                #cv2.waitKey(0)
+                cv2.imshow("Lo que veo",frame)
+                cv2.waitKey(0)
                 if DEBUG > 2:
                     cv2.imshow("Current view", frame)
                     cv2.imshow("Current target", imReference)
