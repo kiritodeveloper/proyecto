@@ -170,8 +170,8 @@ class Reco:
                                    flags=2)
                 img3 = cv2.drawMatches(img1_bgr, kp1, img2_bgr, kp2, good, None, **draw_params)
             print("Voy a mostrarte lo que tengo")
-            #cv2.imshow("INLIERS", img3)
-            #cv2.waitKey(0) # WAIT is run outside
+            cv2.imshow("INLIERS", img3)
+            cv2.waitKey(0) # WAIT is run outside
 
         return found, dst_pts
 
