@@ -216,7 +216,7 @@ class Robot:
 
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
-        file = open("./resultados.txt","w")
+        file = open("./resultados.txt", "w")
         while not finished.value:
 
             d_t = self.P
@@ -241,7 +241,7 @@ class Robot:
             # w_sensor = np.deg2rad((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * (- 0.25))
             w_sensor = self.BP.get_sensor(self.BP.PORT_3)
             th = th + d_t * w
-            file.write(str(w)+" "+str(w_sensor))
+            file.write(str(w) + " " + str(w_sensor) + "\n")
 
             # update odometry
             self.lock_odometry.acquire()
