@@ -189,7 +189,7 @@ class Reco:
                 frame = self.rawCapture.array
                 frame = cv2.flip(frame, -1)  # to rotate 180
                 cv2.imshow("Lo que veo",frame)
-                cv2.waitKey(0)
+                cv2.waitKey(5000)
 
                 if DEBUG > 2:
                     cv2.imshow("Current view", frame)
