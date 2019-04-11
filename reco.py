@@ -283,14 +283,14 @@ class Reco:
         th1 = self.desnormalize(_th1)
         th2 = self.desnormalize(_th2)
 
-        if th1 > math.pi/2 and th2 > 3 * math.pi / 2:
+        if th1 < math.pi/2 and th2 > 3 * math.pi / 2:
             return ['left', 'right']
-        elif th2 > math.pi/2 and th1 > 3 * math.pi / 2:
+        elif th2 < math.pi/2 and th1 > 3 * math.pi / 2:
             return ['right', 'left']
         elif th1 > th2:
-            return ['right', 'left']
-        else:
             return ['left', 'right']
+        else:
+            return ['right', 'left']
 
     def stop_camera(self):
         self.cam.close()
