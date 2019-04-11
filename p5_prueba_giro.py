@@ -45,8 +45,8 @@ def path_90_degree_odometry(robot):
     robot.setSpeed(0, - math.pi / 8)
     wait_for_th(- math.pi / 2, robot, 0.02)
 
-    [_, _, th_odo] = robot.readOdometry()
-    print (th_odo)
+    # [_, _, th_odo] = robot.readOdometry()
+    #  print (th_odo)
 
 def main():
     """
