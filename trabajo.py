@@ -65,14 +65,16 @@ def main(args):
 
         while not R2D2_detected or not BB8_detected:
             if not R2D2_detected:
+                cv2.waitKey(1) # Time beteween frames
                 R2D2_detected, R2D2_points = reco.search_img(R2D2)
                 if R2D2_detected:
                     R2D2_th = robot.readOdometry()[2]
                     actual_th = robot.normalizeAngle(actual_th+math.pi/4)
                     turn_speed = math.pi/2
                     period = -math.pi/32
-                #cv2.waitKey(1) # Time beteween frames
             if not BB8_detected:
+                cv2.waitKey(1) # Time beteween frames
+
                 BB8_detected, BB8_points = reco.search_img(BB8)
                 if BB8_detected:
                     BB8_th = robot.readOdometry()[2]
