@@ -57,7 +57,7 @@ def main(args):
 
         actual_th = 0
         error = 0.2
-        turn_speed = math.pi / 6
+        turn_speed = math.pi / 4
         robot.setSpeed(0, turn_speed)
         robot.wait_for_th(actual_th, error)
 
