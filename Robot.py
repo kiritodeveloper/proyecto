@@ -218,7 +218,21 @@ class Robot:
 
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
-        file = open("./resultados.txt", "w")
+
+        last_values_odometry = [0, 0, 0, 0, 0]
+
+        last_values_gyro_1 = [2342, 2342, 2342, 2342, 2342]
+
+        last_values_gyro_2 = [2338, 2338, 2338, 2338, 2338]
+
+        gOffset_1 = 2342
+        gOffset_2 = 2338
+
+        correct_gyro_1 = 0.17
+        correct_gyro_2 = 0.11
+
+        KGYROSPEEDCORRECT = 0.25
+
         while not finished.value:
 
             d_t = self.P
@@ -240,11 +254,42 @@ class Robot:
                 x = x + (v / w) * (math.sin(th + w * d_t) - math.sin(th))
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
-            # w_sensor = np.deg2rad((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * (- 0.25))
+            # Get w of sensors
             w_sensor = self.BP.get_sensor(self.BP.PORT_3)[0]
             w_sensor_2 = self.BP.get_sensor(self.BP.PORT_4)[0]
+
+            # Obtain precise th
+            # Odometry
+            last_values_odometry.pop(0)
+            last_values_odometry.append(w)
+            actual_value_od = sum(last_values_odometry) / len(last_values_odometry)
+
+            # Sensor 1
+            last_values_gyro_1.pop(0)
+            last_values_gyro_1.append(w_sensor)
+            actual_value_gyro_1 = sum(last_values_gyro_1) / len(last_values_gyro_1)
+
+            actual_value_gyro_1 = (actual_value_gyro_1 - gOffset_1) * correct_gyro_1 * d_t
+
+            gOffset_1 += (actual_value_gyro_1 * KGYROSPEEDCORRECT * d_t)
+
+            actual_value_gyro_1 = - actual_value_gyro_1
+
+            # Sensor 2
+            last_values_gyro_2.pop(0)
+            last_values_gyro_2.append(w_sensor_2)
+            actual_value_gyro_2 = sum(last_values_gyro_2) / len(last_values_gyro_2)
+
+            actual_value_gyro_2 = (actual_value_gyro_2 - gOffset_2) * correct_gyro_2 * d_t
+
+            gOffset_2 += (actual_value_gyro_2 * KGYROSPEEDCORRECT * d_t)
+
+            actual_value_gyro_2 = - actual_value_gyro_2
+
+            w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3
+
+            # Update th
             th = th + d_t * w
-            file.write(str(w) + "," + str(w_sensor) + "," + str(w_sensor_2) + "\n")
 
             # update odometry
             self.lock_odometry.acquire()
