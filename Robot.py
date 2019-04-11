@@ -161,8 +161,6 @@ class Robot:
             w_izq = (rad_izq - self.r_prev_encoder_left) / dt
             w_der = (rad_der - self.r_prev_encoder_right) / dt
 
-            print(w_izq, w_der)
-
             self.r_prev_encoder_left = rad_izq
             self.r_prev_encoder_right = rad_der
 
@@ -172,6 +170,8 @@ class Robot:
 
             v = v_w[0]
             w = v_w[1]
+
+            print(rad_izq, rad_der, dt, w_izq, w_der, w)
 
         self.lock_odometry.release()
 

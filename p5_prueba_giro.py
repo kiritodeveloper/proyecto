@@ -13,7 +13,7 @@ from RobotLogger import start_robot_logger
 from utils import delay_until
 
 
-def wait_for_th(th, robot, th_error_margin):
+def wait_for_th(robot, th, th_error_margin):
     """
     Wait until the robot reaches the position
     :param robot: robot configuration
@@ -43,10 +43,11 @@ def path_90_degree_odometry(robot):
     :param robot: robot configuration
     """
     robot.setSpeed(0, - math.pi / 8)
-    wait_for_th(- math.pi / 2, robot, 0.02)
+    wait_for_th(robot, - math.pi / 2, 0.02)
 
     # [_, _, th_odo] = robot.readOdometry()
     #  print (th_odo)
+
 
 def main():
     """
