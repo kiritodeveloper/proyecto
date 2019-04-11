@@ -57,11 +57,11 @@ def main(args):
 
         actual_th = 0
         error = 0.2
-        turn_speed = math.pi / 4
+        turn_speed = math.pi / 2
         #robot.setSpeed(0, turn_speed)
         #robot.wait_for_th(actual_th, error)
 
-        period = math.pi/4
+        period = math.pi/8
 
         while not R2D2_detected or not BB8_detected:
             if not R2D2_detected:
