@@ -3,6 +3,7 @@
 from __future__ import print_function  # use python 3 syntax but make it compatible with python 2
 from __future__ import division  # ''
 
+import collections
 import math
 import time  # import the time library for the sleep function
 import sys
@@ -90,17 +91,21 @@ class Robot:
             self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
             self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
-        Continue = False
-        while not Continue:
-            try:
-                self.gyro_offset = self.BP.get_sensor(self.BP.PORT_3)[0]
-                Continue = True
-            except brickpi3.SensorError:
-                pass
-            time.sleep(0.1)
+        # Gyro sensor offset and calibration
+        self.gyro_1_offset = 2342
+        self.gyro_2_offset = 2338
+
+        self.gyro_1_correction_factor = 0.17
+        self.gyro_2_correction_factor = 0.11
+
+        self.gyro_1_offset_correction_factor = 0
+        self.gyro_2_offset_correction_factor = 0
 
         # Basket state
         self.basket_state = 'up'
+
+        # Is spinning
+        self.is_spinning = False
 
         # Encoder timer
         self.encoder_timer = 0
@@ -117,6 +122,8 @@ class Robot:
         """
 
         print("setting speed to %.2f %.2f" % (v, w))
+
+        self.is_spinning = w != 0
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
@@ -219,19 +226,12 @@ class Robot:
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
 
-        last_values_odometry = [0, 0, 0, 0, 0]
+        # last values that the odometry got
+        last_values_odometry = collections.deque(5*[0], 5)
 
-        last_values_gyro_1 = [2342, 2342, 2342, 2342, 2342]
+        last_values_gyro_1 = collections.deque(5*[self.gyro_1_offset], 5)
 
-        last_values_gyro_2 = [2338, 2338, 2338, 2338, 2338]
-
-        gOffset_1 = 2342
-        gOffset_2 = 2338
-
-        correct_gyro_1 = 0.17
-        correct_gyro_2 = 0.11
-
-        KGYROSPEEDCORRECT = 0.25
+        last_values_gyro_2 = collections.deque(5*[self.gyro_2_offset], 5)
 
         while not finished.value:
 
@@ -260,35 +260,30 @@ class Robot:
 
             # Obtain precise th
             # Odometry
-            last_values_odometry.pop(0)
             last_values_odometry.append(w)
             actual_value_od = sum(last_values_odometry) / len(last_values_odometry)
 
-            # Sensor 1
-            last_values_gyro_1.pop(0)
-            last_values_gyro_1.append(w_sensor)
-            actual_value_gyro_1 = sum(last_values_gyro_1) / len(last_values_gyro_1)
+            if self.is_spinning:
+                # Only if it is turning on read gyro sensors
+                # Sensor 1
+                last_values_gyro_1.append(w_sensor)
+                actual_value_gyro_1 = sum(last_values_gyro_1) / len(last_values_gyro_1)
 
-            actual_value_gyro_1 = (actual_value_gyro_1 - gOffset_1) * correct_gyro_1 * d_t
+                actual_value_gyro_1 = - (actual_value_gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
 
-            gOffset_1 += (actual_value_gyro_1 * KGYROSPEEDCORRECT * d_t)
+                self.gyro_1_offset += (actual_value_gyro_1 * self.gyro_1_offset_correction_factor * d_t)
 
-            actual_value_gyro_1 = - actual_value_gyro_1
+                # Sensor 2
+                last_values_gyro_2.append(w_sensor_2)
+                actual_value_gyro_2 = sum(last_values_gyro_2) / len(last_values_gyro_2)
 
-            # Sensor 2
-            last_values_gyro_2.pop(0)
-            last_values_gyro_2.append(w_sensor_2)
-            actual_value_gyro_2 = sum(last_values_gyro_2) / len(last_values_gyro_2)
+                actual_value_gyro_2 = - (actual_value_gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
 
-            actual_value_gyro_2 = (actual_value_gyro_2 - gOffset_2) * correct_gyro_2 * d_t
+                self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
 
-            gOffset_2 += (actual_value_gyro_2 * KGYROSPEEDCORRECT * d_t)
-
-            actual_value_gyro_2 = - actual_value_gyro_2
-
-            print(actual_value_od, actual_value_gyro_1, actual_value_gyro_2)
-
-            w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3
+                w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3
+            else:
+                w = actual_value_od
 
             # Update th
             th = th + d_t * w
@@ -310,7 +305,6 @@ class Robot:
             # Periodic task
             t_next_period += self.P
             delay_until(t_next_period)
-        file.close()
         sys.stdout.write("Stopping odometry ... X=  %d, \
                 Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
 
@@ -326,8 +320,7 @@ class Robot:
         Write message in the log (screen)
         :param message: message to write
         """
-        # print(message)
-        kk = 0
+        print(message)
 
     def normalizeAngle(self, angle):
         """
