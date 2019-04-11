@@ -232,22 +232,11 @@ class Reco:
         imReference = cv2.imread(refFilename, cv2.IMREAD_COLOR)
 
         if PI:
-            print("**** processing PI-CAM image file ****")
-            cam = picamera.PiCamera()
-
-            # cam.resolution = (320, 240)
-            cam.resolution = (640, 480)
-            cam.framerate = 10  # less frame rate, more light BUT needs to go slowly (or stop)
-            rawCapture = PiRGBArray(cam)
-
-            # allow the camera to warmup
-            time.sleep(0.2)
-
             while True:
                 t1 = time.time()
                 rectFound = False
-                cam.capture(rawCapture, format="bgr")
-                frame = rawCapture.array
+                self.cam.capture(self.rawCapture, format="bgr")
+                frame = self.rawCapture.array
 
                 frame = cv2.flip(frame, -1)  # to rotate 180
                 if DEBUG > 2:
@@ -260,7 +249,7 @@ class Reco:
                 t3 = time.time()
                 print("time to match %.2f" % (t3 - t2))
 
-                rawCapture.truncate(0)
+                self.rawCapture.truncate(0)
                 #cam.close()
                 return found, dst_points
 
