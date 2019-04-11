@@ -64,6 +64,7 @@ def main(args):
         period = math.pi/4
 
         while not R2D2_detected or not BB8_detected:
+            print(actual_th, robot.normalizeAngle(actual_th+period))
             robot.setSpeed(0, turn_speed)
             actual_th = robot.normalizeAngle(actual_th+period)
             robot.wait_for_th(actual_th, error)

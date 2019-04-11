@@ -247,7 +247,7 @@ class Reco:
                 t2 = time.time()
                 found, dst_points = self.match_images(imReference, frame)
                 t3 = time.time()
-                print("time to match %.2f" % (t3 - t2))
+                #print("time to match %.2f" % (t3 - t2))
 
                 self.rawCapture.truncate(0)
                 #cam.close()
