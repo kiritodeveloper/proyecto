@@ -281,3 +281,7 @@ class Reco:
             total_x_sum += point[0]
             total_y_sum += point[1]
         return total_x_sum / len(dst_pts), total_y_sum / len(dst_pts)
+
+
+    def stop_camera(self):
+        self.cam.close()

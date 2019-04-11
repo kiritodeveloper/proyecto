@@ -55,7 +55,7 @@ def main(args):
         R2D2_detected = False
         BB8_detected = False
 
-        robot.setSpeed(0, math.pi / 16)
+        #robot.setSpeed(0, math.pi / 16)
 
         while not R2D2_detected or not BB8_detected:
             R2D2_detected, R2D2_points = reco.search_img(R2D2)
@@ -64,7 +64,7 @@ def main(args):
             cv2.waitKey(1)
             print(R2D2_detected, BB8_detected)
 
-        robot.setSpeed(0, 0)
+        #robot.setSpeed(0, 0)
 
         robot.stopOdometry()
 
@@ -73,6 +73,7 @@ def main(args):
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
         robot.stopOdometry()
+        reco.stop_camera()
 
 
 if __name__ == "__main__":
