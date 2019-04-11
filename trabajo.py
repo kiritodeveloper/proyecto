@@ -64,16 +64,6 @@ def main(args):
         period = math.pi/4
 
         while not R2D2_detected or not BB8_detected:
-            actual_th_viejo = actual_th
-            actual_th = robot.normalizeAngle(actual_th+period)
-            if actual_th_viejo > actual_th:
-                robot.setSpeed(0, -turn_speed)
-                print(actual_th_viejo, actual_th, -turn_speed)
-            else:
-                robot.setSpeed(0, turn_speed)
-                print(actual_th_viejo, actual_th, turn_speed)
-            robot.wait_for_th(actual_th, error)
-            robot.setSpeed(0, 0)
             if not R2D2_detected:
                 R2D2_detected, R2D2_points = reco.search_img(R2D2)
                 if R2D2_detected:
@@ -91,6 +81,17 @@ def main(args):
                     period = -math.pi/32
                 #cv2.waitKey(1)
             print(R2D2_detected, BB8_detected)
+            if not R2D2_detected or not BB8_detected:
+                actual_th_viejo = actual_th
+                actual_th = robot.normalizeAngle(actual_th+period)
+                if actual_th_viejo > actual_th:
+                    robot.setSpeed(0, -turn_speed)
+                    print(actual_th_viejo, actual_th, -turn_speed)
+                else:
+                    robot.setSpeed(0, turn_speed)
+                    print(actual_th_viejo, actual_th, turn_speed)
+                robot.wait_for_th(actual_th, error)
+                robot.setSpeed(0, 0)
 
         print(R2D2_th, BB8_th)
         R2D2_pos, BB8_pos = reco.get_orientation(R2D2_th, BB8_th)
