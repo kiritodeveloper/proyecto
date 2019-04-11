@@ -55,9 +55,19 @@ def main(args):
         R2D2_detected = False
         BB8_detected = False
 
-        robot.setSpeed(0, math.pi / 16)
+        actual_th = 0
+        error = 0.1
+        turn_speed = math.pi / 6
+        robot.setSpeed(0, turn_speed)
+        robot.wait_for_th(actual_th, error)
+
+        period = math.pi/4
 
         while not R2D2_detected or not BB8_detected:
+            robot.setSpeed(0, turn_speed)
+            robot.wait_for_th(actual_th+period, error)
+            actual_th += period
+            robot.setSpeed(0, 0)
             if not R2D2_detected:
                 R2D2_detected, R2D2_points = reco.search_img(R2D2)
                 if R2D2_detected:
