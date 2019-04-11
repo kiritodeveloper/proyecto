@@ -86,7 +86,9 @@ class Robot:
             self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
             self.min_distance_obstacle_detection = 30  # cm
 
+            # Gyroscopic sensors
             self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
+            self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
         Continue = False
         while not Continue:
@@ -158,6 +160,8 @@ class Robot:
             # Hacia delante es negativo, se cambia el signo
             w_izq = (rad_izq - self.r_prev_encoder_left) / dt
             w_der = (rad_der - self.r_prev_encoder_right) / dt
+
+            print(w_izq, w_der)
 
             self.r_prev_encoder_left = rad_izq
             self.r_prev_encoder_right = rad_der
@@ -239,9 +243,10 @@ class Robot:
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
             # w_sensor = np.deg2rad((self.BP.get_sensor(self.BP.PORT_3)[0] - self.gyro_offset) * (- 0.25))
-            w_sensor = self.BP.get_sensor(self.BP.PORT_3)
+            w_sensor = self.BP.get_sensor(self.BP.PORT_3)[0]
+            w_sensor_2 = self.BP.get_sensor(self.BP.PORT_4)[0]
             th = th + d_t * w
-            file.write(str(w) + " " + str(w_sensor) + "\n")
+            file.write(str(w) + "," + str(w_sensor) + "," + str(w_sensor_2) + "\n")
 
             # update odometry
             self.lock_odometry.acquire()
