@@ -150,11 +150,13 @@ class Reco:
             img2_res = cv2.polylines(img2_bgr, [np.int32(dst)], True,
                                      color=(255, 255, 255), thickness=3)
             found = True
+            dst_pts = []
             print("ROBUST matches found - %d (out of %d) --> OBJECT FOUND" % (np.sum(matchesMask), len(good)))
         else:
             print("Not enough initial matches are found - %d (required %d)" % (len(good), MIN_MATCH_COUNT))
             matchesMask = None
             found = False
+            dst_pts = []
 
         if DEBUG:
             if int(ver[0]) < 3:  # CURRENT RASPBERRY opencv version is 2.4.9
