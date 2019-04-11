@@ -32,12 +32,12 @@ MIN_MATCH_OBJECTFOUND = 15  # after robust check, to consider object-found
 class Reco:
     def __init__(self):
         if PI:
-            cam = picamera.PiCamera()
+            self.cam = picamera.PiCamera()
 
             # cam.resolution = (320, 240)
-            cam.resolution = (640, 480)
-            cam.framerate = 10  # less frame rate, more light BUT needs to go slowly (or stop)
-            rawCapture = PiRGBArray(cam)
+            self.cam.resolution = (640, 480)
+            self.cam.framerate = 10  # less frame rate, more light BUT needs to go slowly (or stop)
+            self.rawCapture = PiRGBArray(self.cam)
 
             # allow the camera to warmup
             time.sleep(0.2)
