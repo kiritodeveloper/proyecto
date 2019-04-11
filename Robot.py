@@ -286,6 +286,8 @@ class Robot:
 
             actual_value_gyro_2 = - actual_value_gyro_2
 
+            print(actual_value_od, actual_value_gyro_1, actual_value_gyro_2)
+
             w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3
 
             # Update th
