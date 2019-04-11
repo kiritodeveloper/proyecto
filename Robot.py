@@ -566,7 +566,7 @@ class Robot:
         else:
             # Go forward
             self.setSpeed(0.15, 0)
-            wait_for_position(final_x, final_y, self, 0.05)
+            wait_for_position(final_x, final_y, self, 0.1)
 
             # Stop robot
             self.setSpeed(0, 0)
