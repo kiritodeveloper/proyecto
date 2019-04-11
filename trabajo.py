@@ -55,7 +55,7 @@ def main(args):
         R2D2_detected = False
         BB8_detected = False
 
-        #robot.setSpeed(0, math.pi / 16)
+        robot.setSpeed(0, math.pi / 16)
 
         while not R2D2_detected or not BB8_detected:
             if not R2D2_detected:
@@ -74,7 +74,7 @@ def main(args):
         R2D2_pos, BB8_pos = reco.get_orientation(R2D2_th, BB8_th)
         print('R2D2: ',R2D2_pos, ' BB8: ', BB8_pos)
 
-        #robot.setSpeed(0, 0)
+        robot.setSpeed(0, 0)
 
         robot.stopOdometry()
 
