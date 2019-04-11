@@ -171,8 +171,6 @@ class Robot:
             v = v_w[0]
             w = v_w[1]
 
-            print(rad_izq, rad_der, dt, w_izq, w_der, w)
-
         self.lock_odometry.release()
 
         return v, w
