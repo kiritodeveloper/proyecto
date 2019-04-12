@@ -243,12 +243,11 @@ class Reco:
                 try:
                     for i in xrange(4):
                         self.cam.capture(self.rawCapture, format="bgr")
+                        self.cam.capture(self.rawCapture, format="bgr")
+                        frame = self.rawCapture.array
                 except ValueError:
                     print("Buffer vaciado")
-                cv2.waitKey(50)
-                self.cam.capture(self.rawCapture, format="bgr")
-                frame = self.rawCapture.array
-
+                #cv2.waitKey(50)
                 #frame = cv2.flip(frame, -1)  # to rotate 180
                 print ("Muestro frame actual")
                 cv2.imshow("Lo que veo",frame)
