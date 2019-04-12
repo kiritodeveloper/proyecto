@@ -235,6 +235,8 @@ class Robot:
 
         last_values_v_odo = collections.deque(5 * [0], 5)
 
+        v_correction_factor = 0.95
+
         while not finished.value:
 
             d_t = self.P
@@ -248,7 +250,7 @@ class Robot:
             th = th_odo.value
 
             last_values_v_odo.append(v)
-            v = sum(last_values_v_odo) / 5
+            v = (sum(last_values_v_odo) / 5) * v_correction_factor
 
             if w == 0:
                 # Straight movement
