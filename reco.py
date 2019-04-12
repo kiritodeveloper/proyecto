@@ -245,7 +245,7 @@ class Reco:
                         self.cam.capture(self.rawCapture, format="bgr")
                 except ValueError:
                     print("Buffer vaciado")
-                cv2.waitKey(35)
+                cv2.waitKey(50)
                 self.cam.capture(self.rawCapture, format="bgr")
                 frame = self.rawCapture.array
 
