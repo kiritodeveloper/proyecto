@@ -240,9 +240,10 @@ class Reco:
                 #for i in xrange(4):
                     #self.cam.grab()
 
+                self.cam.capture(self.rawCapture, format="bgr")
+                frame = self.rawCapture.array
                 try:
                     for i in xrange(4):
-                        self.cam.capture(self.rawCapture, format="bgr")
                         self.cam.capture(self.rawCapture, format="bgr")
                         frame = self.rawCapture.array
                 except ValueError:
