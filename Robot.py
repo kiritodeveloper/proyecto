@@ -227,13 +227,13 @@ class Robot:
         t_next_period = time.time()
 
         # last values that the odometry got
-        last_values_w_odo = collections.deque(5*[0], 5)
+        last_values_w_odo = collections.deque(5 * [0], 5)
 
-        last_values_gyro_1 = collections.deque(5*[self.gyro_1_offset], 5)
+        last_values_gyro_1 = collections.deque(5 * [self.gyro_1_offset], 5)
 
-        last_values_gyro_2 = collections.deque(5*[self.gyro_2_offset], 5)
+        last_values_gyro_2 = collections.deque(5 * [self.gyro_2_offset], 5)
 
-        last_values_v_odo = collections.deque(5*[0], 5)
+        last_values_v_odo = collections.deque(5 * [0], 5)
 
         while not finished.value:
 
@@ -560,15 +560,16 @@ class Robot:
         print("Ha encontrado th")
 
         # Stop robot
-        self.setSpeed(0, 0)
+        # self.setSpeed(0, 0)
 
         # Detect wall
         if self.detectObstacle():
+            self.setSpeed(0, 0)
             return False
         else:
             # Go forward
             self.setSpeed(0.15, 0)
-            wait_for_position(final_x, final_y, self, 0.1)
+            wait_for_position(final_x, final_y, self, 0.08)
 
             # Stop robot
             self.setSpeed(0, 0)
