@@ -243,7 +243,7 @@ class Reco:
                 try:
                     for i in xrange(4):
                         self.cam.capture(self.rawCapture, format="bgr")
-                except:
+                except picamera.exc.PiCameraValueError:
                     kk = 0
 
                 self.cam.capture(self.rawCapture, format="bgr")
