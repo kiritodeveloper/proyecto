@@ -227,11 +227,13 @@ class Robot:
         t_next_period = time.time()
 
         # last values that the odometry got
-        last_values_odometry = collections.deque(5*[0], 5)
+        last_values_w_odo = collections.deque(5*[0], 5)
 
         last_values_gyro_1 = collections.deque(5*[self.gyro_1_offset], 5)
 
         last_values_gyro_2 = collections.deque(5*[self.gyro_2_offset], 5)
+
+        last_values_v_odo = collections.deque(5*[0], 5)
 
         while not finished.value:
 
@@ -260,8 +262,11 @@ class Robot:
 
             # Obtain precise th
             # Odometry
-            last_values_odometry.append(w)
-            actual_value_od = sum(last_values_odometry) / len(last_values_odometry)
+            last_values_w_odo.append(w)
+            actual_value_od = sum(last_values_w_odo) / len(last_values_w_odo)
+
+            last_values_v_odo.append(v)
+            v = sum(last_values_v_odo) / len(last_values_v_odo)
 
             if self.is_spinning:
                 # Only if it is turning on read gyro sensors
@@ -283,6 +288,8 @@ class Robot:
 
                 w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3
             else:
+                last_values_gyro_1.append(self.gyro_1_offset)
+                last_values_gyro_2.append(self.gyro_2_offset)
                 w = actual_value_od
 
             # Update th
