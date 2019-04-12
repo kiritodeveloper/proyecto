@@ -252,7 +252,7 @@ class Reco:
                 #frame = cv2.flip(frame, -1)  # to rotate 180
                 print ("Muestro frame actual")
                 cv2.imshow("Lo que veo",frame)
-                cv2.waitKey(2)
+                cv2.waitKey(0)
                 if DEBUG > 2:
                     cv2.imshow("Current view", frame)
                     cv2.imshow("Current target", imReference)
