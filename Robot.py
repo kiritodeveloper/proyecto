@@ -560,7 +560,7 @@ class Robot:
         print("Ha encontrado th")
 
         # Stop robot
-        # self.setSpeed(0, 0)
+        self.setSpeed(0, 0)
 
         # Detect wall
         if self.detectObstacle():
