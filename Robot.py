@@ -101,6 +101,9 @@ class Robot:
         self.gyro_1_offset_correction_factor = 0
         self.gyro_2_offset_correction_factor = 0
 
+        # V correction factor
+        self.linear_speed_correction_factor = 1.1
+
         # Sensors values history
         self.history_max_size = 5
         self.history_dg_left = collections.deque(5 * [0], self.history_max_size)
@@ -264,6 +267,8 @@ class Robot:
             y = y_odo.value
 
             th = th_odo.value
+
+            v = v * self.linear_speed_correction_factor
 
             if w == 0:
                 # Straight movement
