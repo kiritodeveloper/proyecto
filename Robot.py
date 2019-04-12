@@ -235,7 +235,7 @@ class Robot:
 
         last_values_v_odo = collections.deque(5 * [0], 5)
 
-        v_correction_factor = 0.95
+        v_correction_factor = 1.1
 
         while not finished.value:
 
