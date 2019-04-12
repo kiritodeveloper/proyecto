@@ -220,8 +220,8 @@ def find_template(mirror=False, img=None, refFilename = "R2-D2s.png"):
             cam = cv2.VideoCapture(1)
             #cam.set(CV_CAP_PROPR)
             while True:
-                for i in xrange(4):
-                    cam.grab()
+                #for i in xrange(4):
+                #    cam.grab()
                 """
                 buffer_empty = cam.grab()
                 while not buffer_empty:
