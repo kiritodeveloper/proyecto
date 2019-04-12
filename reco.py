@@ -253,10 +253,10 @@ class Reco:
                 #print ("Muestro frame actual")
                 #cv2.imshow("Lo que veo",frame)
                 #cv2.waitKey(0)
-                #if DEBUG > 2:
-                cv2.imshow("Current view", frame)
-                cv2.imshow("Current target", imReference)
-                cv2.waitKey(0)
+                if DEBUG > 2:
+                    cv2.imshow("Current view", frame)
+                    cv2.imshow("Current target", imReference)
+                    cv2.waitKey(0)
 
                 t2 = time.time()
                 found, dst_points = self.match_images(imReference, frame)
