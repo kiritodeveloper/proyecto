@@ -56,7 +56,7 @@ def main(args):
         BB8_detected = False
 
         actual_th = 0
-        error = 0.02
+        error = 0.05
         turn_speed = math.pi / 2
         #robot.setSpeed(0, turn_speed)
         #robot.wait_for_th(actual_th, error)
