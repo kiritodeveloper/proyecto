@@ -7,7 +7,7 @@ import collections
 import math
 import time  # import the time library for the sleep function
 import sys
-from multiprocessing import Process, Value, Array, Lock
+from multiprocessing import Process, Value, Lock
 import numpy as np
 
 from config_file import *
@@ -101,6 +101,14 @@ class Robot:
         self.gyro_1_offset_correction_factor = 0
         self.gyro_2_offset_correction_factor = 0
 
+        # Sensors values history
+        self.history_max_size = 5
+        self.history_dg_left = collections.deque(5 * [0], self.history_max_size)
+        self.history_dg_right = collections.deque(5 * [0], self.history_max_size)
+        self.history_gyro_1 = collections.deque(5 * [self.gyro_1_offset], self.history_max_size)
+        self.history_gyro_2 = collections.deque(5 * [self.gyro_2_offset], self.history_max_size)
+        self.history_proximity = collections.deque(5 * [1000], self.history_max_size)
+
         # Basket state
         self.basket_state = 'up'
 
@@ -156,6 +164,13 @@ class Robot:
         else:
             [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
                                     self.BP.get_motor_encoder(self.motor_port_right)]
+            self.history_dg_left.append(grad_izq)
+            self.history_dg_right.append(grad_der)
+
+            # Suaviza los valores con la media
+            grad_izq = sum(self.history_dg_left) / self.history_max_size
+            grad_der = sum(self.history_dg_right) / self.history_max_size
+
             rad_izq = math.radians(grad_izq)
             rad_der = math.radians(grad_der)
 
@@ -181,6 +196,18 @@ class Robot:
         self.lock_odometry.release()
 
         return v, w
+
+    def readSensors(self):
+        """
+        Read both gyroscopes and proximity sensor
+        :return: gyroscope_1, gyroscope_2, proximity
+        """
+        self.history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
+        self.history_gyro_1.append(self.BP.get_sensor(self.BP.PORT_3)[0])
+        self.history_gyro_2.append(self.BP.get_sensor(self.BP.PORT_4)[0])
+
+        return sum(self.history_gyro_1) / self.history_max_size, sum(self.history_gyro_2) / self.history_max_size, sum(
+            self.history_proximity) / self.history_max_size
 
     def readOdometry(self):
         """ Returns current value of odometry estimation """
@@ -226,17 +253,6 @@ class Robot:
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
 
-        # last values that the odometry got
-        last_values_w_odo = collections.deque(5 * [0], 5)
-
-        last_values_gyro_1 = collections.deque(5 * [self.gyro_1_offset], 5)
-
-        last_values_gyro_2 = collections.deque(5 * [self.gyro_2_offset], 5)
-
-        last_values_v_odo = collections.deque(5 * [0], 5)
-
-        v_correction_factor = 1.1
-
         while not finished.value:
 
             d_t = self.P
@@ -249,9 +265,6 @@ class Robot:
 
             th = th_odo.value
 
-            last_values_v_odo.append(v)
-            v = (sum(last_values_v_odo) / 5) * v_correction_factor
-
             if w == 0:
                 # Straight movement
                 x = x + d_t * v * math.cos(th)
@@ -261,38 +274,24 @@ class Robot:
                 x = x + (v / w) * (math.sin(th + w * d_t) - math.sin(th))
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
-            # Get w of sensors
-            w_sensor = self.BP.get_sensor(self.BP.PORT_3)[0]
-            w_sensor_2 = self.BP.get_sensor(self.BP.PORT_4)[0]
+            # Get sensors data
+            gyro_1, gyro_2, proximity = self.readSensors()
 
             # Obtain precise th
-            # Odometry
-            last_values_w_odo.append(w)
-            actual_value_od = sum(last_values_w_odo) / 5
-
             if self.is_spinning:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
-                last_values_gyro_1.append(w_sensor)
-                actual_value_gyro_1 = sum(last_values_gyro_1) / 5
-
-                actual_value_gyro_1 = - (actual_value_gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
-
+                actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
                 self.gyro_1_offset += (actual_value_gyro_1 * self.gyro_1_offset_correction_factor * d_t)
 
                 # Sensor 2
-                last_values_gyro_2.append(w_sensor_2)
-                actual_value_gyro_2 = sum(last_values_gyro_2) / 5
-
-                actual_value_gyro_2 = - (actual_value_gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
-
+                actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
                 self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
 
-                w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
+                w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:
-                last_values_gyro_1.append(self.gyro_1_offset)
-                last_values_gyro_2.append(self.gyro_2_offset)
-                w = actual_value_od
+                self.history_gyro_1.append(self.gyro_1_offset)
+                self.history_gyro_2.append(self.gyro_2_offset)
 
             # Update th
             th = th + d_t * w
@@ -478,7 +477,7 @@ class Robot:
             variable = False
             return variable
         else:
-            sensor_value = self.BP.get_sensor(self.motor_port_ultrasonic)
+            sensor_value = self.readSensors()[2]
             print("Distancia: ", sensor_value)
             if sensor_value < self.min_distance_obstacle_detection:
                 return True

@@ -34,8 +34,8 @@ last_values_gyro_1 = collections.deque(5 * [gyro_1_offset], 5)
 last_values_gyro_2 = collections.deque(5 * [gyro_2_offset], 5)
 
 w_odo_accumulated = 0
-gyro_1_accumulated = 0
-gyro_2_accumulated = 0
+gyro_1_accumulated = gyro_1_offset * 5
+gyro_2_accumulated = gyro_2_offset * 5
 
 gyro_1_correction_factor = 0.17
 gyro_2_correction_factor = 0.11
@@ -51,7 +51,7 @@ for i in data:
     w_sensor_2 = i[2]
 
     # Odometria
-    gyro_1_accumulated += w_sensor - last_values_gyro_1.popleft()
+    gyro_1_accumulated = gyro_1_accumulated + w_sensor - last_values_gyro_1.popleft()
     last_values_gyro_1.append(w_sensor)
     actual_value_gyro_1 = gyro_1_accumulated / 5
     #actual_value_gyro_1 = sum(last_values_gyro_1) / 5
