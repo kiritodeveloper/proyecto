@@ -240,9 +240,12 @@ class Reco:
                 #for i in xrange(4):
                     #self.cam.grab()
 
-                #for i in xrange(4):
-                #    self.cam.capture(self.rawCapture, format="bgr")
-
+                try:
+                    for i in xrange(4):
+                        self.cam.capture(self.rawCapture, format="bgr")
+                except ValueError:
+                    print("Buffer vaciado")
+                cv2.waitKey(35)
                 self.cam.capture(self.rawCapture, format="bgr")
                 frame = self.rawCapture.array
 
