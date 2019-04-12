@@ -248,7 +248,7 @@ class Robot:
             th = th_odo.value
 
             last_values_v_odo.append(v)
-            v = sum(last_values_v_odo) / len(last_values_v_odo)
+            v = sum(last_values_v_odo) / 5
 
             if w == 0:
                 # Straight movement
@@ -266,13 +266,13 @@ class Robot:
             # Obtain precise th
             # Odometry
             last_values_w_odo.append(w)
-            actual_value_od = sum(last_values_w_odo) / len(last_values_w_odo)
+            actual_value_od = sum(last_values_w_odo) / 5
 
             if self.is_spinning:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
                 last_values_gyro_1.append(w_sensor)
-                actual_value_gyro_1 = sum(last_values_gyro_1) / len(last_values_gyro_1)
+                actual_value_gyro_1 = sum(last_values_gyro_1) / 5
 
                 actual_value_gyro_1 = - (actual_value_gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
 
@@ -280,7 +280,7 @@ class Robot:
 
                 # Sensor 2
                 last_values_gyro_2.append(w_sensor_2)
-                actual_value_gyro_2 = sum(last_values_gyro_2) / len(last_values_gyro_2)
+                actual_value_gyro_2 = sum(last_values_gyro_2) / 5
 
                 actual_value_gyro_2 = - (actual_value_gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
 
