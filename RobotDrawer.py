@@ -35,9 +35,7 @@ def plot_log_with_map(file_path, map_path):
             th = float(line[2])
             robot_locations = robot_locations + [[int(x* 1000), int(y * 1000), int(th * 1000)]]
 
-    myMap.drawMapWithRobotLocations(robot_locations)
-
-    myMap.stopMap()
+    myMap.drawMapWithRobotLocations(robot_locations, saveSnapshot=True)
 
 
 def start_robot_drawer(finished, robot):

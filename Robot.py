@@ -247,6 +247,9 @@ class Robot:
 
             th = th_odo.value
 
+            last_values_v_odo.append(v)
+            v = sum(last_values_v_odo) / len(last_values_v_odo)
+
             if w == 0:
                 # Straight movement
                 x = x + d_t * v * math.cos(th)
@@ -264,9 +267,6 @@ class Robot:
             # Odometry
             last_values_w_odo.append(w)
             actual_value_od = sum(last_values_w_odo) / len(last_values_w_odo)
-
-            last_values_v_odo.append(v)
-            v = sum(last_values_v_odo) / len(last_values_v_odo)
 
             if self.is_spinning:
                 # Only if it is turning on read gyro sensors
@@ -286,7 +286,7 @@ class Robot:
 
                 self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
 
-                w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3
+                w = (actual_value_od + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:
                 last_values_gyro_1.append(self.gyro_1_offset)
                 last_values_gyro_2.append(self.gyro_2_offset)
@@ -301,13 +301,6 @@ class Robot:
             y_odo.value = y
             th_odo.value = self.normalizeAngle(th)
             self.lock_odometry.release()
-
-            if not is_debug:
-                self.logWrite(
-                    "th: " + str(th) + ", v: " + str(v) + ", w: " + str(w) + ", x: " + str(x) + ", y: " + str(y)
-                )
-            else:
-                pass
 
             # Periodic task
             t_next_period += self.P
@@ -547,7 +540,7 @@ class Robot:
 
         # Turn
         turn_speed = math.pi / 8
-        print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
+        # print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
         if aligned_angle < th_actual:
             if aligned_angle < -3 * math.pi / 4 and th_actual > math.pi / 4 and turn_speed > 0:
                 aligned_angle = -aligned_angle
