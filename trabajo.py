@@ -86,11 +86,10 @@ def main(args):
             if not R2D2_detected or not BB8_detected:
                 actual_th_viejo = actual_th
                 actual_th = robot.normalizeAngle(actual_th+period)
-                if actual_th > 5 * math.pi / 6 and actual_th_viejo < -math.pi / 4:
-                    turn_speed = -turn_speed
-                    actual_th = -actual_th
-                elif actual_th < -5 * math.pi / 6 and actual_th_viejo > math.pi / 4:
-                    actual_th = -actual_th
+                if actual_th_viejo > 5 * math.pi / 6 and actual_th < -math.pi / 4:
+                    actual_th_viejo = -actual_th_viejo
+                elif actual_th_viejo < -5 * math.pi / 6 and actual_th > math.pi / 4:
+                    actual_th_viejo = -actual_th_viejo
 
                 if actual_th_viejo > actual_th:
                     robot.setSpeed(0, -turn_speed)
