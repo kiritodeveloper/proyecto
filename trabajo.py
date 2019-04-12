@@ -56,12 +56,12 @@ def main(args):
         BB8_detected = False
 
         actual_th = 0
-        error = 0.05
+        error = 0.02
         turn_speed = math.pi / 2
         #robot.setSpeed(0, turn_speed)
         #robot.wait_for_th(actual_th, error)
 
-        period = math.pi/8
+        period = math.pi/4
 
         while not R2D2_detected or not BB8_detected:
             print('---- COMIENZO BUCLE ----')
