@@ -539,7 +539,7 @@ class Robot:
         aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
 
         # Turn
-        turn_speed = math.pi / 8
+        turn_speed = math.pi / 10
         # print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
         if aligned_angle < th_actual:
             if aligned_angle < -3 * math.pi / 4 and th_actual > math.pi / 4 and turn_speed > 0:
@@ -561,8 +561,8 @@ class Robot:
             return False
         else:
             # Go forward
-            self.setSpeed(0.15, 0)
-            wait_for_position(final_x, final_y, self, 0.08)
+            self.setSpeed(0.1, 0)
+            wait_for_position(final_x, final_y, self, 0.1)
 
             # Stop robot
             self.setSpeed(0, 0)
