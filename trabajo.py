@@ -65,7 +65,7 @@ def main(args):
 
         while not R2D2_detected or not BB8_detected:
             print('---- COMIENZO BUCLE ----')
-            cv2.waitKey(5000)  # Time beteween frames
+            cv2.waitKey(500)  # Time beteween frames
             if not R2D2_detected:
                 #cv2.waitKey(1000) # Time beteween frames
                 R2D2_detected, R2D2_points = reco.search_img(R2D2)
