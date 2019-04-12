@@ -236,6 +236,10 @@ class Reco:
             while True:
                 t1 = time.time()
                 rectFound = False
+                # https://stackoverflow.com/questions/41412057/get-most-recent-frame-from-webcam
+                for i in xrange(4):
+                    self.cam.grab()
+
                 self.cam.capture(self.rawCapture, format="bgr")
                 frame = self.rawCapture.array
 
