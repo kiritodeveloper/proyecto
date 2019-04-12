@@ -485,6 +485,7 @@ class Robot:
             sensor_value = self.readSensors()[2]
             print("Distancia: ", sensor_value)
             if sensor_value < self.min_distance_obstacle_detection:
+                # TODO: Update X or Y
                 return True
             else:
                 return False
