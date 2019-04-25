@@ -13,7 +13,7 @@ import time
 import Queue, threading
 
 # SET TO FALSE when running OUT of the raspberry to use the webcam
-PI = True
+PI = False
 if PI:
     import picamera
     from picamera.array import PiRGBArray
@@ -87,8 +87,8 @@ def match_images(img1_bgr, img2_bgr):
         #detector = cv2.SURF(400)
         # https://stackoverflow.com/questions/18561910/cant-use-surf-sift-in-opencv
         # https://stackoverflow.com/questions/52305578/sift-cv2-xfeatures2d-sift-create-not-working-even-though-have-contrib-instal
-        detector = cv2.xfeatures2d.SURF_create(400)
-        # detector = cv2.ORB_create()
+        #detector = cv2.xfeatures2d.SURF_create(400)
+        detector = cv2.ORB_create()
         
 
     # find the keypoints and corresponding descriptors
@@ -105,8 +105,8 @@ def match_images(img1_bgr, img2_bgr):
         
 
     if binary_features:
-        # bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        #bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
         matches = bf.match(des1,des2)
         matches = sorted(matches, key = lambda x:x.distance)
         good = matches
@@ -225,7 +225,7 @@ def find_template(mirror=False, img=None, refFilename = "R2-D2s.png"):
 
         else:
             print("**** processing from regular webcam if connected ****")
-            cam = cv2.VideoCapture(1)
+            cam = cv2.VideoCapture(0)
             #cam.set(CV_CAP_PROPR)
             while True:
                 #for i in xrange(4):
