@@ -174,7 +174,7 @@ def find_template(mirror=False, img=None, refFilename = "R2-D2s.png"):
  
     print("Looking for reference image : ", refFilename)
     imReference = cv2.imread(refFilename, cv2.IMREAD_COLOR)
-
+    print(PI, img)
     if PI and img is None:
         print("**** processing PI-CAM image file ****")
         cam = picamera.PiCamera()
