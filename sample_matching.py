@@ -78,7 +78,7 @@ def match_images(img1_bgr, img2_bgr):
 
         #detector = cv2.ORB()
         #detector = cv2.SURF(400)
-        detector = cv2.xfeatures2d.SURF_create(400)
+        detector = cv2.SURF_create(400)
     else:
         # Initiate BRISK detector --> you could use any other detector, including NON binary features (SIFT, SURF)
         # but this is the best performing one in this version
