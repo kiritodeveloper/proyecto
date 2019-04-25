@@ -76,9 +76,9 @@ def match_images(img1_bgr, img2_bgr):
         # Initiate ORB detector --> you could use any other detector, but this is the best performing one in this version
         binary_features = True
 
-        #detector = cv2.ORB()
+        detector = cv2.ORB()
         #detector = cv2.SURF(400)
-        detector = cv2.SURF_create(400)
+        #detector = cv2.SURF_create(400)
     else:
         # Initiate BRISK detector --> you could use any other detector, including NON binary features (SIFT, SURF)
         # but this is the best performing one in this version
