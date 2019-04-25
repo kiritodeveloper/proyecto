@@ -13,7 +13,7 @@ import time
 import Queue, threading
 
 # SET TO FALSE when running OUT of the raspberry to use the webcam
-PI = False
+PI = True
 if PI:
     import picamera
     from picamera.array import PiRGBArray
@@ -28,7 +28,7 @@ letter_s = 115
 MAX_FEATURES = 500
 # REQUIRED number of correspondences (matches) found:
 MIN_MATCH_COUNT=20          # initially
-MIN_MATCH_OBJECTFOUND=15    # after robust check, to consider object-found
+MIN_MATCH_OBJECTFOUND=15  # after robust check, to consider object-found
 
 
 def drawMatches2(img1, kp1, img2, kp2, matches, color=None, thickness = 2, mask=None): 
@@ -76,12 +76,18 @@ def match_images(img1_bgr, img2_bgr):
         # Initiate ORB detector --> you could use any other detector, but this is the best performing one in this version
         binary_features = True
 
-        detector = cv2.ORB()
-    else: 
+        #detector = cv2.ORB()
+        detector = cv2.SURF(400)
+    else:
         # Initiate BRISK detector --> you could use any other detector, including NON binary features (SIFT, SURF)
         # but this is the best performing one in this version
         binary_features=True
-        detector = cv2.BRISK_create()
+        #detector = cv2.BRISK_create()
+        #detector = cv2.SURF(400)
+        # https://stackoverflow.com/questions/18561910/cant-use-surf-sift-in-opencv
+        # https://stackoverflow.com/questions/52305578/sift-cv2-xfeatures2d-sift-create-not-working-even-though-have-contrib-instal
+        detector = cv2.xfeatures2d.SURF_create(400)
+        # detector = cv2.ORB_create()
         
 
     # find the keypoints and corresponding descriptors
@@ -98,7 +104,8 @@ def match_images(img1_bgr, img2_bgr):
         
 
     if binary_features:
-        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        # bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
         matches = bf.match(des1,des2)
         matches = sorted(matches, key = lambda x:x.distance)
         good = matches
