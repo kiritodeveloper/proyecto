@@ -106,7 +106,7 @@ def main(args):
         if phase_from <= 2 and 2 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi/2))
-                pos1 = coord2Meters((1, 5, 0))
+                pos1 = coord2Meters((1, 5, math.pi))
                 pos2 = coord2Meters((1, 3, - math.pi / 2))
                 v = 0.2
                 w_parado = -math.pi/8
@@ -123,7 +123,7 @@ def main(args):
 
             # girar 90
             robot.setSpeed(0, w_parado)
-            wait_for_position(starting_point[0], starting_point[1], - math.pi / 2, robot, 0.2, 0.02)
+            wait_for_position(starting_point[0], starting_point[1], math.pi, robot, 0.2, 0.02)
             """
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
