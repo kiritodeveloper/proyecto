@@ -101,7 +101,7 @@ def main(args):
 
         # SLALOM -> FASE 2
 
-        if phase_from >= 2 and 2 <= phase_to:
+        if phase_from <= 2 and 2 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 7))
                 pos1 = coord2Meters((1, 5))
