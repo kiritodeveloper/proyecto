@@ -6,6 +6,8 @@ import numpy as np
 import time
 import math
 import cv2
+from utils import delay_until
+
 
 #import matplotlib
 from config_file import is_debug
@@ -28,6 +30,56 @@ from reco import Reco
 # 3) you can change the method signatures if you need, depending how you have implemented things
 
 
+# ---- PHASES ----
+# 1 -> DETECTAR SALIDA
+# 2 -> SLALOM
+# 3 -> LABERINTO
+# 4 -> COGER PELOTA
+# 5 -> RECONOCER Y SALIR
+
+salida = 'A'
+sizeCell = 400 # in mm
+
+# DUBUG
+phase_from = 1
+phase_to = 5
+
+def coord2Meters(coord):
+    coord[0] = (coord[0] + 0.5) * sizeCell / 1000.0
+    coord[1] = (coord[1] + 0.5) * sizeCell / 1000.0
+    return coord
+
+def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
+    """
+    Wait until the robot reaches the position
+    :param x: x position to be reached
+    :param y: y position to be reached
+    :param robot: robot configuration
+    :param position_error_margin: error allowed in the position
+    :param th_error_margin: error allowed in the orientation
+    """
+    [x_odo, y_odo, th_odo] = robot.readOdometry()
+
+    print("Waiting for position ", x_odo, y_odo, th_odo, x, y, th)
+
+    t_next_period = time.time()
+
+    if th is None:
+        print("TH none")
+        # None th provided
+        while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
+            [x_odo, y_odo, th_odo] = robot.readOdometry()
+            t_next_period += robot.P
+            delay_until(t_next_period)
+    else:
+        while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
+                th_error_margin < abs(th - th_odo)):
+            [x_odo, y_odo, th_odo] = robot.readOdometry()
+            t_next_period += robot.P
+            delay_until(t_next_period)
+            print ([x_odo, y_odo, th_odo])
+    print([x_odo, y_odo, th_odo])
+
 
 def main(args):
     """
@@ -43,11 +95,44 @@ def main(args):
         reco = Reco()
 
         # Robot logger
-        start_robot_logger(robot.finished, robot, "./out/trayectoria_entrega.csv")
+        start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
 
         robot.startOdometry()
 
+        # SLALOM -> FASE 2
 
+        if phase_from >= 2 and 2 <= phase_to:
+            if salida is 'A':
+                starting_point = coord2Meters((1, 7))
+                pos1 = coord2Meters((1, 5))
+                pos2 = coord2Meters((1, 3))
+                v = 0.2
+                w_parado = -math.pi/8
+                w_movimiento = 0.5
+            else: # Salida es B
+                starting_point = coord2Meters((5, 7))
+                pos1 = coord2Meters((5, 5))
+                pos2 = coord2Meters((5, 3))
+                v = 0.2
+                w_parado = -math.pi / 8
+                w_movimiento = 0.5
+
+            # girar 90
+            robot.setSpeed(0, -math.pi / 8)
+            wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
+
+            # semicirculo 1
+            robot.setSpeed(0.2, 0.5)
+            wait_for_position(0.8, 0, math.pi / 2, robot, 0.2, 0.02)
+
+            # semicirculo 2
+            robot.setSpeed(0.2, -0.5)
+            wait_for_position(1.6, 0, -math.pi / 2, robot, 0.2, 0.02)
+
+            robot.setSpeed(0, 0)
+
+
+        """
         # ------ RECONOCIMIENTO ------
 
         R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
@@ -106,6 +191,7 @@ def main(args):
         print('R2D2: ',R2D2_pos, ' BB8: ', BB8_pos)
 
         robot.setSpeed(0, 0)
+        """
 
         robot.stopOdometry()
 
@@ -122,6 +208,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa_debug.txt")
+                        default="./maps/mapaA.txt")
     args = parser.parse_args()
     main(args)
