@@ -100,9 +100,9 @@ class Robot:
     def setPosition(self, position):
         self.lock_odometry.acquire()
 
-        self.x.value = Value('d', position[0])
-        self.y.value = Value('d', position[1])
-        self.th.value = Value('d', position[2])
+        self.x = Value('d', position[0])
+        self.y = Value('d', position[1])
+        self.th = Value('d', position[2])
 
         self.lock_odometry.release()
 
