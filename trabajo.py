@@ -45,8 +45,9 @@ phase_from = 1
 phase_to = 5
 
 def coord2Meters(coord):
-    coord[0] = (coord[0] + 0.5) * sizeCell / 1000.0
-    coord[1] = (coord[1] + 0.5) * sizeCell / 1000.0
+    new_coord = [None, None]
+    new_coord[0] = (coord[0] + 0.5) * sizeCell / 1000.0
+    new_coord[1] = (coord[1] + 0.5) * sizeCell / 1000.0
     return coord
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
