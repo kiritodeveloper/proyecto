@@ -5,7 +5,7 @@ def main():
     """
     Plot log file
     """
-    plot_log("./path_logs/trayectoria_entrega.csv")
+    plot_log("./out/trayectoria_entrega.csv")
     #plot_log_with_map('./path_logs/trayectoria_mapa3_debug.csv', './maps/mapa3.txt')
 
 

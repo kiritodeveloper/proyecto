@@ -93,7 +93,7 @@ def main(args):
         else:
             print('Can\'t reached the goal')
 
-        myMap.drawMapWithRobotLocations(robot_locations)
+        # myMap.drawMapWithRobotLocations(robot_locations)
 
         robot.stopOdometry()
 

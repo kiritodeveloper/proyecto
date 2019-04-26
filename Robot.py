@@ -72,6 +72,10 @@ class Robot:
         if is_debug:
             self.BP = FakeBlockPi()
 
+            # Gyro sensor offset and calibration
+            self.gyro_1_offset = 2430
+            self.gyro_2_offset = 2430
+
         else:
             self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
             # Set motors ports
@@ -91,9 +95,20 @@ class Robot:
             self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
             self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
-        # Gyro sensor offset and calibration
-        self.gyro_1_offset = 2342
-        self.gyro_2_offset = 2338
+            # Gyro sensor offset and calibration
+            time.sleep(0.5)
+            self.gyro_1_offset = 0
+            self.gyro_2_offset = 0
+            for i in range(10):
+                self.gyro_1_offset += self.BP.get_sensor(self.BP.PORT_3)[0]
+                self.gyro_2_offset += self.BP.get_sensor(self.BP.PORT_4)[0]
+                time.sleep(0.05)
+
+            self.gyro_1_offset /= 10
+            self.gyro_2_offset /= 10
+
+        print("Gyro 1 offset ", self.gyro_1_offset)
+        print("Gyro 2 offset ", self.gyro_2_offset)
 
         self.gyro_1_correction_factor = 0.17
         self.gyro_2_correction_factor = 0.11
@@ -102,7 +117,7 @@ class Robot:
         self.gyro_2_offset_correction_factor = 0
 
         # V correction factor
-        self.linear_speed_correction_factor = 1.1
+        self.linear_speed_correction_factor = 1.2
 
         # Sensors values history
         self.history_max_size = 5
@@ -174,8 +189,8 @@ class Robot:
             grad_izq = sum(self.history_dg_left) / self.history_max_size
             grad_der = sum(self.history_dg_right) / self.history_max_size
 
-            rad_izq = math.radians(grad_izq)
-            rad_der = math.radians(grad_der)
+            rad_izq = math.radians(grad_izq) * self.linear_speed_correction_factor
+            rad_der = math.radians(grad_der) * self.linear_speed_correction_factor
 
             last_timer = self.encoder_timer
             self.encoder_timer = time.time()
@@ -268,7 +283,7 @@ class Robot:
 
             th = th_odo.value
 
-            v = v * self.linear_speed_correction_factor
+            v = v
 
             if w == 0:
                 # Straight movement
@@ -547,7 +562,6 @@ class Robot:
 
         # Turn
         turn_speed = math.pi / 8
-        # print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
         if aligned_angle < th_actual:
             if aligned_angle < -3 * math.pi / 4 and th_actual > math.pi / 4 and turn_speed > 0:
                 aligned_angle = -aligned_angle
@@ -558,7 +572,6 @@ class Robot:
         print('Estoy buscando th ', aligned_angle)
         wait_for_th(aligned_angle, self, 0.02)
         print("Ha encontrado th")
-
         # Stop robot
         self.setSpeed(0, 0)
 
