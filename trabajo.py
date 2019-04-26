@@ -106,8 +106,9 @@ def main(args):
         if phase_from <= 2 and 2 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi/2))
-                pos1 = coord2Meters((1, 5, math.pi))
-                pos2 = coord2Meters((1, 3, - math.pi / 2))
+                pos1 = (starting_point[0]. starting_point[1], math.pi)
+                pos2 = coord2Meters((1, 5, math.pi))
+                pos3 = coord2Meters((1, 3, - math.pi / 2))
                 v = 0.2
                 w_parado = -math.pi/8
                 w_movimiento = 0.5
@@ -119,7 +120,7 @@ def main(args):
                 w_parado = -math.pi / 8
                 w_movimiento = 0.5
 
-            robot.setPosition(starting_point)
+            #robot.setPosition(starting_point)
 
             # girar 90
             robot.setSpeed(0, w_parado)
