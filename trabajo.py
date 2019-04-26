@@ -99,7 +99,7 @@ def main(args):
         # Robot logger
         start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
 
-        robot.startOdometry()
+        # TODO START ODOMETRY POR SEPARADO
 
         # SLALOM -> FASE 2
 
@@ -120,7 +120,7 @@ def main(args):
                 w_parado = -math.pi / 8
                 w_movimiento = 0.5
 
-            robot.setPosition(starting_point)
+            robot.startOdometry(starting_point)
 
             # girar 90
             robot.setSpeed(0, w_parado)
