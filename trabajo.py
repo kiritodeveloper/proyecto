@@ -94,7 +94,7 @@ def main(args):
             exit(1)
 
         robot = Robot()
-        reco = Reco()
+        # reco = Reco()
 
         # Robot logger
         start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
@@ -120,7 +120,10 @@ def main(args):
                 w_parado = -math.pi / 8
                 w_movimiento = 0.5
 
-            robot.startOdometry(starting_point)
+            robot = Robot(starting_point)
+            # Robot logger
+            start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
+            robot.startOdometry()
 
             # girar 90
             robot.setSpeed(0, w_parado)
