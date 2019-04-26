@@ -118,16 +118,18 @@ def main(args):
                 w_parado = -math.pi / 8
                 w_movimiento = 0.5
 
+
+
             # girar 90
-            robot.setSpeed(0, -math.pi / 8)
+            robot.setSpeed(0, w_parado)
             wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
 
             # semicirculo 1
-            robot.setSpeed(0.2, 0.5)
+            robot.setSpeed(v, w_movimiento)
             wait_for_position(0.8, 0, math.pi / 2, robot, 0.2, 0.02)
 
             # semicirculo 2
-            robot.setSpeed(0.2, -0.5)
+            robot.setSpeed(v, w_movimiento)
             wait_for_position(1.6, 0, -math.pi / 2, robot, 0.2, 0.02)
 
             robot.setSpeed(0, 0)
