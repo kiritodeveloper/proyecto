@@ -127,12 +127,13 @@ def main(args):
 
             # girar 90
             robot.setSpeed(0, w_parado)
-            wait_for_position(starting_point[0], starting_point[1], math.pi, robot, 0.2, 0.02)
-            """
+            wait_for_position(pos1[0], pos1[1], pos1[2], robot, 0.2, 0.02)
+
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            wait_for_position(0.8, 0, math.pi / 2, robot, 0.2, 0.02)
+            wait_for_position(pos2[0], pos2[1], pos2[3], robot, 0.2, 0.02)
 
+            """
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
             wait_for_position(1.6, 0, -math.pi / 2, robot, 0.2, 0.02)
