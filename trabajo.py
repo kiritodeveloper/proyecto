@@ -106,7 +106,7 @@ def main(args):
         if phase_from <= 2 and 2 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi/2))
-                pos1 = (starting_point[0]. starting_point[1], math.pi)
+                pos1 = (starting_point[0], starting_point[1], math.pi)
                 pos2 = coord2Meters((1, 5, math.pi))
                 pos3 = coord2Meters((1, 3, - math.pi / 2))
                 v = 0.2
