@@ -97,6 +97,11 @@ class Robot:
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
+    def setPosition(self, position):
+        self.x = Value('d', position[0])
+        self.y = Value('d', position[1])
+        self.th = Value('d', position[2])
+
     def setSpeed(self, v, w):
         """
         Set the speed of the robot

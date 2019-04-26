@@ -45,10 +45,11 @@ phase_from = 1
 phase_to = 5
 
 def coord2Meters(coord):
-    new_coord = [None, None]
+    new_coord = [None, None, None]
     new_coord[0] = (coord[0] + 0.5) * sizeCell / 1000.0
     new_coord[1] = (coord[1] + 0.5) * sizeCell / 1000.0
-    return coord
+    new_coord[2] = coord[2]
+    return new_coord
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     """
@@ -104,26 +105,26 @@ def main(args):
 
         if phase_from <= 2 and 2 <= phase_to:
             if salida is 'A':
-                starting_point = coord2Meters((1, 7))
-                pos1 = coord2Meters((1, 5))
-                pos2 = coord2Meters((1, 3))
+                starting_point = coord2Meters((1, 7, -math.pi/2))
+                pos1 = coord2Meters((1, 5, 0))
+                pos2 = coord2Meters((1, 3, - math.pi / 2))
                 v = 0.2
                 w_parado = -math.pi/8
                 w_movimiento = 0.5
             else: # Salida es B
-                starting_point = coord2Meters((5, 7))
-                pos1 = coord2Meters((5, 5))
-                pos2 = coord2Meters((5, 3))
+                starting_point = coord2Meters((5, 7, -math.pi/2))
+                #pos1 = coord2Meters((5, 5))
+                #pos2 = coord2Meters((5, 3))
                 v = 0.2
                 w_parado = -math.pi / 8
                 w_movimiento = 0.5
 
-
+            robot.setPosition(starting_point)
 
             # girar 90
             robot.setSpeed(0, w_parado)
             wait_for_position(0, 0, - math.pi / 2, robot, 0.2, 0.02)
-
+            """
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
             wait_for_position(0.8, 0, math.pi / 2, robot, 0.2, 0.02)
@@ -131,13 +132,11 @@ def main(args):
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
             wait_for_position(1.6, 0, -math.pi / 2, robot, 0.2, 0.02)
-
+            """
             robot.setSpeed(0, 0)
 
-
-        """
         # ------ RECONOCIMIENTO ------
-
+        """
         R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
         BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
         R2D2_detected = False
