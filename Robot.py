@@ -102,7 +102,7 @@ class Robot:
             for i in range(10):
                 self.gyro_1_offset += self.BP.get_sensor(self.BP.PORT_3)[0]
                 self.gyro_2_offset += self.BP.get_sensor(self.BP.PORT_4)[0]
-                time.sleep(0.05)
+                time.sleep(0.1)
 
             self.gyro_1_offset /= 10
             self.gyro_2_offset /= 10
@@ -308,6 +308,8 @@ class Robot:
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
                 self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
 
+                print(actual_value_gyro_1, actual_value_gyro_2, w)
+
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:
                 self.history_gyro_1.append(self.gyro_1_offset)
@@ -492,14 +494,14 @@ class Robot:
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
-    def detectObstacle(self):
+    def detectObstacle(self, number_of_cells=1):
         if is_debug:
             variable = False
             return variable
         else:
             sensor_value = self.readSensors()[2]
             print("Distancia: ", sensor_value)
-            if sensor_value < self.min_distance_obstacle_detection:
+            if sensor_value < number_of_cells * self.min_distance_obstacle_detection:
                 # TODO: Update X or Y
                 return True
             else:
@@ -568,15 +570,21 @@ class Robot:
             else:
                 turn_speed = -turn_speed
 
-        self.setSpeed(0, turn_speed)
         print('Estoy buscando th ', aligned_angle)
+        self.setSpeed(0, turn_speed)
+        wait_for_th(aligned_angle, self, 0.02)
+
+        self.setSpeed(0, -turn_speed / 4)
         wait_for_th(aligned_angle, self, 0.02)
         print("Ha encontrado th")
         # Stop robot
         self.setSpeed(0, 0)
 
+        # Detect number of cells to jump
+        cells_jump = round(math.sqrt(((final_x - x_actual) ** 2) + ((final_y - y_actual) ** 2)) / 0.4)
+
         # Detect wall
-        if self.detectObstacle():
+        if self.detectObstacle(cells_jump):
             self.setSpeed(0, 0)
             return False
         else:
