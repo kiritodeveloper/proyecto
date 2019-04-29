@@ -175,7 +175,7 @@ def main(args):
             primera = False
 
             myMap.fillCostMatrix([goal_x, goal_y])
-            route = myMap.planPath(init_pos[0], init_pos[1], [goal_x, goal_y])
+            route = myMap.planPath([init_pos[0], init_pos[1]], [goal_x, goal_y])
 
             robot_locations = []
 
