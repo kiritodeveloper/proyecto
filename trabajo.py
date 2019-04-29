@@ -216,6 +216,34 @@ def main(args):
             else:
                 print('Can\'t reached the goal')
 
+
+        # TODO ORIENTARSE
+
+
+        # COGER PELOTA > FASE 4
+
+        if phase_from <= 4 and 4 <= phase_to:
+            if primera:
+                robot = Robot()
+
+                if is_debug:
+                    start_robot_drawer(robot.finished, robot)
+                else:
+                    start_robot_logger(robot.finished, robot, "trayectoria_tracking.csv")
+
+                # 1. launch updateOdometry thread()
+                robot.startOdometry()
+
+            primera = False
+
+
+            redMin = (168, 180, 80)
+            redMax = (2, 255, 255)
+
+            res = robot.trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
+
+
+
         # ------ RECONOCIMIENTO ------
         """
         R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
@@ -282,6 +310,7 @@ def main(args):
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
+        robot.catch("up")
         robot.stopOdometry()
         reco.stop_camera()
 
