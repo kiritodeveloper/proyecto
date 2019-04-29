@@ -42,6 +42,7 @@ salida = 'A'
 sizeCell = 400 # in mm
 
 # DUBUG
+primera = True
 phase_from = 2
 phase_to = 5
 
@@ -99,17 +100,12 @@ def main(args):
         # 1. load map and compute costs and path
         myMap = Map2D(map_file)
 
-        robot = Robot()
-        # reco = Reco()
-
-        # Robot logger
-        start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
-
         # TODO START ODOMETRY POR SEPARADO
 
         # SLALOM -> FASE 2
 
         if phase_from <= 2 and 2 <= phase_to:
+            primera = False
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi/2))
                 pos1 = (starting_point[0], starting_point[1], math.pi)
@@ -168,6 +164,13 @@ def main(args):
                 init_pos = coord2Meters((5, 3, -math.pi/2))
                 goal_x = 3
                 goal_y = 2
+
+            if primera:
+                robot = Robot(init_pos)
+                # Robot logger
+                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
+                robot.startOdometry()
+                primera = False
 
 
             myMap.fillCostMatrix([goal_x, goal_y])
