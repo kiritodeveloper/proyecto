@@ -37,7 +37,7 @@ from reco import Reco
 # 4 -> COGER PELOTA
 # 5 -> RECONOCER Y SALIR
 
-salida = 'A'
+salida = 'B'
 sizeCell = 400 # in mm
 
 # DUBUG
@@ -115,8 +115,10 @@ def main(args):
                 w_movimiento = 0.5
             else: # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi/2))
-                #pos1 = coord2Meters((5, 5))
-                #pos2 = coord2Meters((5, 3))
+                pos1 = (starting_point[0], starting_point[1], 0)
+                pos2 = coord2Meters((5, 3, math.pi))
+                pos3 = coord2Meters((1, 3, 0))
+                pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.2
                 w_parado = -math.pi / 8
                 w_movimiento = 0.5
