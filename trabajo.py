@@ -116,7 +116,7 @@ def main(args):
             else: # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi/2))
                 pos1 = (starting_point[0], starting_point[1], 0)
-                pos2 = coord2Meters((5, 3, math.pi))
+                pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((1, 3, 0))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.2
