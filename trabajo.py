@@ -139,8 +139,10 @@ def main(args):
             wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
 
             # Giro 90 grados mirando al frente
+            robot.setSpeed(0, 0)
 
-            robot.setSpeed(0, w_parado)
+
+            robot.setSpeed(0, -w_parado)
             wait_for_position(pos4[0], pos4[1], pos4[2], robot, 0.2, 0.02)
 
             # Me detengo
