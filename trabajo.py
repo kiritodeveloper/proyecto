@@ -42,7 +42,6 @@ salida = 'A'
 sizeCell = 400 # in mm
 
 # DUBUG
-primera = True
 phase_from = 3
 phase_to = 5
 
@@ -89,6 +88,8 @@ def main(args):
     """
     Example to load "mapa1.txt"
     """
+
+    primera = True
 
     try:
         if not os.path.isfile(args.mapfile):
