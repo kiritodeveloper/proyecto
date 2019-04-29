@@ -158,22 +158,25 @@ def main(args):
 
         if phase_from <= 3 and 3 <= phase_to:
             if salida is 'A':
-                init_pos = coord2Meters((1, 3, -math.pi/2))
+                starting_point = coord2Meters((1, 3, -math.pi/2))
+                init_pos = [1, 3]
                 goal_x = 3
                 goal_y = 2
             else:  # Salida es B
-                init_pos = coord2Meters((5, 3, -math.pi/2))
+                starting_point = coord2Meters((5, 3, -math.pi/2))
+                init_pos = [3, 2]
                 goal_x = 3
                 goal_y = 2
 
             if primera:
-                robot = Robot(init_pos)
+                robot = Robot(starting_point)
                 # Robot logger
                 start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
                 robot.startOdometry()
 
             primera = False
 
+            print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
             route = myMap.planPath([init_pos[0], init_pos[1]], [goal_x, goal_y])
 
