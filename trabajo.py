@@ -43,7 +43,7 @@ sizeCell = 400 # in mm
 
 # DUBUG
 primera = True
-phase_from = 2
+phase_from = 3
 phase_to = 5
 
 def coord2Meters(coord):
