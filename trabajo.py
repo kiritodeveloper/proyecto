@@ -17,6 +17,7 @@ from config_file import is_debug
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 # from Robot import Robot
+from MapLib import Map2D
 from Robot import Robot
 from RobotLogger import start_robot_logger
 
@@ -41,7 +42,7 @@ salida = 'B'
 sizeCell = 400 # in mm
 
 # DUBUG
-phase_from = 1
+phase_from = 2
 phase_to = 5
 
 def coord2Meters(coord):
@@ -92,6 +93,11 @@ def main(args):
         if not os.path.isfile(args.mapfile):
             print('Map file %s does not exist' % args.mapfile)
             exit(1)
+
+        map_file = args.mapfile
+
+        # 1. load map and compute costs and path
+        myMap = Map2D(map_file)
 
         robot = Robot()
         # reco = Reco()
@@ -150,6 +156,58 @@ def main(args):
             # Me detengo
 
             robot.setSpeed(0, 0)
+
+        # LABERINTO -> FASE 3
+
+        if phase_from <= 3 and 3 <= phase_to:
+            if salida is 'A':
+                init_pos = coord2Meters((1, 3, -math.pi/2))
+                goal_x = 3
+                goal_y = 2
+            else:  # Salida es B
+                init_pos = coord2Meters((5, 3, -math.pi/2))
+                goal_x = 3
+                goal_y = 2
+
+
+            myMap.fillCostMatrix([goal_x, goal_y])
+            route = myMap.planPath(init_pos[0], init_pos[1], [goal_x, goal_y])
+
+            robot_locations = []
+
+            # TODO is debug poner que dibuje
+
+            last_reached_pos = [init_pos[0], init_pos[1]]
+
+            while len(route) > 0:
+                goal = route.pop(0)
+                print('Ruta', route)
+                partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell / 1000.0
+                partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell / 1000.0
+                print('Partials: ', partial_goal_x, partial_goal_y)
+                print('El goal: ', goal)
+                print('Estoy: ', robot.readOdometry())
+                no_obstacle = robot.go(partial_goal_x, partial_goal_y)
+                x_odo, y_odo, th_odo = robot.readOdometry()
+                if not no_obstacle:
+                    # There are a obstacle
+                    print('Obstacle detected')
+                    x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
+                    print('ODOMETRIIIA:', x, y, th)
+                    # Delete connections from detected wall
+                    myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
+                    myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
+                    myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) - 1) % 8)
+
+                    route = myMap.replanPath(last_reached_pos[0], last_reached_pos[1], goal_x, goal_y)
+                else:
+                    robot_locations.append([int(x_odo * 1000), int(y_odo * 1000), int(th_odo * 1000)])
+                    last_reached_pos = goal
+
+            if last_reached_pos[0] == goal_x and last_reached_pos[1] == goal_y:
+                print('The goal has been reached')
+            else:
+                print('Can\'t reached the goal')
 
         # ------ RECONOCIMIENTO ------
         """
