@@ -109,6 +109,7 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], math.pi)
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
+                pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.2
                 w_parado = -math.pi/8
                 w_movimiento = 0.5
@@ -136,6 +137,13 @@ def main(args):
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
             wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
+
+            # Giro 90 grados mirando al frente
+
+            robot.setSpeed(0, w_parado)
+            wait_for_position(pos4[0], pos4[1], pos4[2], robot, 0.2, 0.02)
+
+            # Me detengo
 
             robot.setSpeed(0, 0)
 
