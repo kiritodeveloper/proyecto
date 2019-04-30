@@ -171,5 +171,5 @@ class RobotFrameCapturer(object):
                     print('Hay que apagar la camara')
                     break
 
-        print('Apago camara')
-        cap.close()
+            print('Apago camara') # TODO HACERLO OFFLINE PARA DEBUG
+            cam.close()
