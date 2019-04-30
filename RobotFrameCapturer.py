@@ -165,3 +165,5 @@ class RobotFrameCapturer(object):
 
                 if self.finished.value:
                     break
+
+        cap.close()

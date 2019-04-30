@@ -245,7 +245,9 @@ def main(args):
 
             res = robot.trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
 
+            print('Espero a que la camara se apague')
             time.sleep(3)  # espera en segundos
+            print('Supongo que la camara esta apagada')
 
 
         # RECONOCIMIENTO -> FASE 5
