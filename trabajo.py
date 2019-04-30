@@ -42,7 +42,7 @@ salida = 'A'
 sizeCell = 400 # in mm
 
 # DUBUG
-phase_from = 5
+phase_from = 4
 phase_to = 5
 
 def coord2Meters(coord):
@@ -224,7 +224,10 @@ def main(args):
 
         if phase_from <= 4 and 4 <= phase_to:
             if primera:
-                robot = Robot()
+                if salida is 'A':
+                    robot = Robot([3, 3, math.pi/2])
+                else:
+                    robot = Robot([3, 3, math.pi/2])
 
                 if is_debug:
                     start_robot_drawer(robot.finished, robot)
@@ -247,68 +250,27 @@ def main(args):
         # RECONOCIMIENTO -> FASE 5
         if phase_from <= 5 and 5 <= phase_to:
             # TODO si es la primera activar odometria y demas
-            if primera:
-                robot = Robot()
-                robot.startOdometry()
-            primera = False
-
+            # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
             reco = Reco()
+
+            if salida is 'A':
+                cell_to_recognize = coord2Meters([4, 6, 0])
+            else:
+                cell_to_recognize = coord2Meters([2, 6, 0])
+
+            robot.go(cell_to_recognize[0], cell_to_recognize[1])
+
+
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
             R2D2_detected = False
             BB8_detected = False
 
-            actual_th = 0
-            error = 0.05
-            turn_speed = math.pi / 2
-            #robot.setSpeed(0, turn_speed)
-            #robot.wait_for_th(actual_th, error)
+            R2D2_detected, R2D2_points = reco.search_img(R2D2)
+            BB8_detected, BB8_points = reco.search_img(BB8)
 
-            period = math.pi/4
-
-            while not R2D2_detected or not BB8_detected:
-                print('---- COMIENZO BUCLE ----')
-                cv2.waitKey(100)  # Time beteween frames
-                if not R2D2_detected:
-                    #cv2.waitKey(1000) # Time beteween frames
-                    R2D2_detected, R2D2_points = reco.search_img(R2D2)
-                    if R2D2_detected:
-                        R2D2_th = robot.readOdometry()[2]
-                        actual_th = robot.normalizeAngle(actual_th+math.pi/4)
-                        turn_speed = math.pi/2
-                        period = -math.pi/32
-                if not BB8_detected:
-                    #cv2.waitKey(1000) # Time beteween frames
-                    BB8_detected, BB8_points = reco.search_img(BB8)
-                    if BB8_detected:
-                        BB8_th = robot.readOdometry()[2]
-                        actual_th = robot.normalizeAngle(actual_th+math.pi/4)
-                        turn_speed = math.pi/2
-                        period = -math.pi/32
-                print(R2D2_detected, BB8_detected)
-                if not R2D2_detected or not BB8_detected:
-                    actual_th_viejo = actual_th
-                    actual_th = robot.normalizeAngle(actual_th+period)
-                    if actual_th_viejo > 5 * math.pi / 6 and actual_th < -math.pi / 4:
-                        actual_th_viejo = -actual_th_viejo
-                    elif actual_th_viejo < -5 * math.pi / 6 and actual_th > math.pi / 4:
-                        actual_th_viejo = -actual_th_viejo
-
-                    if actual_th_viejo > actual_th:
-                        robot.setSpeed(0, -turn_speed)
-                        print(actual_th_viejo, actual_th, -turn_speed)
-                    else:
-                        robot.setSpeed(0, turn_speed)
-                        print(actual_th_viejo, actual_th, turn_speed)
-
-                    print("Espero a: ", actual_th)
-                    robot.wait_for_th(actual_th, error)
-                    robot.setSpeed(0, 0)
-
-            print(R2D2_th, BB8_th)
-            R2D2_pos, BB8_pos = reco.get_orientation(R2D2_th, BB8_th)
-            print('R2D2: ',R2D2_pos, ' BB8: ', BB8_pos)
+            print(R2D2_detected, BB8_detected)
 
             robot.setSpeed(0, 0)
 
