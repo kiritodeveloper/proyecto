@@ -42,7 +42,7 @@ salida = 'A'
 sizeCell = 400 # in mm
 
 # DUBUG
-phase_from = 4
+phase_from = 2
 phase_to = 5
 
 def coord2Meters(coord):
