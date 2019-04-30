@@ -410,6 +410,7 @@ class Map2D:
             if numberUpdates == 0:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
+            wavefront = list(set(wavefront))
             print(wavefront)
         self.costMatrix = grid
 
