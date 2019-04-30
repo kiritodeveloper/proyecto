@@ -245,6 +245,7 @@ def main(args):
 
             res = robot.trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
 
+            time.sleep(3)  # espera en segundos
 
 
         # RECONOCIMIENTO -> FASE 5
