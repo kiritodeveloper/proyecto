@@ -247,6 +247,9 @@ def main(args):
         # RECONOCIMIENTO -> FASE 5
         if phase_from <= 5 and 5 <= phase_to:
             # TODO si es la primera activar odometria y demas
+            if primera:
+                robot = Robot()
+            primera = False
 
             reco = Reco()
 
