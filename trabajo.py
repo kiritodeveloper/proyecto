@@ -301,6 +301,7 @@ def main(args):
                         robot.setSpeed(0, turn_speed)
                         print(actual_th_viejo, actual_th, turn_speed)
 
+                    print("Espero a: ", actual_th)
                     robot.wait_for_th(actual_th, error)
                     robot.setSpeed(0, 0)
 
