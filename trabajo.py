@@ -249,6 +249,7 @@ def main(args):
             # TODO si es la primera activar odometria y demas
             if primera:
                 robot = Robot()
+                robot.startOdometry()
             primera = False
 
             reco = Reco()
@@ -260,7 +261,7 @@ def main(args):
 
             actual_th = 0
             error = 0.05
-            turn_speed = math.pi / 4
+            turn_speed = math.pi / 2
             #robot.setSpeed(0, turn_speed)
             #robot.wait_for_th(actual_th, error)
 
