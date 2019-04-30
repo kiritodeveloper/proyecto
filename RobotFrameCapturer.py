@@ -165,5 +165,5 @@ class RobotFrameCapturer(object):
 
                 if self.finished.value:
                     break
-
+        print('Apago camara')
         cap.close()
