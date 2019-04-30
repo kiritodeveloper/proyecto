@@ -486,6 +486,8 @@ class Robot:
         final_y = y_goal
         aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
 
+        print('Estoy en la: ', x_actual, y_actual," y voy a: ", final_x, final_y)
+
         # Turn
         turn_speed = math.pi / 8
         print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
