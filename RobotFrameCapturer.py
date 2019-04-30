@@ -35,7 +35,10 @@ class RobotFrameCapturer(object):
         self.p.start()
 
     def stop(self):
-        self.finished.value = False
+        self.lock_frame_capturer.acquire()
+        self.finished.value = True
+        self.lock_frame_capturer.release()
+
 
     def getPosition(self):
         self.lock_frame_capturer.acquire()
@@ -158,12 +161,15 @@ class RobotFrameCapturer(object):
                 self.x_object.value = x
                 self.y_object.value = y
                 self.size_object.value = size
+                turn_off_camera = self.finished.value
                 self.lock_frame_capturer.release()
 
                 rawCapture.truncate(0)
                 cv2.waitKey(1)
 
-                if self.finished.value:
+                if turn_off_camera:
+                    print('Hay que apagar la camara')
                     break
+
         print('Apago camara')
         cap.close()
