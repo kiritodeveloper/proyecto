@@ -116,8 +116,8 @@ class Robot:
         self.gyro_1_offset_correction_factor = 0
         self.gyro_2_offset_correction_factor = 0
 
-        # V correction factor
-        self.linear_speed_correction_factor = 1.2
+        # W wheels correction factor
+        self.linear_speed_correction_factor = 1
 
         # Sensors values history
         self.history_max_size = 5
@@ -131,7 +131,7 @@ class Robot:
         self.basket_state = 'up'
 
         # Is spinning
-        self.is_spinning = False
+        self.is_spinning = Value('b', False)
 
         # Encoder timer
         self.encoder_timer = 0
@@ -149,7 +149,8 @@ class Robot:
 
         print("setting speed to %.2f %.2f" % (v, w))
 
-        self.is_spinning = w != 0
+        with self.is_spinning.get_lock():
+            self.is_spinning.value = w != 0
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
@@ -297,8 +298,11 @@ class Robot:
             # Get sensors data
             gyro_1, gyro_2, proximity = self.readSensors()
 
+            with self.is_spinning.get_lock():
+                is_spinning = self.is_spinning.value
+
             # Obtain precise th
-            if self.is_spinning:
+            if is_spinning:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
                 actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
@@ -308,7 +312,8 @@ class Robot:
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
                 self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
 
-                print(actual_value_gyro_1, actual_value_gyro_2, w)
+                #
+                # print("Valores giro", actual_value_gyro_1, actual_value_gyro_2, w)
 
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:

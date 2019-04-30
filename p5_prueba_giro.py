@@ -42,8 +42,8 @@ def path_90_degree_odometry(robot):
     Instructions to do a 90 degrees turn based on odometry
     :param robot: robot configuration
     """
-    robot.setSpeed(0, - math.pi / 8)
-    wait_for_th(robot, - math.pi / 2, 0.02)
+    robot.setSpeed(0,  math.pi / 8)
+    wait_for_th(robot,  math.pi / 2, 0.02)
 
     # [_, _, th_odo] = robot.readOdometry()
     #  print (th_odo)

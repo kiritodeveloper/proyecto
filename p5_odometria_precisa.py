@@ -16,7 +16,7 @@ def main():
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        robot.go(0.2, 1.2)
+        robot.go(1, 0.2)
 
         robot.stopOdometry()
 
