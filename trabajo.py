@@ -225,9 +225,9 @@ def main(args):
         if phase_from <= 4 and 4 <= phase_to:
             if primera:
                 if salida is 'A':
-                    robot = Robot([3, 3, math.pi/2])
+                    robot = Robot(coord2Meters([3, 3, math.pi/2]))
                 else:
-                    robot = Robot([3, 3, math.pi/2])
+                    robot = Robot(coord2Meters([3, 3, math.pi/2]))
 
                 if is_debug:
                     start_robot_drawer(robot.finished, robot)
