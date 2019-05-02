@@ -120,7 +120,7 @@ def main(args):
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.1
-                w_parado = -math.pi/16
+                w_parado = -math.pi/8
                 w_movimiento = 0.25
             else: # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi/2))
@@ -129,7 +129,7 @@ def main(args):
                 pos3 = coord2Meters((5, 3, 0))
                 pos4 = coord2Meters((5, 3, -math.pi/2))
                 v = 0.1
-                w_parado = math.pi / 16
+                w_parado = math.pi / 8
                 w_movimiento = -0.25
 
             robot = Robot(starting_point)
@@ -138,7 +138,8 @@ def main(args):
             robot.startOdometry()
 
             # girar 90
-            robot.orientate(pos1[2])
+            robot.setSpeed(0, w_parado)
+            wait_for_position(pos1[0], pos1[1], pos1[2], robot, 0.2, 0.02)
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
@@ -151,8 +152,13 @@ def main(args):
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
-            robot.orientate(pos4[2])
 
+            robot.setSpeed(0, -w_parado)
+            wait_for_position(pos4[0], pos4[1], pos4[2], robot, 0.2, 0.02)
+
+            # Me detengo
+
+            robot.setSpeed(0, 0)
 
         # LABERINTO -> FASE 3
 
