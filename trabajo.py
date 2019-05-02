@@ -119,18 +119,18 @@ def main(args):
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi / 2))
-                v = 0.2
+                v = 0.1
                 w_parado = -math.pi / 8
-                w_movimiento = 0.5
+                w_movimiento = 0.25
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
                 pos4 = coord2Meters((5, 3, -math.pi / 2))
-                v = 0.2
+                v = 0.1
                 w_parado = math.pi / 8
-                w_movimiento = -0.5
+                w_movimiento = -0.25
 
             robot = Robot(starting_point)
             # Robot logger
