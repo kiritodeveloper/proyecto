@@ -45,7 +45,7 @@ sizeCell = 400 # in mm
 
 # LOGO -> BB8 - R2D2
 
-logo = 'BB8'
+logo = 'R2D2'
 
 # DUBUG
 phase_from = 1
