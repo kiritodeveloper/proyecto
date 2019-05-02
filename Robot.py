@@ -510,82 +510,55 @@ class Robot:
             else:
                 return False
 
+    def wait_for_position(self, x, y, robot, position_error_margin):
+        """
+        Wait until the robot reaches the position
+        :param x: x position to be reached
+        :param y: y position to be reached
+        :param robot: robot configuration
+        :param position_error_margin: error allowed in the position
+        :param th_error_margin: error allowed in the orientation
+        """
+        [x_odo, y_odo, _] = robot.readOdometry()
+
+        t_next_period = time.time()
+
+        # Repeat while error decrease
+        last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+        actual_error = last_error
+        while position_error_margin < actual_error:
+            last_error = actual_error
+            while last_error >= actual_error:
+                [x_odo, y_odo, _] = robot.readOdometry()
+                last_error = actual_error
+                actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+                t_next_period += robot.P
+                delay_until(t_next_period)
+
+    def wait_for_th(self, th, robot, th_error_margin):
+        """
+        Wait until the robot reaches the position
+        :param robot: robot configuration
+        :param th_error_margin: error allowed in the orientation
+        """
+        [_, _, th_odo] = robot.readOdometry()
+
+        t_next_period = time.time()
+
+        # Repeat while error decrease
+        last_error = abs(self.normalizeAngle(th - th_odo))
+        actual_error = last_error
+        while th_error_margin < actual_error:
+            last_error = actual_error
+            while last_error >= actual_error:
+                [_, _, th_odo] = robot.readOdometry()
+                last_error = actual_error
+                actual_error = abs(self.normalizeAngle(th - th_odo))
+                t_next_period += robot.P
+                delay_until(t_next_period)
+
     def orientate(self, aligned_angle):
-        [x_actual, y_actual, th_actual] = self.readOdometry()
-
-        turn_speed = math.pi / 8
-        print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
-
-        if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
-            turn_speed = -turn_speed
-            aligned_angle = -aligned_angle
-        elif aligned_angle < -5 * math.pi / 6 and th_actual > math.pi / 4:
-            aligned_angle = -aligned_angle
-        elif aligned_angle < th_actual:
-            turn_speed = -turn_speed
-
-        self.setSpeed(0, turn_speed)
-        print('Estoy buscando th ', aligned_angle)
-        self.wait_for_th(aligned_angle, 0.02)
-        print("Ha encontrado th")
-
-        # Stop robot
-        self.setSpeed(0, 0)
-
-    def go(self, x_goal, y_goal):
-        def wait_for_position(x, y, robot, position_error_margin):
-            """
-            Wait until the robot reaches the position
-            :param x: x position to be reached
-            :param y: y position to be reached
-            :param robot: robot configuration
-            :param position_error_margin: error allowed in the position
-            :param th_error_margin: error allowed in the orientation
-            """
-            [x_odo, y_odo, _] = robot.readOdometry()
-
-            t_next_period = time.time()
-
-            # Repeat while error decrease
-            last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-            actual_error = last_error
-            while position_error_margin < actual_error:
-                last_error = actual_error
-                while last_error >= actual_error:
-                    [x_odo, y_odo, _] = robot.readOdometry()
-                    last_error = actual_error
-                    actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-                    t_next_period += robot.P
-                    delay_until(t_next_period)
-
-        def wait_for_th(th, robot, th_error_margin):
-            """
-            Wait until the robot reaches the position
-            :param robot: robot configuration
-            :param th_error_margin: error allowed in the orientation
-            """
-            [_, _, th_odo] = robot.readOdometry()
-
-            t_next_period = time.time()
-
-            # Repeat while error decrease
-            last_error = abs(self.normalizeAngle(th - th_odo))
-            actual_error = last_error
-            while th_error_margin < actual_error:
-                last_error = actual_error
-                while last_error >= actual_error:
-                    [_, _, th_odo] = robot.readOdometry()
-                    last_error = actual_error
-                    actual_error = abs(self.normalizeAngle(th - th_odo))
-                    t_next_period += robot.P
-                    delay_until(t_next_period)
-
-        [x_actual, y_actual, th_actual] = self.readOdometry()
-
-        # Obtain positions
-        final_x = x_goal
-        final_y = y_goal
-        aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
+        [_, _, th_actual] = self.readOdometry()
 
         # Turn
         turn_speed = math.pi / 8
@@ -597,27 +570,39 @@ class Robot:
 
         print('Estoy buscando th ', aligned_angle)
         self.setSpeed(0, turn_speed)
-        wait_for_th(aligned_angle, self, 0.02)
+        self.wait_for_th(aligned_angle, self, 0.02)
 
         self.setSpeed(0, -turn_speed / 4)
-        wait_for_th(aligned_angle, self, 0.02)
+        self.wait_for_th(aligned_angle, self, 0.02)
         print("Ha encontrado th")
+
         # Stop robot
         self.setSpeed(0, 0)
 
+    def go(self, x_goal, y_goal):
+
+        [x_actual, y_actual, _] = self.readOdometry()
+
+        # Obtain positions
+        final_x = x_goal
+        final_y = y_goal
+        aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
+
+        # Turn
+        self.orientate(aligned_angle)
+
         # Detect number of cells to jump
-        cells_jump = round(math.sqrt(((final_x - x_actual) ** 2) + ((final_y - y_actual) ** 2)) / 0.4)
+        # cells_jump = round(math.sqrt(((final_x - x_actual) ** 2) + ((final_y - y_actual) ** 2)) / 0.4)
 
         # Detect wall
-        if self.detectObstacle(cells_jump):
+        if self.detectObstacle():
             self.setSpeed(0, 0)
             return False
         else:
             # Go forward
             self.setSpeed(0.15, 0)
-            wait_for_position(final_x, final_y, self, 0.1)
+            self.wait_for_position(final_x, final_y, self, 0.1)
 
             # Stop robot
             self.setSpeed(0, 0)
-
             return True
