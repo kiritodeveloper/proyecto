@@ -6,7 +6,7 @@ def main():
     Plot log file
     """
     #plot_log("./path_logs/trayectoria_2.csv")
-    plot_log_with_map('./out/trayectoria_entrega.csv', './maps/mapa_debug.txt')
+    plot_log_with_map('./trayectoria_tracking.csv', './maps/mapaA.txt')
 
 
 if __name__ == "__main__":
