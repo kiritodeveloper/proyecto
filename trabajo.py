@@ -247,7 +247,7 @@ def main(args):
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)
 
-            res = robot.trackObject(colorRangeMin=redMin, colorRangeMax=redMax)
+            res = robot.trackObject(salida, colorRangeMin=redMin, colorRangeMax=redMax)
 
             print('Espero a que la camara se apague')
             time.sleep(3)  # espera en segundos
@@ -300,8 +300,10 @@ def main(args):
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
 
-
-
+            # Avanza un poco hacia delante para cruzar la linea de meta
+            robot.orientate(math.pi/2)
+            robot.setSpeed(0.1, 0)
+            time.sleep(1)
             robot.setSpeed(0, 0)
 
 

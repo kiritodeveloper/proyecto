@@ -316,7 +316,7 @@ class Robot:
 
         return v, w
 
-    def trackObject(self, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
+    def trackObject(self, salida, colorRangeMin=[0, 0, 0], colorRangeMax=[255, 255, 255]):
         """
         Track object in range (colorRangeMin, colorRangeMax)
         :param colorRangeMin:
@@ -332,7 +332,10 @@ class Robot:
 
         finished = False
 
-        recognition_w = 0.8
+        if salida == 'A':
+            recognition_w = -0.8
+        else:
+            recognition_w = 0.8
 
         recognition_v = 0
 
