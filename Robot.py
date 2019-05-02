@@ -327,6 +327,7 @@ class Robot:
             y_odo.value = y
             th_odo.value = self.normalizeAngle(th)
             self.lock_odometry.release()
+            print("Actualizo odometria con: ", x, y, self.normalizeAngle(th))
 
             # Periodic task
             t_next_period += self.P
