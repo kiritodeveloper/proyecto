@@ -150,7 +150,8 @@ class Robot:
         # print("setting speed to %.2f %.2f" % (v, w))
 
         with self.is_spinning.get_lock():
-            self.is_spinning.value = w != 0
+            # self.is_spinning.value = w != 0ç
+            self.is_spinning.value = w > 0.05
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
@@ -327,7 +328,7 @@ class Robot:
             y_odo.value = y
             th_odo.value = self.normalizeAngle(th)
             self.lock_odometry.release()
-            #print("Actualizo odometria con: ", x, y, self.normalizeAngle(th))
+            # print("Actualizo odometria con: ", x, y, self.normalizeAngle(th))
 
             # Periodic task
             t_next_period += self.P
