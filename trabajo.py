@@ -41,6 +41,10 @@ from reco import Reco
 salida = 'A'
 sizeCell = 400 # in mm
 
+# LOGO -> BB8 - R2D2
+
+logo = 'R2D2'
+
 # DUBUG
 phase_from = 4
 phase_to = 5
@@ -258,12 +262,18 @@ def main(args):
 
             if salida is 'A':
                 cell_to_recognize = coord2Meters([4, 6, 0])
+                cell_to_exit_left = coord2Meters([3, 7, 0])
+                cell_to_exit_right = coord2Meters([6, 7, 0])
             else:
                 cell_to_recognize = coord2Meters([2, 6, 0])
+                cell_to_exit_left = coord2Meters([0, 7, 0])
+                cell_to_exit_right = coord2Meters([3, 7, 0])
 
             robot.go(cell_to_recognize[0], cell_to_recognize[1])
 
+            # ORIENTARSE HACIA ARRIBA (mirando al frente)
 
+            robot.orientate(math.pi/2)
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
@@ -274,6 +284,23 @@ def main(args):
             BB8_detected, BB8_points = reco.search_img(BB8)
 
             print(R2D2_detected, BB8_detected)
+
+            # SALIR POR LA PUERTA CORRESPONDIENTE
+            if BB8_detected and logo == 'BB8' and salida == 'A':
+                print('1')
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+            elif R2D2_detected and logo == 'BB8' and salida == 'A':
+                print('2')
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif R2D2_detected and logo == 'R2D2' and salida == 'A':
+                print('3')
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+            elif BB8_detected and logo == 'R2D2' and salida == 'A':
+                print('4')
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+
+
+
 
             robot.setSpeed(0, 0)
 

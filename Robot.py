@@ -476,6 +476,29 @@ class Robot:
                 t_next_period += self.P
                 delay_until(t_next_period)
 
+    def orientate(self, aligned_angle):
+        [x_actual, y_actual, th_actual] = self.readOdometry()
+
+        turn_speed = math.pi / 8
+        print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
+
+        if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
+            turn_speed = -turn_speed
+            aligned_angle = -aligned_angle
+        elif aligned_angle < -5 * math.pi / 6 and th_actual > math.pi / 4:
+            aligned_angle = -aligned_angle
+        elif aligned_angle < th_actual:
+            turn_speed = -turn_speed
+
+        self.setSpeed(0, turn_speed)
+        print('Estoy buscando th ', aligned_angle)
+        self.wait_for_th(aligned_angle, 0.02)
+        print("Ha encontrado th")
+
+        # Stop robot
+        self.setSpeed(0, 0)
+
+
 
     def go(self, x_goal, y_goal):
 
@@ -491,16 +514,7 @@ class Robot:
         # Turn
         turn_speed = math.pi / 8
         print('YOU SPIN MY RIGHT ROUNG BABY: ', aligned_angle, th_actual)
-        """
-        if aligned_angle < th_actual:
-            if aligned_angle < -3*math.pi/4 and th_actual > math.pi/4 and turn_speed > 0:
-                aligned_angle = -aligned_angle
-            elif aligned_angle > 3*math.pi/4 and th_actual < -math.pi/4 and turn_speed < 0:
-                aligned_angle = -aligned_angle
-                turn_speed = -turn_speed
-        else:
-            turn_speed = -turn_speed
-        """
+
         if aligned_angle > 5*math.pi/6 and th_actual < -math.pi/4:
             turn_speed = -turn_speed
             aligned_angle = -aligned_angle
