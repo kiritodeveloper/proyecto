@@ -1,7 +1,7 @@
 import csv
 from multiprocessing import Process
 
-from MapLib import Map2D
+from MapLib_python3 import Map2D
 from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
