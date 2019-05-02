@@ -147,7 +147,7 @@ class Robot:
         :param w: angular speed in rad/s
         """
 
-        print("setting speed to %.2f %.2f" % (v, w))
+        # print("setting speed to %.2f %.2f" % (v, w))
 
         with self.is_spinning.get_lock():
             self.is_spinning.value = w != 0
