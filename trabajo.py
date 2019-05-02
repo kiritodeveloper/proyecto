@@ -119,16 +119,18 @@ def main(args):
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
-                v = 0.2
-                w_movimiento = 0.50
+                v = 0.1
+                w_parado = -math.pi/16
+                w_movimiento = 0.25
             else: # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi/2))
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
                 pos4 = coord2Meters((5, 3, -math.pi/2))
-                v = 0.2
-                w_movimiento = -0.50
+                v = 0.1
+                w_parado = math.pi / 16
+                w_movimiento = -0.25
 
             robot = Robot(starting_point)
             # Robot logger
@@ -140,16 +142,17 @@ def main(args):
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            robot.wait_for_position(pos2[0], pos2[1], robot, 0.2)
+            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            robot.wait_for_position(pos3[0], pos3[1], robot, 0.2)
+            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
             robot.orientate(pos4[2])
+
 
         # LABERINTO -> FASE 3
 
