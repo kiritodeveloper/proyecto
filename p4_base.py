@@ -9,7 +9,6 @@ import math
 import matplotlib
 from config_file import is_debug
 
-
 matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
@@ -43,7 +42,7 @@ def main(args):
         myMap = Map2D(map_file)
 
         # Initialize Odometry
-        initial_pos = [1, 1, 0]
+        initial_pos = [0.2, 0.2, 0]
         robot = Robot(initial_pos)
 
         # Robot logger
@@ -52,17 +51,17 @@ def main(args):
         # 2. launch updateOdometry thread()
         robot.startOdometry()
 
-        goal_x = 0
-        goal_y = 0
+        goal_x = 2
+        goal_y = 2
 
         myMap.fillCostMatrix([goal_x, goal_y])
-        route = myMap.planPath([2, 2], [goal_x, goal_y])
+        route = myMap.planPath([0, 0], [goal_x, goal_y])
 
         robot_locations = []
 
         if is_debug:
             start_robot_drawer(robot.finished, robot)
-        last_reached_pos = [2, 2]
+        last_reached_pos = [0, 0]
 
         while len(route) > 0:
             goal = route.pop(0)
@@ -78,7 +77,7 @@ def main(args):
                 # There are a obstacle
                 print('Obstacle detected')
                 x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
-                print('ODOMETRIIIA:' ,x,y,th)
+                print('ODOMETRIIIA:', x, y, th)
                 # Delete connections from detected wall
                 myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
                 myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
@@ -94,7 +93,7 @@ def main(args):
         else:
             print('Can\'t reached the goal')
 
-        myMap.drawMapWithRobotLocations(robot_locations)
+        # myMap.drawMapWithRobotLocations(robot_locations)
 
         robot.stopOdometry()
 
@@ -110,6 +109,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa_debug.txt")
+                        default="./maps/mapa3.txt")
     args = parser.parse_args()
     main(args)
