@@ -53,6 +53,7 @@ class Robot:
         self.x = Value('d', init_position[0])
         self.y = Value('d', init_position[1])
         self.th = Value('d', init_position[2])
+        self.proximity = Value('d', 600)
         self.finished = Value('b', 1)  # boolean to show if odometry updates are finished
 
         # if we want to block several instructions to be run together, we may want to use an explicit Lock
@@ -327,6 +328,7 @@ class Robot:
             x_odo.value = x
             y_odo.value = y
             th_odo.value = self.normalizeAngle(th)
+            self.proximity.value = proximity
             self.lock_odometry.release()
             # print("Actualizo odometria con: ", x, y, self.normalizeAngle(th))
 
@@ -507,10 +509,11 @@ class Robot:
             variable = False
             return variable
         else:
-            sensor_value = self.readSensors()[2]
+            self.lock_odometry.acquire()
+            sensor_value = self.proximity.value
+            self.lock_odometry.release()
             print("Distancia: ", sensor_value)
             if sensor_value < number_of_cells * self.min_distance_obstacle_detection:
-                # TODO: Update X or Y
                 return True
             else:
                 return False
