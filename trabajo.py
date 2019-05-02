@@ -138,27 +138,20 @@ def main(args):
             robot.startOdometry()
 
             # girar 90
-            robot.setSpeed(0, w_parado)
-            wait_for_position(pos1[0], pos1[1], pos1[2], robot, 0.2, 0.02)
+            robot.orientate(pos1[2])
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos2[0], pos2[1], robot, 0.2)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos3[0], pos3[1], robot, 0.2)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
-
-            robot.setSpeed(0, -w_parado)
-            wait_for_position(pos4[0], pos4[1], pos4[2], robot, 0.2, 0.02)
-
-            # Me detengo
-
-            robot.setSpeed(0, 0)
+            robot.orientate(pos4[2])
 
         # LABERINTO -> FASE 3
 
