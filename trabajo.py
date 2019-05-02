@@ -120,7 +120,7 @@ def main(args):
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.1
-                w_parado = -math.pi/4
+                w_parado = -math.pi/16
                 w_movimiento = 0.25
             else: # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi/2))
@@ -129,7 +129,7 @@ def main(args):
                 pos3 = coord2Meters((5, 3, 0))
                 pos4 = coord2Meters((5, 3, -math.pi/2))
                 v = 0.1
-                w_parado = math.pi / 4
+                w_parado = math.pi / 16
                 w_movimiento = -0.25
 
             robot = Robot(starting_point)
