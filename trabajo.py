@@ -118,9 +118,9 @@ def main(args):
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi / 2))
-                v = 0.2
+                v = 0.1
                 w_parado = -math.pi / 8
-                w_movimiento = 0.5
+                w_movimiento = 0.25
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], 0)
@@ -178,6 +178,8 @@ def main(args):
                 robot.startOdometry()
 
             primera = False
+
+            robot.enableSensors(True)
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
@@ -244,6 +246,8 @@ def main(args):
                 robot.startOdometry()
 
             primera = False
+
+            robot.enableSensors(False)
 
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)

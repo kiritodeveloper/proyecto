@@ -134,12 +134,20 @@ class Robot:
         # Is spinning
         self.is_spinning = Value('b', False)
 
+        # Enable sensors
+        self.enable_sensors = Value('b', False)
+
         # Encoder timer
         self.encoder_timer = 0
 
         # Previous values of encoders in rads
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
+
+    def enableSensors(self, value):
+        self.lock_odometry.acquire()
+        self.enable_sensors.value = value
+        self.lock_odometry.release()
 
     def setSpeed(self, v, w):
         """
@@ -150,9 +158,9 @@ class Robot:
 
         # print("setting speed to %.2f %.2f" % (v, w))
 
-        with self.is_spinning.get_lock():
-            self.is_spinning.value = w != 0
-            # self.is_spinning.value = w > 0.05
+        # with self.is_spinning.get_lock():
+        # self.is_spinning.value = w != 0
+        # self.is_spinning.value = w > 0.05
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
@@ -170,6 +178,7 @@ class Robot:
         self.lock_odometry.acquire()
         self.v.value = v
         self.w.value = w
+        self.is_spinning.value = w != 0
         self.lock_odometry.release()
 
     def readSpeed(self):
@@ -295,14 +304,20 @@ class Robot:
                 x = x + (v / w) * (math.sin(th + w * d_t) - math.sin(th))
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
-            # Get sensors data
-            gyro_1, gyro_2, proximity = self.readSensors()
+            # Check if use sensors
+            self.lock_odometry.acquire()
+            is_spinning = self.is_spinning.value
+            enable_sensors = self.enable_sensors.value
+            self.lock_odometry.release()
 
-            with self.is_spinning.get_lock():
-                is_spinning = self.is_spinning.value
+            # Get sensors data
+            if enable_sensors:
+                gyro_1, gyro_2, proximity = self.readSensors()
+            else:
+                gyro_1, gyro_2, proximity = 0, 0, 0
 
             # Obtain precise th
-            if is_spinning:
+            if is_spinning and enable_sensors:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
                 actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
@@ -542,6 +557,8 @@ class Robot:
                 t_next_period += self.P
                 delay_until(t_next_period)
 
+        print("He llegado a : ", x_odo, y_odo, " y busco: ", x, y)
+
     def wait_for_th(self, th, th_error_margin):
         """
         Wait until the robot reaches the position
@@ -558,11 +575,12 @@ class Robot:
             last_error = actual_error
             while last_error >= actual_error:
                 [_, _, th_odo] = self.readOdometry()
-                print("Tengo th: ", th_odo, " y busco: ", th)
+                # print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
                 t_next_period += self.P
                 delay_until(t_next_period)
+        print("He llegado a : ", th_odo, " y busco: ", th)
 
     def orientate(self, aligned_angle):
         [_, _, th_actual] = self.readOdometry()
