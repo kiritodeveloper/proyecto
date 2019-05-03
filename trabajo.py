@@ -143,7 +143,7 @@ def main(args):
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos2[0], pos2[1], robot, 0.2)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
