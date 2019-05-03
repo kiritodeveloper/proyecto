@@ -86,7 +86,7 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
             t_next_period += robot.P
             delay_until(t_next_period)
-            print ([x_odo, y_odo, th_odo])
+            #print ([x_odo, y_odo, th_odo])
     print([x_odo, y_odo, th_odo])
 
 
@@ -119,18 +119,18 @@ def main(args):
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi / 2))
-                v = 0.1
+                v = 0.2
                 w_parado = -math.pi / 8
-                w_movimiento = 0.25
+                w_movimiento = 0.5
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
                 pos4 = coord2Meters((5, 3, -math.pi / 2))
-                v = 0.1
+                v = 0.2
                 w_parado = math.pi / 8
-                w_movimiento = -0.25
+                w_movimiento = -0.5
 
             robot = Robot(starting_point)
             # Robot logger
