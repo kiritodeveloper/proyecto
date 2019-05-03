@@ -48,7 +48,7 @@ sizeCell = 400 # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 2
+phase_from = 3
 phase_to = 5
 
 def coord2Meters(coord):
