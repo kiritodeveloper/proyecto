@@ -151,8 +151,8 @@ class Robot:
         # print("setting speed to %.2f %.2f" % (v, w))
 
         with self.is_spinning.get_lock():
-            # self.is_spinning.value = w != 0ç
-            self.is_spinning.value = w > 0.05
+            self.is_spinning.value = w != 0
+            # self.is_spinning.value = w > 0.05
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
@@ -518,16 +518,15 @@ class Robot:
             else:
                 return False
 
-    def wait_for_position(self, x, y, robot, position_error_margin):
+    def wait_for_position(self, x, y, position_error_margin):
         """
         Wait until the robot reaches the position
         :param x: x position to be reached
         :param y: y position to be reached
-        :param robot: robot configuration
         :param position_error_margin: error allowed in the position
         :param th_error_margin: error allowed in the orientation
         """
-        [x_odo, y_odo, _] = robot.readOdometry()
+        [x_odo, y_odo, _] = self.readOdometry()
 
         t_next_period = time.time()
 
@@ -537,19 +536,18 @@ class Robot:
         while position_error_margin < actual_error:
             last_error = actual_error
             while last_error >= actual_error:
-                [x_odo, y_odo, _] = robot.readOdometry()
+                [x_odo, y_odo, _] = self.readOdometry()
                 last_error = actual_error
                 actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-                t_next_period += robot.P
+                t_next_period += self.P
                 delay_until(t_next_period)
 
-    def wait_for_th(self, th, robot, th_error_margin):
+    def wait_for_th(self, th, th_error_margin):
         """
         Wait until the robot reaches the position
-        :param robot: robot configuration
         :param th_error_margin: error allowed in the orientation
         """
-        [_, _, th_odo] = robot.readOdometry()
+        [_, _, th_odo] = self.readOdometry()
 
         t_next_period = time.time()
 
@@ -559,11 +557,11 @@ class Robot:
         while th_error_margin < actual_error:
             last_error = actual_error
             while last_error >= actual_error:
-                [_, _, th_odo] = robot.readOdometry()
+                [_, _, th_odo] = self.readOdometry()
                 print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
-                t_next_period += robot.P
+                t_next_period += self.P
                 delay_until(t_next_period)
 
     def orientate(self, aligned_angle):
@@ -582,10 +580,10 @@ class Robot:
 
         print('Estoy buscando th ', aligned_angle)
         self.setSpeed(0, turn_speed)
-        self.wait_for_th(aligned_angle, self, 0.02)
+        self.wait_for_th(aligned_angle, 0.02)
 
         self.setSpeed(0, -turn_speed / 4)
-        self.wait_for_th(aligned_angle, self, 0.02)
+        self.wait_for_th(aligned_angle, 0.02)
         print("Ha encontrado th")
 
         # Stop robot
@@ -613,7 +611,7 @@ class Robot:
         else:
             # Go forward
             self.setSpeed(0.15, 0)
-            self.wait_for_position(final_x, final_y, self, 0.1)
+            self.wait_for_position(final_x, final_y, 0.1)
 
             # Stop robot
             self.setSpeed(0, 0)

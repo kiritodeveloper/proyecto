@@ -10,12 +10,10 @@ import cv2
 from RobotDrawer import start_robot_drawer
 from utils import delay_until
 
-
-#import matplotlib
+# import matplotlib
 from config_file import is_debug
 
-
-#matplotlib.use("TkAgg")
+# matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 # from Robot import Robot
@@ -25,7 +23,6 @@ from RobotLogger import start_robot_logger
 
 # Recognization
 from reco import Reco
-
 
 # NOTES ABOUT TASKS to DO in P4:
 # 1)findPath(x1,y1, x2,y2),   fillCostMatrix(), replanPath () --> should be methods from the new Map2D class
@@ -41,7 +38,7 @@ from reco import Reco
 # 5 -> RECONOCER Y SALIR
 
 salida = 'A'
-sizeCell = 400 # in mm
+sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
 
@@ -51,12 +48,14 @@ logo = 'R2D2'
 phase_from = 2
 phase_to = 5
 
+
 def coord2Meters(coord):
     new_coord = [None, None, None]
     new_coord[0] = (coord[0] + 0.5) * sizeCell / 1000.0
     new_coord[1] = (coord[1] + 0.5) * sizeCell / 1000.0
     new_coord[2] = coord[2]
     return new_coord
+
 
 def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     """
@@ -86,7 +85,7 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
             t_next_period += robot.P
             delay_until(t_next_period)
-            #print ([x_odo, y_odo, th_odo])
+            # print ([x_odo, y_odo, th_odo])
     print([x_odo, y_odo, th_odo])
 
 
@@ -134,42 +133,40 @@ def main(args):
 
             robot = Robot(starting_point)
             # Robot logger
-            start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
+            start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
             robot.startOdometry()
 
             # girar 90
             robot.setSpeed(0, w_parado)
-            wait_for_position(pos1[0], pos1[1], pos1[2], robot, 0.2, 0.02)
+            robot.wait_for_th(pos1[2], 0.02)
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            robot.wait_for_position(pos2[0], pos2[1], robot, 0.2)
+            robot.wait_for_position(pos2[0], pos2[1], 0.2)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos3[0], pos3[1], 0.2)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
-
             robot.setSpeed(0, -w_parado)
-            wait_for_position(pos4[0], pos4[1], pos4[2], robot, 0.2, 0.02)
+            robot.wait_for_th(pos4[2], 0.02)
 
             # Me detengo
-
             robot.setSpeed(0, 0)
 
         # LABERINTO -> FASE 3
 
         if phase_from <= 3 and 3 <= phase_to:
             if salida is 'A':
-                starting_point = coord2Meters((1, 3, -math.pi/2))
+                starting_point = coord2Meters((1, 3, -math.pi / 2))
                 init_pos = [1, 3]
                 goal_x = 3
                 goal_y = 2
             else:  # Salida es B
-                starting_point = coord2Meters((5, 3, -math.pi/2))
+                starting_point = coord2Meters((5, 3, -math.pi / 2))
                 init_pos = [3, 2]
                 goal_x = 3
                 goal_y = 2
@@ -222,7 +219,6 @@ def main(args):
             else:
                 print('Can\'t reached the goal')
 
-
             # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
             # Avanza un poco hacia delante para cruzar la linea de meta
             robot.orientate(math.pi / 2)
@@ -230,15 +226,14 @@ def main(args):
             time.sleep(2)
             robot.setSpeed(0, 0)
 
-
         # COGER PELOTA -> FASE 4
 
         if phase_from <= 4 and 4 <= phase_to:
             if primera:
                 if salida is 'A':
-                    robot = Robot(coord2Meters([3, 3, math.pi/2]))
+                    robot = Robot(coord2Meters([3, 3, math.pi / 2]))
                 else:
-                    robot = Robot(coord2Meters([3, 3, math.pi/2]))
+                    robot = Robot(coord2Meters([3, 3, math.pi / 2]))
 
                 if is_debug:
                     start_robot_drawer(robot.finished, robot)
@@ -250,7 +245,6 @@ def main(args):
 
             primera = False
 
-
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)
 
@@ -259,7 +253,6 @@ def main(args):
             print('Espero a que la camara se apague')
             time.sleep(3)  # espera en segundos
             print('Supongo que la camara esta apagada')
-
 
         # RECONOCIMIENTO -> FASE 5
         if phase_from <= 5 and 5 <= phase_to:
@@ -280,7 +273,7 @@ def main(args):
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)
 
-            robot.orientate(math.pi/2)
+            robot.orientate(math.pi / 2)
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
@@ -306,13 +299,11 @@ def main(args):
                 print('4')
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
-
             # Avanza un poco hacia delante para cruzar la linea de meta
-            robot.orientate(math.pi/2)
+            robot.orientate(math.pi / 2)
             robot.setSpeed(0.2, 0)
             time.sleep(2)
             robot.setSpeed(0, 0)
-
 
         robot.stopOdometry()
 

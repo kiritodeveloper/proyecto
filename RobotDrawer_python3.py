@@ -15,6 +15,8 @@ def plot_log(file_path):
         i = csv.reader(log)
         for line in i:
             dibrobot([float(line[0]), float(line[1]), float(line[2])], 'r', 'p')
+    plt.xlim([-1, 3])
+    plt.ylim([0, 4])
     plt.show()
 
 
