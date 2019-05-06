@@ -317,9 +317,8 @@ def main(args):
             time.sleep(5.2)
 
             robot.setSpeed(0, 0)
-            time.sleep(1)
-
-            [_,_,previous_value] = robot.readSensors()
+            for i in range(1,20):
+                [_,_,previous_value] = robot.readSensors()
 
             print("previous value",previous_value)
 
