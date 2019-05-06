@@ -485,7 +485,7 @@ class Robot:
                         else:
                             self.setSpeed(0, -0.4)
 
-                        time.sleep(3)
+                        time.sleep(5)
 
                         self.setSpeed(0, 0)
                         _, _, size = frame_capturer.getPosition()
