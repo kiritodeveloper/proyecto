@@ -290,32 +290,34 @@ def main(args):
                 cell_to_exit_right = coord2Meters([3, 7, 0])
 
             robot.orientate(objective_angle)
+            robot.setSpeed(0, 0)
             previous_value = 100
             new_value = 100
-            robot.setSpeed(0,turn_speed)
+            robot.setSpeed(0, turn_speed)
             while previous_value >= new_value:
                 previous_value = new_value
-                [_,_,new_value] = robot.readSensors(True,False)
+                [_,_,new_value] = robot.readSensors(True, False)
+                print("new value", new_value)
 
             retro_value = 0.1
             time_retro = abs((60 - previous_value)) / retro_value
 
             if previous_value > 60:
-                robot.setSpeed(retro_value,0)
+                robot.setSpeed(retro_value, 0)
             else:
-                robot.setSpeed(-retro_value,0)
+                robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
 
-            robot.setSpeed(0,0.4)
+            robot.setSpeed(0, 0.4)
             time.sleep(5)
 
             [_,_,previous_value] = robot.readSensors(True,False)
 
             time_retro = abs((60 - previous_value)) / retro_value
             if previous_value > 60:
-                robot.setSpeed(retro_value,0)
+                robot.setSpeed(retro_value, 0)
             else:
-                robot.setSpeed(-retro_value,0)
+                robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
 
             #print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
