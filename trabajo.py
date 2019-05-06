@@ -301,6 +301,8 @@ def main(args):
                 print("new value", new_value)
                 time.sleep(0.1)
 
+            robot.setSpeed(0, -turn_speed)
+            time.sleep(0.2)
             retro_value = 0.1
             time_retro = abs((0.55 - previous_value/100)) / retro_value
 
