@@ -480,8 +480,12 @@ class Robot:
                         self.setSpeed(0, 0)
                         self.catch('down')
 
-                        self.setSpeed(0, 0.4)
-                        time.sleep(5)
+                        if salida == 'A':
+                            self.setSpeed(0, 0.4)
+                        else:
+                            self.setSpeed(0, -0.4)
+
+                        time.sleep(3)
 
                         self.setSpeed(0, 0)
                         _, _, size = frame_capturer.getPosition()
