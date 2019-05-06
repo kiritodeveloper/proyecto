@@ -167,7 +167,7 @@ def main(args):
                 goal_y = 2
             else:  # Salida es B
                 starting_point = coord2Meters((5, 3, -math.pi / 2))
-                init_pos = [3, 2]
+                init_pos = [5, 3]
                 goal_x = 3
                 goal_y = 2
 
