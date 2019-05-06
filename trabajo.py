@@ -292,8 +292,8 @@ def main(args):
             robot.enableProximitySensor(True)
             robot.orientate(objective_angle)
             robot.setSpeed(0, 0)
-            previous_value = 100
-            new_value = 100
+            previous_value = 1000
+            new_value = 1000
             robot.setSpeed(0, turn_speed)
             while previous_value >= new_value:
                 previous_value = new_value
