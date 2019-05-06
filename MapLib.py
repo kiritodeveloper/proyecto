@@ -411,7 +411,7 @@ class Map2D:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
             wavefront = list(set(wavefront))
-            print(wavefront)
+            #print(wavefront)
         self.costMatrix = grid
 
     def findPath(self, x_ini, y_ini, x_end, y_end):
