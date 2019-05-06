@@ -126,10 +126,10 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
-                pos4 = coord2Meters((5, 3, -math.pi / 2))
-                v = 0.2
+                pos4 = coord2Meters((5, 3, -1.39626))
+                v = 0.15
                 w_parado = math.pi / 8
-                w_movimiento = -0.5
+                w_movimiento = -0.375
 
             robot = Robot(starting_point)
             # Robot logger
@@ -304,6 +304,18 @@ def main(args):
             elif BB8_detected and logo == 'R2D2' and salida == 'A':
                 print('4')
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif BB8_detected and logo == 'BB8' and salida == 'B':
+                print('5')
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif R2D2_detected and logo == 'BB8' and salida == 'B':
+                print('6')
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+            elif R2D2_detected and logo == 'R2D2' and salida == 'B':
+                print('7')
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif BB8_detected and logo == 'R2D2' and salida == 'B':
+                print('8')
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
 
             # Avanza un poco hacia delante para cruzar la linea de meta
             robot.orientate(math.pi / 2)
