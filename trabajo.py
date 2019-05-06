@@ -117,7 +117,7 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], math.pi)
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
-                pos4 = coord2Meters((1, 3, -math.pi / 2))
+                pos4 = coord2Meters((1, 3, -1.39626))
                 v = 0.15
                 w_parado = -math.pi / 8
                 w_movimiento = 0.375
@@ -152,7 +152,7 @@ def main(args):
             robot.setSpeed(0, 0)
 
             robot.setSpeed(0, -w_parado)
-            robot.wait_for_th(pos4[2], 0.01)
+            robot.wait_for_th(pos4[2], 0.02)
 
             # Me detengo
             robot.setSpeed(0, 0)
