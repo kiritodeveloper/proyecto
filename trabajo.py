@@ -316,7 +316,7 @@ def main(args):
 
             [_,_,previous_value] = robot.readSensors()
 
-            time_retro = abs((60 - previous_value)) / retro_value
+            time_retro = abs((0.6 - previous_value/100)) / retro_value
             if previous_value > 60:
                 robot.setSpeed(retro_value, 0)
             else:
