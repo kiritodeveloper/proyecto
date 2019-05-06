@@ -289,6 +289,7 @@ def main(args):
                 cell_to_exit_left = coord2Meters([0, 7, 0])
                 cell_to_exit_right = coord2Meters([3, 7, 0])
 
+            robot.enableProximitySensor(True)
             robot.orientate(objective_angle)
             robot.setSpeed(0, 0)
             previous_value = 100
