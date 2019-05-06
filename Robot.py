@@ -589,10 +589,10 @@ class Robot:
         turn_speed = math.pi / 8
 
         if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
-            turn_speed = -turn_speed
-            aligned_angle = -aligned_angle
+            aligned_angle = aligned_angle - 2 * math.pi
         elif aligned_angle < -5 * math.pi / 6 and th_actual > math.pi / 4:
-            aligned_angle = -aligned_angle
+            turn_speed = -turn_speed
+            aligned_angle = aligned_angle + 2 * math.pi
         elif aligned_angle < th_actual:
             turn_speed = -turn_speed
 
