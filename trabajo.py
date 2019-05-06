@@ -142,11 +142,11 @@ def main(args):
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            wait_for_position(pos2[0], pos2[1], 0.2)
+            robot.wait_for_position(pos2[0], pos2[1], 0.1)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            wait_for_position(pos3[0], pos3[1], 0.2)
+            robot.wait_for_position(pos3[0], pos3[1], 0.1)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
