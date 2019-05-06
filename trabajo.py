@@ -37,7 +37,7 @@ from reco import Reco
 # 4 -> COGER PELOTA
 # 5 -> RECONOCER Y SALIR
 
-salida = 'A'
+salida = 'B'
 sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
@@ -339,6 +339,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapaA.txt")
+                        default="./maps/mapaB.txt")
     args = parser.parse_args()
     main(args)
