@@ -302,25 +302,25 @@ def main(args):
                 time.sleep(0.1)
 
             retro_value = 0.1
-            time_retro = abs((0.6 - previous_value/100)) / retro_value
+            time_retro = abs((0.55 - previous_value/100)) / retro_value
 
             print("tiempo", time_retro)
-            if previous_value > 60:
+            if previous_value > 55:
                 robot.setSpeed(retro_value, 0)
             else:
                 robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
 
             robot.setSpeed(0, -turn_speed * 4)
-            time.sleep(5)
+            time.sleep(5.2)
 
             [_,_,previous_value] = robot.readSensors()
 
             print("previous value",previous_value)
 
-            time_retro = abs((0.6 - previous_value/100)) / retro_value
+            time_retro = abs((0.55 - previous_value/100)) / retro_value
             print("tiempo",time_retro)
-            if previous_value > 60:
+            if previous_value > 55:
                 robot.setSpeed(retro_value, 0)
             else:
                 robot.setSpeed(-retro_value, 0)
