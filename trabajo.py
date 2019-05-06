@@ -37,7 +37,7 @@ from reco import Reco
 # 4 -> COGER PELOTA
 # 5 -> RECONOCER Y SALIR
 
-salida = 'A'
+salida = 'B'
 sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
@@ -117,7 +117,7 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], math.pi)
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
-                pos4 = coord2Meters((1, 3, -math.pi / 2))
+                pos4 = coord2Meters((1, 3, -1.39626))
                 v = 0.15
                 w_parado = -math.pi / 8
                 w_movimiento = 0.375
@@ -126,10 +126,10 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
-                pos4 = coord2Meters((5, 3, -math.pi / 2))
-                v = 0.2
+                pos4 = coord2Meters((5, 3, -1.39626))
+                v = 0.15
                 w_parado = math.pi / 8
-                w_movimiento = -0.5
+                w_movimiento = -0.375
 
             robot = Robot(starting_point)
             # Robot logger
@@ -173,7 +173,7 @@ def main(args):
                 goal_y = 2
             else:  # Salida es B
                 starting_point = coord2Meters((5, 3, -math.pi / 2))
-                init_pos = [3, 2]
+                init_pos = [5, 3]
                 goal_x = 3
                 goal_y = 2
 
@@ -314,6 +314,18 @@ def main(args):
             elif BB8_detected and logo == 'R2D2' and salida == 'A':
                 print('4')
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif BB8_detected and logo == 'BB8' and salida == 'B':
+                print('5')
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif R2D2_detected and logo == 'BB8' and salida == 'B':
+                print('6')
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+            elif R2D2_detected and logo == 'R2D2' and salida == 'B':
+                print('7')
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+            elif BB8_detected and logo == 'R2D2' and salida == 'B':
+                print('8')
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
 
             # Avanza un poco hacia delante para cruzar la linea de meta
             robot.orientate(math.pi / 2)
@@ -337,6 +349,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapaA.txt")
+                        default="./maps/mapaB.txt")
     args = parser.parse_args()
     main(args)

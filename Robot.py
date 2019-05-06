@@ -603,10 +603,13 @@ class Robot:
             aligned_angle = -aligned_angle
         elif aligned_angle < -5 * math.pi / 6 and th_actual > math.pi / 4:
             aligned_angle = -aligned_angle
-        elif aligned_angle < th_actual:
+        elif th_actual < -5 * math.pi / 6 and aligned_angle > math.pi / 4:
+            turn_speed = -turn_speed
+        elif aligned_angle < th_actual and not (th_actual > 5 * math.pi / 6 and aligned_angle < -math.pi / 4):
             turn_speed = -turn_speed
 
         print('Estoy buscando th ', aligned_angle)
+        print('Velocidad ', turn_speed)
         self.setSpeed(0, turn_speed)
         self.wait_for_th(aligned_angle, 0.02)
 
@@ -619,9 +622,9 @@ class Robot:
 
     def go(self, x_goal, y_goal):
 
-        [x_actual, y_actual, _] = self.readOdometry()
+        [x_actual, y_actual, th_actual] = self.readOdometry()
 
-        print('Estoy en: ', x_actual, y_actual)
+        print('Estoy en: ', x_actual, y_actual, th_actual)
 
         # Obtain positions
         final_x = x_goal
