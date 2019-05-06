@@ -273,6 +273,7 @@ def main(args):
                 cell_to_exit_left = coord2Meters([0, 7, 0])
                 cell_to_exit_right = coord2Meters([3, 7, 0])
 
+            print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
             robot.go(cell_to_recognize[0], cell_to_recognize[1])
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)

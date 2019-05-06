@@ -611,6 +611,8 @@ class Robot:
 
         [x_actual, y_actual, _] = self.readOdometry()
 
+        print('Estoy en: ', x_actual, y_actual)
+
         # Obtain positions
         final_x = x_goal
         final_y = y_goal
