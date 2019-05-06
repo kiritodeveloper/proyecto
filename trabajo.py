@@ -42,7 +42,7 @@ sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
 
-logo = 'R2D2'
+logo = 'BB8'
 
 # DUBUG
 phase_from = 2
@@ -118,9 +118,9 @@ def main(args):
                 pos2 = coord2Meters((1, 5, 0))
                 pos3 = coord2Meters((1, 3, math.pi))
                 pos4 = coord2Meters((1, 3, -math.pi / 2))
-                v = 0.1
+                v = 0.15
                 w_parado = -math.pi / 8
-                w_movimiento = 0.25
+                w_movimiento = 0.375
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], 0)
@@ -142,11 +142,11 @@ def main(args):
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            robot.wait_for_position(pos2[0], pos2[1], 0.2)
+            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            robot.wait_for_position(pos3[0], pos3[1], 0.2)
+            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
@@ -275,6 +275,7 @@ def main(args):
 
             print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
             robot.go(cell_to_recognize[0], cell_to_recognize[1])
+            print('y me MARCHEEEEE')
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)
 

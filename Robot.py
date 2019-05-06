@@ -301,7 +301,7 @@ class Robot:
             if enable_sensors:
                 gyro_1, gyro_2, proximity = self.readSensors()
             else:
-                gyro_1, gyro_2, proximity = 0, 0, 0
+                gyro_1, gyro_2, proximity = 0, 0, 255
 
             # Obtain precise th
             if is_spinning and enable_sensors:
