@@ -45,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'BB8'
 
 # DUBUG
-phase_from = 2
+phase_from = 4
 phase_to = 5
 
 
@@ -277,21 +277,56 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
+                turn_speed = 0.4
+                objective_angle = 3 * math.pi / 4
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right = coord2Meters([6, 7, 0])
             else:
+                turn_speed = -0.4
+                objective_angle = math.pi / 4
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left = coord2Meters([0, 7, 0])
                 cell_to_exit_right = coord2Meters([3, 7, 0])
 
-            print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
-            robot.go(cell_to_recognize[0], cell_to_recognize[1])
-            print('y me MARCHEEEEE')
+            robot.orientate(objective_angle)
+            previous_value = 100
+            new_value = 100
+            robot.setSpeed(turn_speed)
+            while previous_value >= new_value:
+                previous_value = new_value
+                [_,_,new_value] = robot.readSensors(True,False)
+
+            retro_value = 0.1
+            time_retro = abs((60 - previous_value)) / retro_value
+
+            if previous_value > 60:
+                robot.setSpeed(retro_value,0)
+            else:
+                robot.setSpeed(-retro_value,0)
+            time.sleep(time_retro)
+
+            robot.setSpeed(0,0.4)
+            time.sleep(5)
+
+            [_,_,previous_value] = robot.readSensors(True,False)
+
+            time_retro = abs((60 - previous_value)) / retro_value
+            if previous_value > 60:
+                robot.setSpeed(retro_value,0)
+            else:
+                robot.setSpeed(-retro_value,0)
+            time.sleep(time_retro)
+
+            #print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
+            #robot.go(cell_to_recognize[0], cell_to_recognize[1])
+            #print('y me MARCHEEEEE')
+
+
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)
 
-            robot.orientate(math.pi / 2)
+            #robot.orientate(math.pi / 2)
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
