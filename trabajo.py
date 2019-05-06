@@ -330,7 +330,6 @@ def main(args):
                 robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
             robot.setSpeed(0, 0)
-            time.sleep(0.5)
             #print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
             #robot.go(cell_to_recognize[0], cell_to_recognize[1])
             #print('y me MARCHEEEEE')
@@ -399,7 +398,7 @@ def main(args):
             robot.setSpeed(0, -turn_speed)
             time.sleep(5)
             robot.setSpeed(0.1, 0)
-            time.sleep(8)
+            time.sleep(10)
 
         robot.stopOdometry()
 
