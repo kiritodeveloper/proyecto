@@ -304,13 +304,14 @@ def main(args):
             retro_value = 0.1
             time_retro = abs((60 - previous_value)) / retro_value
 
+            print("tiempo", time_retro)
             if previous_value > 60:
                 robot.setSpeed(retro_value, 0)
             else:
                 robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
 
-            robot.setSpeed(0, 0.4)
+            robot.setSpeed(0, -turn_speed * 4)
             time.sleep(5)
 
             [_,_,previous_value] = robot.readSensors()
