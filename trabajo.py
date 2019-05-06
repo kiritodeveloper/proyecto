@@ -347,7 +347,7 @@ def main(args):
             print(R2D2_detected, BB8_detected)
 
             turn_speed = 0.4
-            advance_time = 4
+            advance_time = 3.8
 
             # SALIR POR LA PUERTA CORRESPONDIENTE
             if BB8_detected and logo == 'BB8' and salida == 'A':
@@ -394,7 +394,7 @@ def main(args):
             robot.setSpeed(0.1, 0)
             time.sleep(advance_time)
             robot.setSpeed(0, -turn_speed)
-            time.sleep(3.93)
+            time.sleep(3.96)
             robot.setSpeed(0.1, 0)
             time.sleep(10)
 
