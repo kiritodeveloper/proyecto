@@ -108,17 +108,14 @@ class Robot:
             self.gyro_1_offset /= 10
             self.gyro_2_offset /= 10
 
-        print("Gyro 1 offset ", self.gyro_1_offset)
-        print("Gyro 2 offset ", self.gyro_2_offset)
+        # print("Gyro 1 offset ", self.gyro_1_offset)
+        # print("Gyro 2 offset ", self.gyro_2_offset)
 
         self.gyro_1_correction_factor = 0.17
         self.gyro_2_correction_factor = 0.11
 
         self.gyro_1_offset_correction_factor = 0
         self.gyro_2_offset_correction_factor = 0
-
-        # W wheels correction factor
-        self.linear_speed_correction_factor = 1
 
         # Sensors values history
         self.history_max_size = 5
@@ -155,13 +152,6 @@ class Robot:
         :param v: lineal speed in m/s
         :param w: angular speed in rad/s
         """
-
-        # print("setting speed to %.2f %.2f" % (v, w))
-
-        # with self.is_spinning.get_lock():
-        # self.is_spinning.value = w != 0
-        # self.is_spinning.value = w > 0.05
-
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
                              [1 / self.wheel_radius,
@@ -198,11 +188,8 @@ class Robot:
             self.history_dg_right.append(grad_der)
 
             # Suaviza los valores con la media
-            grad_izq = sum(self.history_dg_left) / self.history_max_size
-            grad_der = sum(self.history_dg_right) / self.history_max_size
-
-            rad_izq = math.radians(grad_izq) * self.linear_speed_correction_factor
-            rad_der = math.radians(grad_der) * self.linear_speed_correction_factor
+            rad_izq = math.radians(sum(self.history_dg_left) / self.history_max_size)
+            rad_der = math.radians(sum(self.history_dg_right) / self.history_max_size)
 
             last_timer = self.encoder_timer
             self.encoder_timer = time.time()
@@ -327,9 +314,6 @@ class Robot:
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
                 self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
 
-                #
-                # print("Valores giro", actual_value_gyro_1, actual_value_gyro_2, w)
-
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:
                 self.history_gyro_1.append(self.gyro_1_offset)
@@ -345,7 +329,6 @@ class Robot:
             th_odo.value = self.normalizeAngle(th)
             self.proximity.value = proximity
             self.lock_odometry.release()
-            # print("Actualizo odometria con: ", x, y, self.normalizeAngle(th))
 
             # Periodic task
             t_next_period += self.P
@@ -533,13 +516,13 @@ class Robot:
             else:
                 return False
 
-    def wait_for_position(self, x, y, position_error_margin):
+    def wait_for_position(self, x, y, position_error_margin, minimize_error=True):
         """
         Wait until the robot reaches the position
         :param x: x position to be reached
         :param y: y position to be reached
         :param position_error_margin: error allowed in the position
-        :param th_error_margin: error allowed in the orientation
+        :param minimize_error: if true, the loop will keep control until the last error is minor to actual error
         """
         [x_odo, y_odo, _] = self.readOdometry()
 
@@ -548,12 +531,21 @@ class Robot:
         # Repeat while error decrease
         last_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
         actual_error = last_error
-        while position_error_margin < actual_error:
-            last_error = actual_error
-            while last_error >= actual_error:
-                [x_odo, y_odo, _] = self.readOdometry()
+
+        if minimize_error:
+            # Minimize error
+            while position_error_margin < actual_error:
                 last_error = actual_error
-                actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+                while last_error >= actual_error:
+                    [x_odo, y_odo, _] = self.readOdometry()
+                    last_error = actual_error
+                    actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
+                    t_next_period += self.P
+                    delay_until(t_next_period)
+        else:
+            # Stop when be in error margin
+            while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
+                [x_odo, y_odo, _] = self.readOdometry()
                 t_next_period += self.P
                 delay_until(t_next_period)
 
@@ -620,9 +612,6 @@ class Robot:
 
         # Turn
         self.orientate(aligned_angle)
-
-        # Detect number of cells to jump
-        # cells_jump = round(math.sqrt(((final_x - x_actual) ** 2) + ((final_y - y_actual) ** 2)) / 0.4)
 
         # Detect wall
         if self.detectObstacle():
