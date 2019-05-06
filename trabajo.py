@@ -126,7 +126,7 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
-                pos4 = coord2Meters((5, 3, -1.39626))
+                pos4 = coord2Meters((5, 3, math.pi))
                 v = 0.15
                 w_parado = math.pi / 8
                 w_movimiento = -0.375
