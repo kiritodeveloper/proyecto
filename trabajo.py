@@ -275,6 +275,7 @@ def main(args):
 
             print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
             robot.go(cell_to_recognize[0], cell_to_recognize[1])
+            print('y me MARCHEEEEE')
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)
 
