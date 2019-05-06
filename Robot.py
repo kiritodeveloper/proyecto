@@ -609,9 +609,9 @@ class Robot:
 
     def go(self, x_goal, y_goal):
 
-        [x_actual, y_actual, _] = self.readOdometry()
+        [x_actual, y_actual, th_actual] = self.readOdometry()
 
-        print('Estoy en: ', x_actual, y_actual)
+        print('Estoy en: ', x_actual, y_actual, th_actual)
 
         # Obtain positions
         final_x = x_goal
