@@ -39,6 +39,23 @@ def plot_log_with_map(file_path, map_path):
 
     myMap.drawMapWithRobotLocations(robot_locations, saveSnapshot=True)
 
+def plot_log_with_map_path(path, map_path):
+    """
+    Read a path log file and plot it
+    :param file_path: Path log file path
+    """
+    myMap = Map2D(map_path)
+
+    robot_locations = []
+
+    for i in path:
+        x = float(i[0]) * 0.4 + 0.2
+        y = float(i[1]) * 0.4 + 0.2
+        th = float(0)
+        robot_locations = robot_locations + [[int(x * 1000), int(y * 1000), int(th * 1000)]]
+
+    myMap.drawMapWithRobotLocations(robot_locations, saveSnapshot=True)
+
 
 def start_robot_drawer(finished, robot):
     """
