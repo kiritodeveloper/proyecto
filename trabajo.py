@@ -138,7 +138,7 @@ def main(args):
 
             # Disable sensors
             robot.enableProximitySensor(False)
-            robot.enable_gyro_sensors(False)
+            robot.enableGyroSensors(False)
 
             # girar 90
             robot.setSpeed(0, w_parado)
@@ -146,13 +146,13 @@ def main(args):
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            robot.wait_for_position(pos2[0], pos2[1], 0.2, False)
-            # wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
+            #robot.wait_for_position(pos2[0], pos2[1], 0.2, False)
+            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            robot.wait_for_position(pos3[0], pos3[1], 0.2, False)
-            # wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
+            # robot.wait_for_position(pos3[0], pos3[1], 0.2, False)
+            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
@@ -188,7 +188,7 @@ def main(args):
             # Disable sensors
             # TODO: Enable gyro sensors
             robot.enableProximitySensor(True)
-            robot.enable_gyro_sensors(False)
+            robot.enableGyroSensors(True)
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
@@ -259,7 +259,7 @@ def main(args):
             # Disable sensors
             # TODO: Enable gyro sensors
             robot.enableProximitySensor(False)
-            robot.enable_gyro_sensors(False)
+            robot.enableGyroSensors(False)
 
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)
