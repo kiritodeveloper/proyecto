@@ -132,7 +132,8 @@ class Robot:
         self.is_spinning = Value('b', False)
 
         # Enable sensors
-        self.enable_sensors = Value('b', False)
+        self.enable_gyro_sensors = Value('b', False)
+        self.enable_proximity_sensor = Value('b', False)
 
         # Encoder timer
         self.encoder_timer = 0
@@ -141,9 +142,14 @@ class Robot:
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
-    def enableSensors(self, value):
+    def enableGyroSensors(self, value):
         self.lock_odometry.acquire()
-        self.enable_sensors.value = value
+        self.enable_gyro_sensors.value = value
+        self.lock_odometry.release()
+
+    def enableProximitySensor(self, value):
+        self.lock_odometry.acquire()
+        self.enable_proximity_sensor.value = value
         self.lock_odometry.release()
 
     def setSpeed(self, v, w):
@@ -214,17 +220,30 @@ class Robot:
 
         return v, w
 
-    def readSensors(self):
+    def readSensors(self, read_proximity=True, read_gyro=True):
         """
         Read both gyroscopes and proximity sensor
+        :param read_proximity: If false return 0 for proximity
+        :param read_gyro: If false return 255 for gyro
         :return: gyroscope_1, gyroscope_2, proximity
         """
-        self.history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
-        self.history_gyro_1.append(self.BP.get_sensor(self.BP.PORT_3)[0])
-        self.history_gyro_2.append(self.BP.get_sensor(self.BP.PORT_4)[0])
 
-        return sum(self.history_gyro_1) / self.history_max_size, sum(self.history_gyro_2) / self.history_max_size, sum(
-            self.history_proximity) / self.history_max_size
+        gyro_1 = 0
+        gyro_2 = 0
+
+        if read_gyro:
+            self.history_gyro_1.append(self.BP.get_sensor(self.BP.PORT_3)[0])
+            self.history_gyro_2.append(self.BP.get_sensor(self.BP.PORT_4)[0])
+
+            gyro_1, gyro_2 = sum(self.history_gyro_1) / self.history_max_size, sum(
+                self.history_gyro_2) / self.history_max_size
+
+        proximity = 255
+        if read_proximity:
+            self.history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
+            proximity = sum(self.history_proximity) / self.history_max_size
+
+        return gyro_1, gyro_2, proximity
 
     def readOdometry(self):
         """ Returns current value of odometry estimation """
@@ -294,17 +313,16 @@ class Robot:
             # Check if use sensors
             self.lock_odometry.acquire()
             is_spinning = self.is_spinning.value
-            enable_sensors = self.enable_sensors.value
+            enable_gyro_sensors = self.enable_gyro_sensors.value
+            enable_proximity_sensor = self.enable_proximity_sensor.value
             self.lock_odometry.release()
 
             # Get sensors data
-            if enable_sensors:
-                gyro_1, gyro_2, proximity = self.readSensors()
-            else:
-                gyro_1, gyro_2, proximity = 0, 0, 255
+            gyro_1, gyro_2, proximity = self.readSensors(read_proximity=enable_proximity_sensor,
+                                                         read_gyro=enable_gyro_sensors)
 
             # Obtain precise th
-            if is_spinning and enable_sensors:
+            if is_spinning and enable_gyro_sensors:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
                 actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
@@ -322,7 +340,7 @@ class Robot:
             # Update th
             th = th + d_t * w
 
-            # update odometry
+            # Update odometry
             self.lock_odometry.acquire()
             x_odo.value = x
             y_odo.value = y

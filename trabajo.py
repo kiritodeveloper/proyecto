@@ -136,17 +136,23 @@ def main(args):
             start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
             robot.startOdometry()
 
+            # Disable sensors
+            robot.enableProximitySensor(False)
+            robot.enable_gyro_sensors(False)
+
             # girar 90
             robot.setSpeed(0, w_parado)
             robot.wait_for_th(pos1[2], 0.02)
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos2[0], pos2[1], 0.2, False)
+            # wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos3[0], pos3[1], 0.2, False)
+            # wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
@@ -179,7 +185,10 @@ def main(args):
 
             primera = False
 
-            robot.enableSensors(True)
+            # Disable sensors
+            # TODO: Enable gyro sensors
+            robot.enableProximitySensor(True)
+            robot.enable_gyro_sensors(False)
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
@@ -247,7 +256,10 @@ def main(args):
 
             primera = False
 
-            robot.enableSensors(False)
+            # Disable sensors
+            # TODO: Enable gyro sensors
+            robot.enableProximitySensor(False)
+            robot.enable_gyro_sensors(False)
 
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)
@@ -283,8 +295,6 @@ def main(args):
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
-            R2D2_detected = False
-            BB8_detected = False
 
             R2D2_detected, R2D2_points = reco.search_img(R2D2)
             BB8_detected, BB8_points = reco.search_img(BB8)
