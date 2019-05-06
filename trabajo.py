@@ -152,7 +152,7 @@ def main(args):
             robot.setSpeed(0, 0)
 
             robot.setSpeed(0, -w_parado)
-            robot.wait_for_th(pos4[2], 0.025)
+            robot.wait_for_th(pos4[2], 0.01)
 
             # Me detengo
             robot.setSpeed(0, 0)
