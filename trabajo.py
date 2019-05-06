@@ -296,7 +296,7 @@ def main(args):
             robot.setSpeed(0, turn_speed)
             while previous_value >= new_value:
                 previous_value = new_value
-                [_,_,new_value] = robot.readSensors(True, False)
+                [_,_,new_value] = robot.readSensors()
                 print("new value", new_value)
 
             retro_value = 0.1
@@ -311,7 +311,7 @@ def main(args):
             robot.setSpeed(0, 0.4)
             time.sleep(5)
 
-            [_,_,previous_value] = robot.readSensors(True,False)
+            [_,_,previous_value] = robot.readSensors()
 
             time_retro = abs((60 - previous_value)) / retro_value
             if previous_value > 60:
