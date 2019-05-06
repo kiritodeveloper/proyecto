@@ -292,7 +292,7 @@ def main(args):
             robot.orientate(objective_angle)
             previous_value = 100
             new_value = 100
-            robot.setSpeed(turn_speed)
+            robot.setSpeed(0,turn_speed)
             while previous_value >= new_value:
                 previous_value = new_value
                 [_,_,new_value] = robot.readSensors(True,False)
