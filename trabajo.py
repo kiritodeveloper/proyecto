@@ -302,7 +302,7 @@ def main(args):
                 time.sleep(0.1)
 
             retro_value = 0.1
-            time_retro = abs((60 - previous_value)) / retro_value
+            time_retro = abs((0.6 - previous_value/100)) / retro_value
 
             print("tiempo", time_retro)
             if previous_value > 60:
