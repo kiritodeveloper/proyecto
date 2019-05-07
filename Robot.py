@@ -375,8 +375,6 @@ class Robot:
 
             # Periodic task
             t_next_period += self.P
-
-            print("Posicion", x, y, th)
             delay_until(t_next_period)
         sys.stdout.write("Stopping odometry ... X=  %d, \
                 Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
@@ -507,7 +505,11 @@ class Robot:
                         self.setSpeed(0, 0)
                         self.catch('down')
 
-                        self.setSpeed(0, 0.4)
+                        if salida == 'A':
+                            self.setSpeed(0, 0.4)
+                        else:
+                            self.setSpeed(0, -0.4)
+
                         time.sleep(5)
 
                         self.setSpeed(0, 0)
@@ -612,7 +614,7 @@ class Robot:
             last_error = actual_error
             while last_error >= actual_error:
                 [_, _, th_odo] = self.readOdometry()
-                # print("Tengo th: ", th_odo, " y busco: ", th)
+                #print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
                 t_next_period += self.P

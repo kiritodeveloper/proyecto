@@ -45,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'BB8'
 
 # DUBUG
-phase_from = 2
+phase_from = 4
 phase_to = 5
 
 
@@ -126,7 +126,7 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], 0)
                 pos2 = coord2Meters((5, 5, math.pi))
                 pos3 = coord2Meters((5, 3, 0))
-                pos4 = coord2Meters((5, 3, -1.39626))
+                pos4 = coord2Meters((5, 3, math.pi))
                 v = 0.15
                 w_parado = math.pi / 8
                 w_movimiento = -0.375
@@ -277,21 +277,66 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
+                turn_speed = 0.1
+                objective_angle = 5 * math.pi / 6
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right = coord2Meters([6, 7, 0])
             else:
+                turn_speed = -0.1
+                objective_angle = math.pi / 5
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left = coord2Meters([0, 7, 0])
                 cell_to_exit_right = coord2Meters([3, 7, 0])
 
-            print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
-            robot.go(cell_to_recognize[0], cell_to_recognize[1])
-            print('y me MARCHEEEEE')
+            robot.enableProximitySensor(True)
+            robot.orientate(objective_angle)
+            robot.setSpeed(0, 0)
+            previous_value = 1000
+            new_value = 1000
+            robot.setSpeed(0, turn_speed)
+            while previous_value >= new_value:
+                previous_value = new_value
+                [_,_,new_value] = robot.readSensors()
+                print("new value", new_value)
+                time.sleep(0.1)
+
+            retro_value = 0.1
+            time_retro = abs((0.55 - previous_value/100)) / retro_value
+
+            print("tiempo", time_retro)
+            if previous_value > 55:
+                robot.setSpeed(retro_value, 0)
+            else:
+                robot.setSpeed(-retro_value, 0)
+            time.sleep(time_retro)
+
+            robot.setSpeed(0, -turn_speed * 4)
+            time.sleep(5.2)
+
+            robot.setSpeed(0, 0)
+            for i in range(1,20):
+                [_,_,previous_value] = robot.readSensors()
+
+            print("previous value",previous_value)
+
+            time_retro = abs((0.55 - previous_value/100)) / retro_value
+            print("tiempo",time_retro)
+            if previous_value > 55:
+                robot.setSpeed(retro_value, 0)
+            else:
+                robot.setSpeed(-retro_value, 0)
+            time.sleep(time_retro)
+            robot.setSpeed(0, 0)
+            #print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
+            #robot.go(cell_to_recognize[0], cell_to_recognize[1])
+            #print('y me MARCHEEEEE')
+
+
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)
 
-            robot.orientate(math.pi / 2)
+            #robot.orientate(math.pi / 2)
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
@@ -301,37 +346,57 @@ def main(args):
 
             print(R2D2_detected, BB8_detected)
 
+            turn_speed = 0.4
+            advance_time = 3.8
+
             # SALIR POR LA PUERTA CORRESPONDIENTE
             if BB8_detected and logo == 'BB8' and salida == 'A':
                 print('1')
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
             elif R2D2_detected and logo == 'BB8' and salida == 'A':
                 print('2')
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                turn_speed = -turn_speed
+                advance_time = advance_time * 2
+                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
             elif R2D2_detected and logo == 'R2D2' and salida == 'A':
                 print('3')
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
             elif BB8_detected and logo == 'R2D2' and salida == 'A':
                 print('4')
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                turn_speed = -turn_speed
+                advance_time = advance_time * 2
             elif BB8_detected and logo == 'BB8' and salida == 'B':
                 print('5')
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                turn_speed = -turn_speed
             elif R2D2_detected and logo == 'BB8' and salida == 'B':
                 print('6')
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                advance_time = advance_time * 2
             elif R2D2_detected and logo == 'R2D2' and salida == 'B':
                 print('7')
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                turn_speed = - turn_speed
             elif BB8_detected and logo == 'R2D2' and salida == 'B':
                 print('8')
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                advance_time = advance_time * 2
 
             # Avanza un poco hacia delante para cruzar la linea de meta
-            robot.orientate(math.pi / 2)
-            robot.setSpeed(0.2, 0)
-            time.sleep(2)
-            robot.setSpeed(0, 0)
+            #robot.orientate(math.pi / 2)
+            #robot.setSpeed(0.2, 0)
+            #time.sleep(2)
+            #robot.setSpeed(0, 0)
+
+            robot.setSpeed(0, turn_speed)
+            time.sleep(3.93)
+            robot.setSpeed(0.1, 0)
+            time.sleep(advance_time)
+            robot.setSpeed(0, -turn_speed)
+            time.sleep(3.96)
+            robot.setSpeed(0.1, 0)
+            time.sleep(10)
 
         robot.stopOdometry()
 
@@ -349,6 +414,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapaB.txt")
+                        default="./maps/mapaA.txt")
     args = parser.parse_args()
     main(args)
