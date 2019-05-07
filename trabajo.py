@@ -281,7 +281,11 @@ def main(args):
                 objective_angle = 5 * math.pi / 6
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
-                cell_to_exit_right = coord2Meters([6, 7, 0])
+                cell_to_exit_right_1 = coord2Meters([5, 6, 0])
+                cell_to_exit_right_2 = coord2Meters([6, 6, 0])
+                cell_to_exit_right_3 = coord2Meters([6, 7, 0])
+
+
             else:
                 turn_speed = -0.1
                 objective_angle = math.pi / 5
@@ -375,7 +379,9 @@ def main(args):
                 print('2')
                 #turn_speed = -turn_speed
                 #advance_time = advance_time * 2
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                robot.go(cell_to_exit_right_1[0], cell_to_exit_right_1[1])
+                robot.go(cell_to_exit_right_2[0], cell_to_exit_right_2[1])
+                robot.go(cell_to_exit_right_3[0], cell_to_exit_right_3[1])
             elif R2D2_detected and logo == 'R2D2' and salida == 'A':
                 print('3')
                 #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
