@@ -296,15 +296,21 @@ def main(args):
             new_value = 1000
             robot.setSpeed(0, turn_speed)
             idem = 0
+            previousDifferent = True
             while previous_value >= new_value:
                 previous_value = new_value
                 if previous_value == new_value:
+                    previousDifferent = False
                     idem = idem + 1
-                else:
+                elif previousDifferent:
                     idem = 0
+                else:
+                    previousDifferent = True
                 [_,_,new_value] = robot.readSensors()
                 print("new value", new_value)
                 time.sleep(0.1)
+
+            print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
             time.sleep(0.1 * idem / 2)
