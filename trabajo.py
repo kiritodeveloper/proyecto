@@ -346,7 +346,7 @@ def main(args):
             time.sleep(time_retro)
             """
             robot.setSpeed(0, 0)
-            #print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
+            print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
             robot.go(cell_to_recognize[0], cell_to_recognize[1])
             #print('y me MARCHEEEEE')
 
