@@ -290,7 +290,9 @@ def main(args):
                 turn_speed = -0.1
                 objective_angle = math.pi / 5
                 cell_to_recognize = coord2Meters([2, 6, 0])
-                cell_to_exit_left = coord2Meters([0, 7, 0])
+                cell_to_exit_left_1 = coord2Meters([1, 6, 0])
+                cell_to_exit_left_2 = coord2Meters([0, 6, 0])
+                cell_to_exit_left_3 = coord2Meters([0, 7, 0])
                 cell_to_exit_right = coord2Meters([3, 7, 0])
 
             robot.enableProximitySensor(True)
@@ -384,30 +386,38 @@ def main(args):
                 robot.go(cell_to_exit_right_3[0], cell_to_exit_right_3[1])
             elif R2D2_detected and logo == 'R2D2' and salida == 'A':
                 print('3')
-                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
             elif BB8_detected and logo == 'R2D2' and salida == 'A':
                 print('4')
-                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                robot.go(cell_to_exit_right_1[0], cell_to_exit_right_1[1])
+                robot.go(cell_to_exit_right_2[0], cell_to_exit_right_2[1])
+                robot.go(cell_to_exit_right_3[0], cell_to_exit_right_3[1])
                 turn_speed = -turn_speed
                 advance_time = advance_time * 2
             elif BB8_detected and logo == 'BB8' and salida == 'B':
                 print('5')
-                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
                 turn_speed = -turn_speed
             elif R2D2_detected and logo == 'BB8' and salida == 'B':
                 print('6')
-                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                robot.go(cell_to_exit_left_1[0], cell_to_exit_left_1[1])
+                robot.go(cell_to_exit_left_2[0], cell_to_exit_left_2[1])
+                robot.go(cell_to_exit_left_3[0], cell_to_exit_left_3[1])
                 advance_time = advance_time * 2
             elif R2D2_detected and logo == 'R2D2' and salida == 'B':
                 print('7')
-                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
                 turn_speed = - turn_speed
             elif BB8_detected and logo == 'R2D2' and salida == 'B':
                 print('8')
-                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                robot.go(cell_to_exit_left_1[0], cell_to_exit_left_1[1])
+                robot.go(cell_to_exit_left_2[0], cell_to_exit_left_2[1])
+                robot.go(cell_to_exit_left_3[0], cell_to_exit_left_3[1])
                 advance_time = advance_time * 2
-            else:
+            elif salida == 'A':
                 robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+            else:
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
             # Avanza un poco hacia delante para cruzar la linea de meta
             robot.orientate(math.pi / 2)
