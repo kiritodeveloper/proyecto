@@ -240,6 +240,8 @@ def main(args):
 
         # COGER PELOTA -> FASE 4
 
+        [x, y, th] = robot.readOdometry()
+        print("Estoy principio 4", x, y, th)
         if phase_from <= 4 and 4 <= phase_to:
             if primera:
                 if salida is 'A':
@@ -272,6 +274,8 @@ def main(args):
             print('Supongo que la camara esta apagada')
 
         # RECONOCIMIENTO -> FASE 5
+        [x, y, th] = robot.readOdometry()
+        print("Principio de la 5",x, y, th)
         if phase_from <= 5 and 5 <= phase_to:
             # TODO si es la primera activar odometria y demas
             # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
