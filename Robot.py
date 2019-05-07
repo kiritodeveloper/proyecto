@@ -135,6 +135,9 @@ class Robot:
         self.enable_gyro_sensors = Value('b', False)
         self.enable_proximity_sensor = Value('b', False)
 
+        # Is spinning
+        self.odometry_reseted = Value('b', False)
+
         # Encoder timer
         self.encoder_timer = 0
 
@@ -276,6 +279,23 @@ class Robot:
         # because they are part of the class, so visible within updateOdometry in any case,
         # but it's just to show an example of process receiving params
 
+    def resetOdometry(self, x_new, y_new, th_new):
+        x, y, th = self.readOdometry()
+
+        if x_new is not None:
+            x = x_new
+        if y_new is not None:
+            y = y_new
+        if th_new is not None:
+            th = th_new
+
+        self.lock_odometry.acquire()
+        self.x.value = x
+        self.y.value = y
+        self.th.value = th
+        self.odometry_reseted.value = True
+        self.lock_odometry.release()
+
     # You may want to pass additional shared variables besides the odometry values and stop flag
     def updateOdometry(self, x_odo, y_odo, th_odo, finished):
         """
@@ -342,14 +362,21 @@ class Robot:
 
             # Update odometry
             self.lock_odometry.acquire()
-            x_odo.value = x
-            y_odo.value = y
-            th_odo.value = self.normalizeAngle(th)
+            if not self.odometry_reseted.value:
+                x_odo.value = x
+                y_odo.value = y
+                th_odo.value = self.normalizeAngle(th)
+            else:
+                # In case odometry is reseted, jump this updating period
+                self.odometry_reseted.value = False
+
             self.proximity.value = proximity
             self.lock_odometry.release()
 
             # Periodic task
             t_next_period += self.P
+
+            print("Posicion", x, y, th)
             delay_until(t_next_period)
         sys.stdout.write("Stopping odometry ... X=  %d, \
                 Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
@@ -585,7 +612,7 @@ class Robot:
             last_error = actual_error
             while last_error >= actual_error:
                 [_, _, th_odo] = self.readOdometry()
-                print("Tengo th: ", th_odo, " y busco: ", th)
+                # print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
                 t_next_period += self.P

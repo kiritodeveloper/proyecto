@@ -37,7 +37,7 @@ from reco import Reco
 # 4 -> COGER PELOTA
 # 5 -> RECONOCER Y SALIR
 
-salida = 'B'
+salida = 'A'
 sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2

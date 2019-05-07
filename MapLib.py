@@ -47,8 +47,8 @@ class Map2D:
         self.costMatrix = None
         self.currentPath = None
 
-        self.neighbor = np.array([[1, 1, 0, -1, -1, -1, 0, 1],  # row index
-                                  [0, 1, 1, 1, 0, -1, -1, -1]])  # column index
+        self.neighbor = np.array([[1, 0, -1, 0],  # row index
+                                  [0, 1, 0, -1]])  # column index
         self.sizeXExtended = 0
         self.sizeYExtended = 0
 
@@ -357,7 +357,7 @@ class Map2D:
     def propagateWavefront(self, grid, origin):
         numberUpdates = 0
         cellsUpdated = []
-        for i in range(0, 8):
+        for i in range(4):
             x, y = (origin[0] + self.neighbor[0][i], origin[1] + self.neighbor[1][i])
             if 0 <= x < 2 * self.sizeX + 1 and 0 <= y < 2 * self.sizeY + 1:
                 updated = False
@@ -377,7 +377,7 @@ class Map2D:
     def incrementWavefront(self, cells_updated, grid):
         new_wavefront = []
         for cell in cells_updated:
-            for i in range(0, 8):
+            for i in range(4):
                 x, y = (cell[0] + self.neighbor[0][i], cell[1] + self.neighbor[1][i])
                 if 0 <= x < 2 * self.sizeX + 1 and 0 <= y < 2 * self.sizeY + 1 and grid[x, y] != -1:
                     if grid[x, y] == grid[cell[0]][cell[1]] + 1:
@@ -418,10 +418,13 @@ class Map2D:
         """
         Return an array with the path is found or None if not
         """
-        def findPath_recursive(cost_matrix, x_ini_ext, y_ini_ext):
+
+        def findPath_recursive(cost_matrix, x_ini_ext, y_ini_ext, orientation):
             """
             x_ini, y_ini, x_end, y_end: integer values that indicate \
                 the x and y coordinates of the starting (ini) and ending (end) cell
+            if orientation is true, we are following a horizontal line, else we are following a vertical line
+            else we are
             """
             if cost_matrix[x_ini_ext, y_ini_ext] == -1:
                 # Never should go into
@@ -429,7 +432,7 @@ class Map2D:
             elif cost_matrix[x_ini_ext, y_ini_ext] == 0:
                 return [(x_ini_ext, y_ini_ext)]
             else:
-                best_step = None
+                posible_steps = []
                 low_path = 10000000  # If we increase the map we should change this value
                 for i in [[0, 1], [0, -1], [1, 0], [-1, 0]]:
                     # 4 neighbours
@@ -437,21 +440,23 @@ class Map2D:
 
                     if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
                             and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
-                        best_step = [next_mov_x, next_mov_y]
+                        posible_steps[:] = []
+                        posible_steps.append([next_mov_x, next_mov_y])
                         low_path = cost_matrix[next_mov_x, next_mov_y]
+                    elif self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
+                            and low_path == cost_matrix[next_mov_x, next_mov_y] > -1:
+                        posible_steps.append([next_mov_x, next_mov_y])
 
-                # 8 neighbours
-                # for i in [[1, -1], [1, 1], [-1, 1], [-1, -1]]:
-                #    if (cost_matrix[x_ini_ext + i[0], y_ini_ext] != -1) and (
-                #            cost_matrix[x_ini_ext, y_ini_ext + i[1]] != -1):
-                #        next_mov_x, next_mov_y = [i[0] + x_ini_ext, i[1] + y_ini_ext]
-                #
-                #        if self.sizeXExtended > next_mov_x >= 0 and self.sizeYExtended > next_mov_y >= 0 \
-                #                and low_path > cost_matrix[next_mov_x, next_mov_y] > -1:
-                #            best_step = [next_mov_x, next_mov_y]
-                #            low_path = cost_matrix[next_mov_x, next_mov_y]
+                if len(posible_steps) == 2:
+                    if (posible_steps[0][1] == y_ini_ext and orientation) or (
+                            posible_steps[0][0] == x_ini_ext and not orientation):
+                        best_step = posible_steps[0]
+                    else:
+                        best_step = posible_steps[1]
+                else:
+                    best_step = posible_steps[0]
 
-                next_steps = findPath_recursive(cost_matrix, best_step[0], best_step[1])
+                next_steps = findPath_recursive(cost_matrix, best_step[0], best_step[1], y_ini_ext == best_step[1])
 
                 if next_steps is None:
                     return None
@@ -463,7 +468,7 @@ class Map2D:
         x_ini_ext = 2 * x_ini + 1
         y_ini_ext = 2 * y_ini + 1
 
-        path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext)
+        path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext, False)
         print('El path es: ', path)
         path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
 
