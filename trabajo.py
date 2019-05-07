@@ -337,6 +337,8 @@ def main(args):
             else:
                 robot.resetOdometry(1, None, 0)
 
+            [x, y, th] = robot.readOdometry()
+            print("Ajustadas x e y", x, y, th, math.pi/2)
             robot.orientate(math.pi/2)
 
             robot.setSpeed(0, 0)
