@@ -45,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'BB8'
 
 # DUBUG
-phase_from = 2
+phase_from = 4
 phase_to = 5
 
 
