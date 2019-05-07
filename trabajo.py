@@ -321,8 +321,12 @@ def main(args):
                 robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
 
-            robot.setSpeed(0, -turn_speed * 4)
-            time.sleep(3.93)
+            if salida == 'A':
+                robot.resetOdometry(1.8, None, math.pi)
+            else:
+                robot.resetOdometry(1, None, 0)
+
+            robot.orientate(math.pi/2)
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
@@ -330,23 +334,27 @@ def main(args):
 
             print("previous value",previous_value)
 
+            robot.resetOdometry(None, 2.4-previous_value/100, None)
+
             time_retro = abs((0.55 - previous_value/100)) / retro_value
+            """
             print("tiempo",time_retro)
             if previous_value > 55:
                 robot.setSpeed(retro_value, 0)
             else:
                 robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
+            """
             robot.setSpeed(0, 0)
             #print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
-            #robot.go(cell_to_recognize[0], cell_to_recognize[1])
+            robot.go(cell_to_recognize[0], cell_to_recognize[1])
             #print('y me MARCHEEEEE')
 
 
 
             # ORIENTARSE HACIA ARRIBA (mirando al frente)
 
-            #robot.orientate(math.pi / 2)
+            robot.orientate(math.pi / 2)
 
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
@@ -362,12 +370,12 @@ def main(args):
             # SALIR POR LA PUERTA CORRESPONDIENTE
             if BB8_detected and logo == 'BB8' and salida == 'A':
                 print('1')
-                #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
             elif R2D2_detected and logo == 'BB8' and salida == 'A':
                 print('2')
-                turn_speed = -turn_speed
-                advance_time = advance_time * 2
-                #robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
+                #turn_speed = -turn_speed
+                #advance_time = advance_time * 2
+                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
             elif R2D2_detected and logo == 'R2D2' and salida == 'A':
                 print('3')
                 #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
@@ -394,11 +402,12 @@ def main(args):
                 advance_time = advance_time * 2
 
             # Avanza un poco hacia delante para cruzar la linea de meta
-            #robot.orientate(math.pi / 2)
-            #robot.setSpeed(0.2, 0)
-            #time.sleep(2)
-            #robot.setSpeed(0, 0)
+            robot.orientate(math.pi / 2)
+            robot.setSpeed(0.1, 0)
+            time.sleep(4)
+            robot.setSpeed(0, 0)
 
+            '''
             robot.setSpeed(0, turn_speed)
             time.sleep(3.93)
             robot.setSpeed(0.1, 0)
@@ -407,6 +416,7 @@ def main(args):
             time.sleep(3.96)
             robot.setSpeed(0.1, 0)
             time.sleep(10)
+            '''
 
         robot.stopOdometry()
 
