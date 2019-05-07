@@ -466,7 +466,7 @@ class Robot:
 
         recognition_sample_period = 0.2
 
-        last_x = 0
+        last_x = -10
 
         while not finished:
             x, y, size = frame_capturer.getPosition()
@@ -474,10 +474,18 @@ class Robot:
             # 1. search the most promising blob ..
             # Find promising blob
             print("last_x valor", last_x)
-            if last_x < 160:
+            if last_x == -10:
                 self.setSpeed(recognition_v, recognition_w)
+            elif last_x < 160:
+                if salida == "A":
+                    self.setSpeed(recognition_v, -recognition_w)
+                else:
+                    self.setSpeed(recognition_v, recognition_w)
             else:
-                self.setSpeed(recognition_v, -recognition_w)
+                if salida == "A":
+                    self.setSpeed(recognition_v, recognition_w)
+                else:
+                    self.setSpeed(recognition_v, -recognition_w)
 
             while size == 0:
                 # While not promising blob found
