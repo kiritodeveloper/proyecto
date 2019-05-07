@@ -157,6 +157,9 @@ def main(args):
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
+            robot.enableProximitySensor(True)
+            robot.enableGyroSensors(True)
+
             robot.setSpeed(0, -w_parado)
             robot.wait_for_th(pos4[2], 0.02)
 
@@ -187,8 +190,6 @@ def main(args):
 
             # Disable sensors
             # TODO: Enable gyro sensors
-            robot.enableProximitySensor(True)
-            robot.enableGyroSensors(True)
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
