@@ -334,7 +334,7 @@ def main(args):
 
             print("previous value",previous_value)
 
-            robot.resetOdometry(None, 2.4-previous_value/100, None)
+            robot.resetOdometry(None, 3.2-previous_value/100, None)
 
             time_retro = abs((0.55 - previous_value/100)) / retro_value
             """
