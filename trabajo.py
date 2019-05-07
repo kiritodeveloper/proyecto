@@ -238,10 +238,11 @@ def main(args):
             time.sleep(2)
             robot.setSpeed(0, 0)
 
+            [x, y, th] = robot.readOdometry()
+            print("Estoy principio 4", x, y, th)
         # COGER PELOTA -> FASE 4
 
-        [x, y, th] = robot.readOdometry()
-        print("Estoy principio 4", x, y, th)
+
         if phase_from <= 4 and 4 <= phase_to:
             if primera:
                 if salida is 'A':
