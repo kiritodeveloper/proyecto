@@ -473,6 +473,7 @@ class Robot:
 
             # 1. search the most promising blob ..
             # Find promising blob
+            print("last_x valor", last_x)
             if last_x < 160:
                 self.setSpeed(recognition_v, recognition_w)
             else:
