@@ -333,7 +333,7 @@ def main(args):
             time.sleep(time_retro)
 
             if salida == 'A':
-                robot.resetOdometry(1.8, None, math.pi)
+                robot.resetOdometry(1.8, None, math.pi-0.001)
             else:
                 robot.resetOdometry(1, None, 0)
 
