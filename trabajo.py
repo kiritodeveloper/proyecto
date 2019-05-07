@@ -295,11 +295,19 @@ def main(args):
             previous_value = 1000
             new_value = 1000
             robot.setSpeed(0, turn_speed)
+            idem = 0
             while previous_value >= new_value:
                 previous_value = new_value
+                if previous_value == new_value:
+                    idem = idem + 1
+                else:
+                    idem = 0
                 [_,_,new_value] = robot.readSensors()
                 print("new value", new_value)
                 time.sleep(0.1)
+
+            robot.setSpeed(0, -turn_speed)
+            time.sleep(0.1 * idem / 2)
 
             retro_value = 0.1
             time_retro = abs((0.55 - previous_value/100)) / retro_value
@@ -312,7 +320,7 @@ def main(args):
             time.sleep(time_retro)
 
             robot.setSpeed(0, -turn_speed * 4)
-            time.sleep(5.2)
+            time.sleep(3.93)
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
