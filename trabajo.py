@@ -45,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'BB8'
 
 # DUBUG
-phase_from = 4
+phase_from = 1
 phase_to = 5
 
 
@@ -400,6 +400,8 @@ def main(args):
                 print('8')
                 #robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
                 advance_time = advance_time * 2
+            else:
+                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
 
             # Avanza un poco hacia delante para cruzar la linea de meta
             robot.orientate(math.pi / 2)
@@ -407,16 +409,6 @@ def main(args):
             time.sleep(4)
             robot.setSpeed(0, 0)
 
-            '''
-            robot.setSpeed(0, turn_speed)
-            time.sleep(3.93)
-            robot.setSpeed(0.1, 0)
-            time.sleep(advance_time)
-            robot.setSpeed(0, -turn_speed)
-            time.sleep(3.96)
-            robot.setSpeed(0.1, 0)
-            time.sleep(10)
-            '''
 
         robot.stopOdometry()
 
