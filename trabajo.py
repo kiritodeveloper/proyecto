@@ -202,19 +202,19 @@ def main(args):
 
             while len(route) > 0:
                 goal = route.pop(0)
-                print('Ruta', route)
+                #print('Ruta', route)
                 partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell / 1000.0
                 partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell / 1000.0
-                print('Partials: ', partial_goal_x, partial_goal_y)
-                print('El goal: ', goal)
-                print('Estoy: ', robot.readOdometry())
+                #print('Partials: ', partial_goal_x, partial_goal_y)
+                #print('El goal: ', goal)
+                #print('Estoy: ', robot.readOdometry())
                 no_obstacle = robot.go(partial_goal_x, partial_goal_y)
                 x_odo, y_odo, th_odo = robot.readOdometry()
                 if not no_obstacle:
                     # There are a obstacle
                     print('Obstacle detected')
                     x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
-                    print('ODOMETRIIIA:', x, y, th)
+                    #print('ODOMETRIIIA:', x, y, th)
                     # Delete connections from detected wall
                     myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
                     myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
@@ -278,7 +278,7 @@ def main(args):
 
             if salida is 'A':
                 turn_speed = 0.1
-                objective_angle = 5 * math.pi / 6
+                objective_angle = 9 * math.pi / 10
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right_1 = coord2Meters([5, 6, 0])
@@ -288,7 +288,7 @@ def main(args):
 
             else:
                 turn_speed = -0.1
-                objective_angle = math.pi / 5
+                objective_angle = math.pi / 10
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
                 cell_to_exit_left_2 = coord2Meters([0, 6, 0])
