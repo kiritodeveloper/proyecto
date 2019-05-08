@@ -290,6 +290,7 @@ def main(args):
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right_1 = coord2Meters([5, 6, 0])
                 cell_to_exit_right_2 = coord2Meters([6, 6, 0])
+                cell_to_exit_right_2[0] = cell_to_exit_right_2[0] + 0.1
                 cell_to_exit_right_3 = coord2Meters([6, 7, 0])
 
 
