@@ -92,7 +92,7 @@ class Map2D:
             mapF = open(mapFileName, "r")
 
             # 1. special case for first line. initialize dimX dimY cellSize
-            header = mapF.next()
+            header = next(mapF)
             tmp = header.split()  # any whitespace string is a separator and empty strings are removed from the result
             if self.verbose:
                 print("Header line: %s " % header)
@@ -410,8 +410,7 @@ class Map2D:
             if numberUpdates == 0:
                 finished = True
             wavefront = self.incrementWavefront(wavefront, grid)
-            wavefront = list(set(wavefront))
-            #print(wavefront)
+        print(wavefront)
         self.costMatrix = grid
 
     def findPath(self, x_ini, y_ini, x_end, y_end):
@@ -470,7 +469,8 @@ class Map2D:
 
         path = findPath_recursive(self.costMatrix, x_ini_ext, y_ini_ext, False)
         print('El path es: ', path)
-        path = map(lambda (x, y): (int((x - 1) / 2), int((y - 1) / 2)), path)
+
+        path = map(lambda next_pos: (int((next_pos[0] - 1) / 2), int((next_pos[1] - 1) / 2)), path)
 
         last = None
         path_to_return = []
