@@ -190,7 +190,7 @@ def main(args):
             # Disable sensors
             # TODO: Enable gyro sensors
             robot.enableProximitySensor(True)
-            robot.enableGyroSensors(False)
+            robot.enableGyroSensors(True)
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
@@ -288,6 +288,7 @@ def main(args):
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
+                cell_to_exit_left[0] = cell_to_exit_left[0] - 0.1
                 cell_to_exit_right_1 = coord2Meters([5, 6, 0])
                 cell_to_exit_right_2 = coord2Meters([6, 6, 0])
                 cell_to_exit_right_2[0] = cell_to_exit_right_2[0] + 0.05
@@ -442,7 +443,7 @@ def main(args):
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate(math.pi / 2)
             robot.setSpeed(0.4, 0)
-            time.sleep(3)
+            time.sleep(1.5)
             robot.setSpeed(0, 0)
 
 
