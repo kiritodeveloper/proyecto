@@ -157,6 +157,8 @@ def main(args):
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
+            robot.resetOdometry(None, None, math.pi)
+
             robot.setSpeed(0, -w_parado)
             robot.wait_for_th(pos4[2], 0.02)
 
@@ -320,7 +322,7 @@ def main(args):
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.1 * idem / 2)
+            time.sleep(0.1 * 2 * idem / 3)
 
             retro_value = 0.1
             time_retro = abs((0.55 - previous_value/100)) / retro_value
