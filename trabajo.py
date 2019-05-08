@@ -42,7 +42,7 @@ sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
 
-logo = 'BB8'
+logo = 'R2D2'
 
 # DUBUG
 phase_from = 2
@@ -439,10 +439,10 @@ def main(args):
             else:
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
-            # Avanza un poco hacia delante para cruzar la linea de meta
+            # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate(math.pi / 2)
-            robot.setSpeed(0.1, 0)
-            time.sleep(4)
+            robot.setSpeed(0.4, 0)
+            time.sleep(3)
             robot.setSpeed(0, 0)
 
 
