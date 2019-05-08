@@ -310,7 +310,7 @@ def main(args):
             idem = 0
 
             robot.setSpeed(0, 0)
-            for i in range(1, 20):
+            for i in range(1, 5):
                 [_, _, new_value] = robot.readSensors()
 
             new_value = 1000
