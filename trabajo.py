@@ -319,6 +319,7 @@ def main(args):
                     idem = 0
                     previous_value = new_value
                 [_,_,new_value] = robot.readSensors()
+                new_value = math.floor(new_value)
                 print("new value", new_value)
                 time.sleep(0.1)
 
