@@ -353,7 +353,7 @@ def main(args):
 
             [x, y, th] = robot.readOdometry()
             print("Ajustadas x e y", x, y, th, math.pi/2)
-            robot.orientate(math.pi/2 - turn_speed)
+            robot.orientate((math.pi/2) - turn_speed)
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
@@ -441,7 +441,7 @@ def main(args):
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
-            robot.orientate(math.pi / 2)
+            robot.orientate((math.pi / 2) - 0.1)
             robot.setSpeed(0.4, 0)
             time.sleep(1.5)
             robot.setSpeed(0, 0)
