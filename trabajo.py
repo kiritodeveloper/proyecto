@@ -285,7 +285,7 @@ def main(args):
 
             if salida is 'A':
                 turn_speed = 0.1
-                objective_angle = 9 * math.pi / 10
+                objective_angle = 2 * math.pi / 3
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right_1 = coord2Meters([5, 6, 0])
@@ -295,7 +295,7 @@ def main(args):
 
             else:
                 turn_speed = -0.1
-                objective_angle = math.pi / 10
+                objective_angle = math.pi / 3
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
                 cell_to_exit_left_2 = coord2Meters([0, 6, 0])
@@ -319,10 +319,12 @@ def main(args):
                 print("new value", new_value)
                 time.sleep(0.1)
 
+            idem = idem + 1
+
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.1 * 2 * idem / 3)
+            time.sleep(0.1 *  idem)
 
             retro_value = 0.1
             time_retro = abs((0.55 - previous_value/100)) / retro_value
