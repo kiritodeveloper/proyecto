@@ -9,7 +9,6 @@ import math
 import matplotlib
 from config_file import is_debug
 
-
 matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
@@ -78,7 +77,7 @@ def main(args):
                 # There are a obstacle
                 print('Obstacle detected')
                 x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
-                print('ODOMETRIIIA:' ,x,y,th)
+                print('ODOMETRIIIA:', x, y, th)
                 # Delete connections from detected wall
                 myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
                 myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
@@ -94,7 +93,7 @@ def main(args):
         else:
             print('Can\'t reached the goal')
 
-        myMap.drawMapWithRobotLocations(robot_locations)
+        # myMap.drawMapWithRobotLocations(robot_locations)
 
         robot.stopOdometry()
 
@@ -110,6 +109,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapa_debug.txt")
+                        default="./maps/mapa3.txt")
     args = parser.parse_args()
     main(args)
