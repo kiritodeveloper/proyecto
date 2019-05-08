@@ -285,7 +285,7 @@ def main(args):
 
             if salida is 'A':
                 turn_speed = 0.1
-                objective_angle = 2 * math.pi / 3
+                objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right_1 = coord2Meters([5, 6, 0])
@@ -295,7 +295,7 @@ def main(args):
 
             else:
                 turn_speed = -0.1
-                objective_angle = math.pi / 3
+                objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
                 cell_to_exit_left_2 = coord2Meters([0, 6, 0])
@@ -349,7 +349,7 @@ def main(args):
             for i in range(1,20):
                 [_,_,previous_value] = robot.readSensors()
 
-            print("previous value",previous_value)
+            print("previous value", previous_value)
 
             robot.resetOdometry(None, 3.2-previous_value/100, None)
 
