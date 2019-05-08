@@ -98,8 +98,10 @@ class Robot:
 
             # Gyro sensor offset and calibration
             time.sleep(0.5)
-            self.gyro_1_offset = 0
-            self.gyro_2_offset = 0
+            self.gyro_1_offset = 2325
+            self.gyro_2_offset = 2367
+
+        """
             for i in range(10):
                 self.gyro_1_offset += self.BP.get_sensor(self.BP.PORT_3)[0]
                 self.gyro_2_offset += self.BP.get_sensor(self.BP.PORT_4)[0]
@@ -107,12 +109,13 @@ class Robot:
 
             self.gyro_1_offset /= 10
             self.gyro_2_offset /= 10
+        """
 
         # print("Gyro 1 offset ", self.gyro_1_offset)
         # print("Gyro 2 offset ", self.gyro_2_offset)
 
-        self.gyro_1_correction_factor = 0.17
-        self.gyro_2_correction_factor = 0.11
+        self.gyro_1_correction_factor = 0.14
+        self.gyro_2_correction_factor = 0.135
 
         self.gyro_1_offset_correction_factor = 0
         self.gyro_2_offset_correction_factor = 0
@@ -346,11 +349,13 @@ class Robot:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
                 actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
-                self.gyro_1_offset += (actual_value_gyro_1 * self.gyro_1_offset_correction_factor * d_t)
+                #self.gyro_1_offset += (actual_value_gyro_1 * self.gyro_1_offset_correction_factor * d_t)
 
                 # Sensor 2
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
-                self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
+                #self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
+
+                print(w, actual_value_gyro_1, actual_value_gyro_2)
 
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:
@@ -623,7 +628,7 @@ class Robot:
             last_error = actual_error
             while last_error >= actual_error:
                 [_, _, th_odo] = self.readOdometry()
-                #print("Tengo th: ", th_odo, " y busco: ", th)
+                # print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
                 t_next_period += self.P
