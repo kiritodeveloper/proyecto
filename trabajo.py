@@ -338,6 +338,8 @@ def main(args):
 
             robot.setSpeed(0, 0)
 
+            time.sleep(0.3)
+
             if salida == 'A':
                 robot.resetOdometry(1.8, None, math.pi-0.001)
             else:
