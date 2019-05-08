@@ -190,7 +190,7 @@ def main(args):
             # Disable sensors
             # TODO: Enable gyro sensors
             robot.enableProximitySensor(True)
-            robot.enableGyroSensors(True)
+            robot.enableGyroSensors(False)
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
@@ -264,7 +264,7 @@ def main(args):
             # Disable sensors
             # TODO: Enable gyro sensors
             robot.enableProximitySensor(False)
-            robot.enableGyroSensors(True)
+            robot.enableGyroSensors(False)
 
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)
