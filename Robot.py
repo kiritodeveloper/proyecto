@@ -518,7 +518,9 @@ class Robot:
                     if size > 110:
                         self.setSpeed(0, 0)
                         self.catch('down')
-
+                        followBallRecognised = False
+                        finished = True
+                        '''
                         if salida == 'A':
                             self.setSpeed(0, 0.4)
                         else:
@@ -537,6 +539,7 @@ class Robot:
                         else:
                             self.catch('up')
                             self.setSpeed(next_v, next_w)
+                        '''
                     else:
                         self.setSpeed(next_v, next_w)
                 else:

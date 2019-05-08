@@ -42,7 +42,7 @@ sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
 
-logo = 'BB8'
+logo = 'R2D2'
 
 # DUBUG
 phase_from = 2
@@ -156,6 +156,8 @@ def main(args):
 
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
+
+            robot.resetOdometry(None, None, math.pi)
 
             robot.setSpeed(0, -w_parado)
             robot.wait_for_th(pos4[2], 0.02)
@@ -283,17 +285,18 @@ def main(args):
 
             if salida is 'A':
                 turn_speed = 0.1
-                objective_angle = 9 * math.pi / 10
+                objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_right_1 = coord2Meters([5, 6, 0])
                 cell_to_exit_right_2 = coord2Meters([6, 6, 0])
+                cell_to_exit_right_2[0] = cell_to_exit_right_2[0] + 0.05
                 cell_to_exit_right_3 = coord2Meters([6, 7, 0])
 
 
             else:
                 turn_speed = -0.1
-                objective_angle = math.pi / 10
+                objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
                 cell_to_exit_left_2 = coord2Meters([0, 6, 0])
@@ -304,9 +307,12 @@ def main(args):
             robot.orientate(objective_angle)
             robot.setSpeed(0, 0)
             previous_value = 1000
-            new_value = 1000
-            robot.setSpeed(0, turn_speed)
             idem = 0
+            for i in range(1, 5):
+                [_, _, new_value] = robot.readSensors()
+
+            robot.setSpeed(0, turn_speed)
+            new_value = 1000
             while previous_value >= new_value:
                 if previous_value == new_value:
                     idem = idem + 1
@@ -314,13 +320,16 @@ def main(args):
                     idem = 0
                     previous_value = new_value
                 [_,_,new_value] = robot.readSensors()
+                new_value = math.floor(new_value)
                 print("new value", new_value)
                 time.sleep(0.1)
+
+            idem = idem + 1
 
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.1 * idem / 2)
+            time.sleep(0.1 * 4 *  idem / 5)
 
             retro_value = 0.1
             time_retro = abs((0.55 - previous_value/100)) / retro_value
@@ -332,6 +341,10 @@ def main(args):
                 robot.setSpeed(-retro_value, 0)
             time.sleep(time_retro)
 
+            robot.setSpeed(0, 0)
+
+            time.sleep(0.3)
+
             if salida == 'A':
                 robot.resetOdometry(1.8, None, math.pi-0.001)
             else:
@@ -339,13 +352,13 @@ def main(args):
 
             [x, y, th] = robot.readOdometry()
             print("Ajustadas x e y", x, y, th, math.pi/2)
-            robot.orientate(math.pi/2)
+            robot.orientate(math.pi/2 - turn_speed)
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
                 [_,_,previous_value] = robot.readSensors()
 
-            print("previous value",previous_value)
+            print("previous value", previous_value)
 
             robot.resetOdometry(None, 3.2-previous_value/100, None)
 
@@ -426,10 +439,10 @@ def main(args):
             else:
                 robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
-            # Avanza un poco hacia delante para cruzar la linea de meta
+            # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate(math.pi / 2)
-            robot.setSpeed(0.1, 0)
-            time.sleep(4)
+            robot.setSpeed(0.4, 0)
+            time.sleep(3)
             robot.setSpeed(0, 0)
 
 
