@@ -349,14 +349,9 @@ class Robot:
                 # Only if it is turning on read gyro sensors
                 # Sensor 1
                 actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
-                #self.gyro_1_offset += (actual_value_gyro_1 * self.gyro_1_offset_correction_factor * d_t)
 
                 # Sensor 2
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
-                #self.gyro_2_offset += (actual_value_gyro_2 * self.gyro_2_offset_correction_factor * d_t)
-
-                print(w, actual_value_gyro_1, actual_value_gyro_2)
-
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
             else:
                 self.history_gyro_1.append(self.gyro_1_offset)
