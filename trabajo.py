@@ -350,7 +350,7 @@ def main(args):
 
             [x, y, th] = robot.readOdometry()
             print("Ajustadas x e y", x, y, th, math.pi/2)
-            robot.orientate(math.pi/2)
+            robot.orientate(math.pi/2 - turn_speed)
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
