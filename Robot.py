@@ -12,16 +12,12 @@ import numpy as np
 
 from config_file import *
 
-if not is_debug and not disable_open_cv:
-    from RobotFrameCapturer import RobotFrameCapturer
+from RobotFrameCapturer import RobotFrameCapturer
 
 from utils import delay_until
 
 # Only import original drivers if it isn't in debug mode
-if not is_debug:
-    import brickpi3  # import the BrickPi3 drivers
-else:
-    from FakeBlockPi import FakeBlockPi
+import brickpi3
 
 
 class Robot:
@@ -31,75 +27,54 @@ class Robot:
 
         Initialize Motors and Sensors according to the set up in your robot
         """
+        ######################################
+        # Shared variables                   #
+        ######################################
 
-        ##################################################
-        # Motors and sensors setup
-
-        # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-        # self.BP = brickpi3.BrickPi3()
-
-        # Configure sensors, for example a touch sensor.
-        # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
-
-        # reset encoder B and C (or all the motors you are using)
-        # self.BP.offset_motor_encoder(self.BP.PORT_B,
-        #    self.BP.get_motor_encoder(self.BP.PORT_B))
-        # self.BP.offset_motor_encoder(self.BP.PORT_C,
-        #    self.BP.get_motor_encoder(self.BP.PORT_C))
-
-        ##################################################
-
-        # odometry shared memory values
+        # Odometry (shared memory values)
         self.x = Value('d', init_position[0])
         self.y = Value('d', init_position[1])
         self.th = Value('d', init_position[2])
-        self.proximity = Value('d', 600)
         self.finished = Value('b', 1)  # boolean to show if odometry updates are finished
 
-        # if we want to block several instructions to be run together, we may want to use an explicit Lock
+        # Lock used
         self.lock_odometry = Lock()
 
-        # odometry update period
+        # Odometry update period (shared constant values)
         self.P = 0.03
 
-        # Set robot physical parameters
+        # Set robot physical parameters (shared constant values)
         self.wheel_radius = 0.028  # m
         self.axis_length = 0.112  # m
 
-        # Set initial speed
+        # Set initial speed (shared memory values)
         self.v = Value('d', 0.0)
         self.w = Value('d', 0.0)
 
-        if is_debug:
-            self.BP = FakeBlockPi()
+        # Lock used
+        self.lock_speed = Lock()
 
-            # Gyro sensor offset and calibration
-            self.gyro_1_offset = 2430
-            self.gyro_2_offset = 2430
+        # Robot sensors configuration
+        self.BP = brickpi3.BrickPi3()
+        self.BP.reset_all()
 
-        else:
-            self.BP = brickpi3.BrickPi3()  # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-            # Set motors ports
+        # Set motors ports
+        self.motor_port_left = self.BP.PORT_C
+        self.motor_port_right = self.BP.PORT_B
+        self.motor_port_basket = self.BP.PORT_A
 
-            self.BP.reset_all()
+        # Sonar config
+        self.motor_port_ultrasonic = self.BP.PORT_1
+        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+        self.min_distance_obstacle_detection = 30  # cm
 
-            self.motor_port_left = self.BP.PORT_C
-            self.motor_port_right = self.BP.PORT_B
-            self.motor_port_basket = self.BP.PORT_A
+        # Gyroscopic sensors
+        self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
+        self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
-            # Sonar config
-            self.motor_port_ultrasonic = self.BP.PORT_1
-            self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
-            self.min_distance_obstacle_detection = 30  # cm
-
-            # Gyroscopic sensors
-            self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
-            self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
-
-            # Gyro sensor offset and calibration
-            time.sleep(0.5)
-            self.gyro_1_offset = 2325
-            self.gyro_2_offset = 2367
+        # Gyro sensor offset and calibration
+        self.gyro_1_offset = 2325
+        self.gyro_2_offset = 2367
 
         self.gyro_1_correction_factor = 0.14
         self.gyro_2_correction_factor = 0.135
@@ -118,14 +93,11 @@ class Robot:
         # Basket state
         self.basket_state = 'up'
 
-        # Is spinning
-        self.is_spinning = Value('b', False)
-
         # Enable sensors
         self.enable_gyro_sensors = Value('b', False)
         self.enable_proximity_sensor = Value('b', False)
 
-        # Is spinning
+        # Odometry reseted
         self.odometry_reseted = Value('b', False)
 
         # Encoder timer
