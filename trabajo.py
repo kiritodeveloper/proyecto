@@ -333,10 +333,10 @@ def main(args):
             time.sleep(0.1 * 4 *  idem / 5)
 
             retro_value = 0.1
-            time_retro = abs((0.25 - previous_value/100)) / retro_value
+            time_retro = abs((0.20 - previous_value/100)) / retro_value
 
             print("tiempo", time_retro)
-            if previous_value > 25:
+            if previous_value > 20:
                 robot.setSpeed(retro_value, 0)
             else:
                 robot.setSpeed(-retro_value, 0)
@@ -365,9 +365,14 @@ def main(args):
 
 
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
-            #robot.orientate((math.pi / 2) - 0.1)
-            #robot.setSpeed(0.2, 0)
-            #time.sleep(2.5)
+            robot.orientate(math.pi / 2)
+
+            # Calcular distancia hasta linea meta
+            distance = (0.4*7 + 0.2) - y
+            sprint_speed = 0.25
+            sprint_time = distance * sprint_speed
+            robot.setSpeed(sprint_speed, 0)
+            time.sleep(sprint_time)
             robot.setSpeed(0, 0)
 
 
