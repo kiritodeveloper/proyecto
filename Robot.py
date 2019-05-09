@@ -551,13 +551,13 @@ class Robot:
         """
         if movement != self.basket_state:
             if movement == 'up':
-                self.BP.set_motor_dps(self.motor_port_basket, -100)
-                time.sleep(0.5)
+                self.BP.set_motor_dps(self.motor_port_basket, -180)
+                time.sleep(0.4)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
             elif movement == 'down':
-                self.BP.set_motor_dps(self.motor_port_basket, 100)
-                time.sleep(0.5)
+                self.BP.set_motor_dps(self.motor_port_basket, 180)
+                time.sleep(0.4)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
