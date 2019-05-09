@@ -383,6 +383,8 @@ def main(args):
 
             robot.orientate(math.pi / 2)
 
+            robot.enableProximitySensor(False)
+
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
 
