@@ -1,7 +1,7 @@
 import csv
 from multiprocessing import Process
 
-from MapLib import Map2D
+from MapLib_python3 import Map2D
 from plot_robot import dibrobot
 import matplotlib.pyplot as plt
 
@@ -15,6 +15,8 @@ def plot_log(file_path):
         i = csv.reader(log)
         for line in i:
             dibrobot([float(line[0]), float(line[1]), float(line[2])], 'r', 'p')
+    plt.xlim([-1, 3])
+    plt.ylim([0, 4])
     plt.show()
 
 
@@ -34,6 +36,23 @@ def plot_log_with_map(file_path, map_path):
             y = float(line[1])
             th = float(line[2])
             robot_locations = robot_locations + [[int(x* 1000), int(y * 1000), int(th * 1000)]]
+
+    myMap.drawMapWithRobotLocations(robot_locations, saveSnapshot=True)
+
+def plot_log_with_map_path(path, map_path):
+    """
+    Read a path log file and plot it
+    :param file_path: Path log file path
+    """
+    myMap = Map2D(map_path)
+
+    robot_locations = []
+
+    for i in path:
+        x = float(i[0]) * 0.4 + 0.2
+        y = float(i[1]) * 0.4 + 0.2
+        th = float(0)
+        robot_locations = robot_locations + [[int(x * 1000), int(y * 1000), int(th * 1000)]]
 
     myMap.drawMapWithRobotLocations(robot_locations, saveSnapshot=True)
 
