@@ -435,7 +435,7 @@ class Robot:
         if size < 40:
             v = 0.3
         elif size < 80:
-            v = 0.2
+            v = 0.15
         else:
             v = 0.1
 
@@ -552,12 +552,12 @@ class Robot:
         if movement != self.basket_state:
             if movement == 'up':
                 self.BP.set_motor_dps(self.motor_port_basket, -270)
-                time.sleep(0.27)
+                time.sleep(0.3)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
             elif movement == 'down':
                 self.BP.set_motor_dps(self.motor_port_basket, 270)
-                time.sleep(0.27)
+                time.sleep(0.3)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
