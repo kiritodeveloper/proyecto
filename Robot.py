@@ -433,7 +433,7 @@ class Robot:
 
         # Depending how far is the ball, the robot will follow it faster or slower
         if size < 40:
-            v = 0.3
+            v = 0.25
         elif size < 80:
             v = 0.15
         else:
