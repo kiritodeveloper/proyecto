@@ -36,23 +36,22 @@ class Robot:
         self.y = Value('d', init_position[1])
         self.th = Value('d', init_position[2])
         self.finished = Value('b', 1)  # boolean to show if odometry updates are finished
-
-        # Lock used
         self.lock_odometry = Lock()
 
-        # Odometry update period (shared constant values)
-        self.P = 0.03
+        # Update period (shared constant values)
+        self.odometry_update_period = 0.03
+        self.speed_update_period = 0.03
+        self.proximity_update_period = 0.03
+        self.gyros_update_period = 0.03
 
         # Set robot physical parameters (shared constant values)
         self.wheel_radius = 0.028  # m
         self.axis_length = 0.112  # m
 
-        # Set initial speed (shared memory values)
-        self.v = Value('d', 0.0)
-        self.w = Value('d', 0.0)
-
-        # Lock used
-        self.lock_speed = Lock()
+        # Actual speed (shared memory values)
+        self.v_actual = Value('d', 0.0)
+        self.w_actual = Value('d', 0.0)
+        self.lock_actual_speed = Lock()
 
         # Robot sensors configuration
         self.BP = brickpi3.BrickPi3()
@@ -76,11 +75,16 @@ class Robot:
         self.gyro_1_offset = 2325
         self.gyro_2_offset = 2367
 
-        self.gyro_1_correction_factor = 0.14
-        self.gyro_2_correction_factor = 0.135
+        self.gyro_1_correction_factor = 0.14 * 0.03
+        self.gyro_2_correction_factor = 0.135 * 0.03
 
         self.gyro_1_offset_correction_factor = 0
         self.gyro_2_offset_correction_factor = 0
+
+        # Sensors raw dara
+        self.gyro_1_raw = Value('d', self.gyro_1_offset)
+        self.gyro_2_raw = Value('d', self.gyro_2_offset)
+        self.proximity_raw = Value('d', 255)
 
         # Sensors values history
         self.history_max_size = 5
@@ -100,22 +104,17 @@ class Robot:
         # Odometry reseted
         self.odometry_reseted = Value('b', False)
 
-        # Encoder timer
-        self.encoder_timer = 0
-
         # Previous values of encoders in rads
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
 
     def enableGyroSensors(self, value):
-        self.lock_odometry.acquire()
-        self.enable_gyro_sensors.value = value
-        self.lock_odometry.release()
+        with self.enable_gyro_sensors.get_lock():
+            self.enable_gyro_sensors.value = value
 
     def enableProximitySensor(self, value):
-        self.lock_odometry.acquire()
-        self.enable_proximity_sensor.value = value
-        self.lock_odometry.release()
+        with self.enable_proximity_sensor.get_lock():
+            self.enable_proximity_sensor.value = value
 
     def setSpeed(self, v, w):
         """
@@ -129,32 +128,35 @@ class Robot:
                               -self.axis_length / (2 * self.wheel_radius)]]).dot(np.array([v, w]))
 
         # Set motors speed
-        if not is_debug:
-            speed_dps_left = math.degrees(w_motors[1])
-            speed_dps_right = math.degrees(w_motors[0])
+        speed_dps_left = math.degrees(w_motors[1])
+        speed_dps_right = math.degrees(w_motors[0])
 
-            self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
-            self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
-
-        self.lock_odometry.acquire()
-        self.v.value = v
-        self.w.value = w
-        self.is_spinning.value = w != 0
-        self.lock_odometry.release()
+        self.BP.set_motor_dps(self.motor_port_left, speed_dps_left)
+        self.BP.set_motor_dps(self.motor_port_right, speed_dps_right)
 
     def readSpeed(self):
         """
         Read the robot speed
         :return: robot speed
         """
+        # Save speeds
+        self.lock_actual_speed.acquire()
+        v = self.v_actual.value
+        w = self.w_actual.value
+        self.lock_actual_speed.release()
+        return v, w
 
-        self.lock_odometry.acquire()
-        if is_debug:
-            v = self.v.value
-            w = self.w.value
-        else:
+    def updateSpeed(self):
+        # Encoder timer
+        encoder_timer = 0
+
+        # current processor time in a floating point value, in seconds
+        t_next_period = time.time()
+
+        while not self.finished.value:
             [grad_izq, grad_der] = [self.BP.get_motor_encoder(self.motor_port_left),
                                     self.BP.get_motor_encoder(self.motor_port_right)]
+
             self.history_dg_left.append(grad_izq)
             self.history_dg_right.append(grad_der)
 
@@ -162,10 +164,10 @@ class Robot:
             rad_izq = math.radians(sum(self.history_dg_left) / self.history_max_size)
             rad_der = math.radians(sum(self.history_dg_right) / self.history_max_size)
 
-            last_timer = self.encoder_timer
-            self.encoder_timer = time.time()
+            last_timer = encoder_timer
+            encoder_timer = time.time()
 
-            dt = self.encoder_timer - last_timer
+            dt = encoder_timer - last_timer
 
             # Hacia delante es negativo, se cambia el signo
             w_izq = (rad_izq - self.r_prev_encoder_left) / dt
@@ -181,32 +183,93 @@ class Robot:
             v = v_w[0]
             w = v_w[1]
 
-        self.lock_odometry.release()
+            with self.gyro_1_raw.get_lock():
+                gyro_1 = self.gyro_1_raw.value
 
-        return v, w
+            with self.gyro_2_raw.get_lock():
+                gyro_2 = self.gyro_2_raw.value
 
-    def readSensors(self, read_proximity=True, read_gyro=True):
+            if self.enable_gyro_sensors.value:
+                # Only if it is turning on read gyro sensors
+                # Sensor 1
+                actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor
+
+                # Sensor 2
+                actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor
+                w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
+            else:
+                self.history_gyro_1.append(self.gyro_1_offset)
+                self.history_gyro_2.append(self.gyro_2_offset)
+
+            # Save speeds
+            self.lock_actual_speed.acquire()
+            self.v_actual.value = v
+            self.w_actual.value = w
+            self.lock_actual_speed.release()
+
+            # Periodic task
+            t_next_period += self.speed_update_period
+            delay_until(t_next_period)
+
+    def updateGyros(self):
+        # current processor time in a floating point value, in seconds
+        t_next_period = time.time()
+
+        while not self.finished.value:
+            if not self.enable_gyro_sensors.value:
+                self.history_gyro_1.append(self.BP.get_sensor(self.BP.PORT_3)[0])
+                self.history_gyro_2.append(self.BP.get_sensor(self.BP.PORT_4)[0])
+
+                gyro_1, gyro_2 = sum(self.history_gyro_1) / self.history_max_size, sum(
+                    self.history_gyro_2) / self.history_max_size
+
+                with self.gyro_1_raw.get_lock():
+                    self.gyro_1_raw.value = gyro_1
+
+                with self.gyro_2_raw.get_lock():
+                    self.gyro_2_raw.value = gyro_2
+            else:
+                with self.gyro_1_raw.get_lock():
+                    self.gyro_1_raw.value = 0
+
+                with self.gyro_2_raw.get_lock():
+                    self.gyro_2_raw.value = 0
+
+        # Periodic task
+        t_next_period += self.gyros_update_period
+        delay_until(t_next_period)
+
+    def updateProximity(self):
+        # current processor time in a floating point value, in seconds
+        t_next_period = time.time()
+
+        while not self.finished.value:
+            if not self.enable_proximity_sensor.value:
+                self.history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
+                proximity = sum(self.history_proximity) / self.history_max_size
+
+                with self.proximity_raw.get_lock():
+                    self.proximity_raw.value = proximity
+            else:
+                with self.proximity_raw.get_lock():
+                    self.proximity_raw.value = 255
+        # Periodic task
+        t_next_period += self.proximity_update_period
+        delay_until(t_next_period)
+
+    def readSensors(self):
         """
         Read both gyroscopes and proximity sensor
-        :param read_proximity: If false return 0 for proximity
-        :param read_gyro: If false return 255 for gyro
         :return: gyroscope_1, gyroscope_2, proximity
         """
+        with self.proximity_raw.get_lock():
+            proximity = self.proximity_raw.value
 
-        gyro_1 = 0
-        gyro_2 = 0
+        with self.gyro_1_raw.get_lock():
+            gyro_1 = self.gyro_1_raw.value
 
-        if read_gyro:
-            self.history_gyro_1.append(self.BP.get_sensor(self.BP.PORT_3)[0])
-            self.history_gyro_2.append(self.BP.get_sensor(self.BP.PORT_4)[0])
-
-            gyro_1, gyro_2 = sum(self.history_gyro_1) / self.history_max_size, sum(
-                self.history_gyro_2) / self.history_max_size
-
-        proximity = 255
-        if read_proximity:
-            self.history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
-            proximity = sum(self.history_proximity) / self.history_max_size
+        with self.gyro_2_raw.get_lock():
+            gyro_2 = self.gyro_2_raw.value
 
         return gyro_1, gyro_2, proximity
 
@@ -224,22 +287,26 @@ class Robot:
         """ This starts a new process/thread that will be updating the odometry periodically """
         self.finished.value = False
 
-        if not is_debug:
-            self.BP.offset_motor_encoder(self.motor_port_left,
-                                         self.BP.get_motor_encoder(self.motor_port_left))  # reset encoder B
-            self.BP.offset_motor_encoder(self.motor_port_right,
-                                         self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
-
-        self.encoder_timer = time.time()
+        self.BP.offset_motor_encoder(self.motor_port_left,
+                                     self.BP.get_motor_encoder(self.motor_port_left))  # reset encoder B
+        self.BP.offset_motor_encoder(self.motor_port_right,
+                                     self.BP.get_motor_encoder(self.motor_port_right))  # reset encoder C
 
         # Odometry update process
-        self.p = Process(target=self.updateOdometry, args=(self.x, self.y, self.th, self.finished))
-
+        self.p = Process(target=self.updateOdometry)
         self.p.start()
-        print("PID: ", self.p.pid)
-        # we don't really need to pass the shared params x, y, th, finished,
-        # because they are part of the class, so visible within updateOdometry in any case,
-        # but it's just to show an example of process receiving params
+
+        # Speed update process
+        self.p_s = Process(target=self.updateSpeed)
+        self.p_s.start()
+
+        # Gyro update process
+        self.p_g = Process(target=self.updateGyros)
+        self.p_g.start()
+
+        # Proximity update process
+        self.p_p = Process(target=self.updateProximity)
+        self.p_p.start()
 
     def resetOdometry(self, x_new, y_new, th_new):
         x, y, th = self.readOdometry()
@@ -259,7 +326,7 @@ class Robot:
         self.lock_odometry.release()
 
     # You may want to pass additional shared variables besides the odometry values and stop flag
-    def updateOdometry(self, x_odo, y_odo, th_odo, finished):
+    def updateOdometry(self):
         """
         Update odometry every period
         :param x_odo: value where x coordinate must be stored
@@ -271,17 +338,17 @@ class Robot:
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
 
-        while not finished.value:
+        while not self.finished.value:
 
-            d_t = self.P
+            d_t = self.odometry_update_period
 
             [v, w] = self.readSpeed()
 
-            x = x_odo.value
+            x = self.x.value
 
-            y = y_odo.value
+            y = self.y.value
 
-            th = th_odo.value
+            th = self.th.value
 
             if w == 0:
                 # Straight movement
@@ -292,51 +359,26 @@ class Robot:
                 x = x + (v / w) * (math.sin(th + w * d_t) - math.sin(th))
                 y = y - (v / w) * (math.cos(th + w * d_t) - math.cos(th))
 
-            # Check if use sensors
-            self.lock_odometry.acquire()
-            is_spinning = self.is_spinning.value
-            enable_gyro_sensors = self.enable_gyro_sensors.value
-            enable_proximity_sensor = self.enable_proximity_sensor.value
-            self.lock_odometry.release()
-
-            # Get sensors data
-            gyro_1, gyro_2, proximity = self.readSensors(read_proximity=enable_proximity_sensor,
-                                                         read_gyro=enable_gyro_sensors)
-
-            # Obtain precise th
-            if is_spinning and enable_gyro_sensors:
-                # Only if it is turning on read gyro sensors
-                # Sensor 1
-                actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor * d_t
-
-                # Sensor 2
-                actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor * d_t
-                w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
-            else:
-                self.history_gyro_1.append(self.gyro_1_offset)
-                self.history_gyro_2.append(self.gyro_2_offset)
-
             # Update th
             th = th + d_t * w
 
             # Update odometry
-            self.lock_odometry.acquire()
+
             if not self.odometry_reseted.value:
-                x_odo.value = x
-                y_odo.value = y
-                th_odo.value = self.normalizeAngle(th)
+                self.lock_odometry.acquire()
+                self.x.value = x
+                self.y.value = y
+                self.th.value = self.normalizeAngle(th)
+                self.lock_odometry.release()
             else:
                 # In case odometry is reseted, jump this updating period
                 self.odometry_reseted.value = False
 
-            self.proximity.value = proximity
-            self.lock_odometry.release()
-
             # Periodic task
-            t_next_period += self.P
+            t_next_period += self.odometry_update_period
             delay_until(t_next_period)
         sys.stdout.write("Stopping odometry ... X=  %d, \
-                Y=  %d, th=  %d \n" % (x_odo.value, y_odo.value, th_odo.value))
+                Y=  %d, th=  %d \n" % (self.x.value, self.y.value, self.th.value))
 
     def stopOdometry(self):
         """
@@ -474,26 +516,6 @@ class Robot:
                         self.catch('down')
                         followBallRecognised = False
                         finished = True
-                        '''
-                        if salida == 'A':
-                            self.setSpeed(0, 0.4)
-                        else:
-                            self.setSpeed(0, -0.4)
-
-                        time.sleep(5)
-
-                        self.setSpeed(0, 0)
-                        _, _, size = frame_capturer.getPosition()
-
-                        # If ball is in the basket, finish, else lift the basket
-                        if size > 70:
-                            followBallRecognised = False
-                            finished = True
-
-                        else:
-                            self.catch('up')
-                            self.setSpeed(next_v, next_w)
-                        '''
                     else:
                         self.setSpeed(next_v, next_w)
                 else:
@@ -526,7 +548,7 @@ class Robot:
             return variable
         else:
             self.lock_odometry.acquire()
-            sensor_value = self.proximity.value
+            sensor_value = self.proximity_raw.value
             self.lock_odometry.release()
             print("Distancia: ", sensor_value)
             if sensor_value < number_of_cells * self.min_distance_obstacle_detection:
@@ -558,13 +580,13 @@ class Robot:
                     [x_odo, y_odo, _] = self.readOdometry()
                     last_error = actual_error
                     actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
-                    t_next_period += self.P
+                    t_next_period += self.odometry_update_period
                     delay_until(t_next_period)
         else:
             # Stop when be in error margin
             while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
                 [x_odo, y_odo, _] = self.readOdometry()
-                t_next_period += self.P
+                t_next_period += self.odometry_update_period
                 delay_until(t_next_period)
 
         print("He llegado a : ", x_odo, y_odo, " y busco: ", x, y)
@@ -588,7 +610,7 @@ class Robot:
                 # print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
-                t_next_period += self.P
+                t_next_period += self.odometry_update_period
                 delay_until(t_next_period)
         # print("He llegado a : ", th_odo, " y busco: ", th)
 
@@ -633,12 +655,18 @@ class Robot:
         final_y = y_goal
         aligned_angle = self.normalizeAngle(math.atan2(final_y - y_actual, final_x - x_actual))
 
+        with self.enable_gyro_sensors.get_lock():
+            gyro_enabled = self.enable_gyro_sensors.value
+
         # Turn
+        self.enableGyroSensors(True)
         self.orientate(aligned_angle)
+        self.enableGyroSensors(False)
 
         # Detect wall
         if self.detectObstacle():
             self.setSpeed(0, 0)
+            self.enableGyroSensors(gyro_enabled)
             return False
         else:
             # Go forward
@@ -647,4 +675,5 @@ class Robot:
 
             # Stop robot
             self.setSpeed(0, 0)
+            self.enableGyroSensors(gyro_enabled)
             return True
