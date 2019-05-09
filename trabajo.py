@@ -284,7 +284,7 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
-                turn_speed = 0.35
+                turn_speed = 0.3
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
@@ -296,7 +296,7 @@ def main(args):
 
 
             else:
-                turn_speed = -0.35
+                turn_speed = -0.3
                 objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
@@ -323,7 +323,7 @@ def main(args):
                 [_,_,new_value] = robot.readSensors()
                 new_value = math.floor(new_value)
                 print("new value", new_value)
-                time.sleep(0.02)
+                time.sleep(0.05)
 
             idem = idem + 1
 
