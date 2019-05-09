@@ -14,17 +14,17 @@ def main():
         start_robot_logger(robot.finished, robot, "./out/trayectoria_entrega.csv")
 
         # 2. launch updateOdometry thread()
-        robot.startOdometry()
+        robot.startRobot()
 
         robot.go(1, 0.2)
 
-        robot.stopOdometry()
+        robot.stopRobot()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
-        robot.stopOdometry()
+        robot.stopRobot()
 
 
 if __name__ == "__main__":

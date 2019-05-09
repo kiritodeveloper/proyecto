@@ -49,7 +49,7 @@ def main(args):
         start_robot_logger(robot.finished, robot, "./out/trayectoria_entrega.csv")
 
         # 2. launch updateOdometry thread()
-        robot.startOdometry()
+        robot.startRobot()
 
         goal_x = 2
         goal_y = 2
@@ -95,13 +95,13 @@ def main(args):
 
         # myMap.drawMapWithRobotLocations(robot_locations)
 
-        robot.stopOdometry()
+        robot.stopRobot()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
-        robot.stopOdometry()
+        robot.stopRobot()
 
 
 if __name__ == "__main__":

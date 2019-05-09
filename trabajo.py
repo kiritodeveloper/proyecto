@@ -8,7 +8,7 @@ import math
 import cv2
 
 from RobotDrawer import start_robot_drawer
-from utils import delay_until
+from TimeUtils import delay_until
 
 # import matplotlib
 from config_file import is_debug
@@ -134,7 +134,7 @@ def main(args):
             robot = Robot(starting_point)
             # Robot logger
             start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
-            robot.startOdometry()
+            robot.startRobot()
 
             # Disable sensors
             robot.enableProximitySensor(False)
@@ -157,7 +157,7 @@ def main(args):
             # Giro 90 grados mirando al frente
             robot.setSpeed(0, 0)
 
-            robot.resetOdometry(None, None, math.pi)
+            robot.setOdometry(None, None, math.pi)
 
             robot.setSpeed(0, -w_parado)
             robot.wait_for_th(pos4[2], 0.02)
@@ -183,7 +183,7 @@ def main(args):
                 robot = Robot(starting_point)
                 # Robot logger
                 start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
-                robot.startOdometry()
+                robot.startRobot()
 
             primera = False
 
@@ -257,7 +257,7 @@ def main(args):
                     start_robot_logger(robot.finished, robot, "trayectoria_tracking.csv")
 
                 # 1. launch updateOdometry thread()
-                robot.startOdometry()
+                robot.startRobot()
 
             primera = False
 
@@ -347,9 +347,9 @@ def main(args):
             time.sleep(0.3)
 
             if salida == 'A':
-                robot.resetOdometry(1.8, None, math.pi-0.001)
+                robot.setOdometry(1.8, None, math.pi - 0.001)
             else:
-                robot.resetOdometry(1, None, 0)
+                robot.setOdometry(1, None, 0)
 
             [x, y, th] = robot.readOdometry()
             print("Ajustadas x e y", x, y, th, math.pi/2)
@@ -361,7 +361,7 @@ def main(args):
 
             print("previous value", previous_value)
 
-            robot.resetOdometry(None, 3.2-previous_value/100, None)
+            robot.setOdometry(None, 3.2 - previous_value / 100, None)
 
             time_retro = abs((0.55 - previous_value/100)) / retro_value
             """
@@ -449,14 +449,14 @@ def main(args):
             robot.setSpeed(0, 0)
 
 
-        robot.stopOdometry()
+        robot.stopRobot()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         #    robot.stopOdometry()
         robot.catch("up")
-        robot.stopOdometry()
+        robot.stopRobot()
         reco.stop_camera()
 
 

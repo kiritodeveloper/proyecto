@@ -10,7 +10,7 @@ from RobotDrawer import start_robot_drawer
 from RobotLogger import start_robot_logger
 
 # Queue defined for communication with RobotDrawer
-from utils import delay_until
+from TimeUtils import delay_until
 
 
 # Timed paths
@@ -149,7 +149,7 @@ def main():
         print("X value at the beginning from main X= %d" % (robot.x.value))
 
         # 1. launch updateOdometry Process()
-        robot.startOdometry()
+        robot.startRobot()
 
         # 2. perform trajectory
         path_1_odometry(robot)
@@ -157,12 +157,12 @@ def main():
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors,
         # and restore the LED to the control of the BrickPi3 firmware.
-        robot.stopOdometry()
+        robot.stopRobot()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
-        robot.stopOdometry()
+        robot.stopRobot()
 
 
 if __name__ == "__main__":

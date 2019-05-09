@@ -22,7 +22,7 @@ def main(args):
             start_robot_logger(robot.finished, robot, "trayectoria_tracking.csv")
 
         # 1. launch updateOdometry thread()
-        robot.startOdometry()
+        robot.startRobot()
 
         # 2. Loop running the tracking until ??, then catch the ball
         # TO-DO: ADD to the Robot class a method to track an object, given certain parameters
@@ -43,13 +43,13 @@ def main(args):
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors, 
         # and restore the LED to the control of the BrickPi3 firmware.
-        robot.stopOdometry()
+        robot.stopRobot()
 
     except KeyboardInterrupt:
         # except the program gets interrupted by Ctrl+C on the keyboard.
         # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
         robot.catch("up")
-        robot.stopOdometry()
+        robot.stopRobot()
 
 
 if __name__ == "__main__":
