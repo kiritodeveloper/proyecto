@@ -383,6 +383,8 @@ def main(args):
 
             robot.orientate(math.pi / 2)
 
+            robot.enableProximitySensor(False)
+
             R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
             BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
 
@@ -442,8 +444,8 @@ def main(args):
 
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate((math.pi / 2) - 0.1)
-            robot.setSpeed(0.4, 0)
-            time.sleep(1.5)
+            robot.setSpeed(0.2, 0)
+            time.sleep(2.5)
             robot.setSpeed(0, 0)
 
 
