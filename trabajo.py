@@ -284,7 +284,7 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
-                turn_speed = 0.1
+                turn_speed = 0.2
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
@@ -296,7 +296,7 @@ def main(args):
 
 
             else:
-                turn_speed = -0.1
+                turn_speed = -0.2
                 objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
