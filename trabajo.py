@@ -120,7 +120,7 @@ def main(args):
                 pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.2475659794
                 w_parado = -math.pi / 8
-                w_movimiento = 0.553574359
+                w_movimiento = 0.5535743589
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], 0)
