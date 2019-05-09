@@ -370,7 +370,7 @@ def main(args):
             # Calcular distancia hasta linea meta
             distance = (0.4*7 + 0.2) - y
             sprint_speed = 0.25
-            sprint_time = distance * sprint_speed
+            sprint_time = distance / sprint_speed
             robot.setSpeed(sprint_speed, 0)
             time.sleep(sprint_time)
             robot.setSpeed(0, 0)
