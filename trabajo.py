@@ -272,7 +272,7 @@ def main(args):
             res = robot.trackObject(salida, colorRangeMin=redMin, colorRangeMax=redMax)
 
             print('Espero a que la camara se apague')
-            time.sleep(3)  # espera en segundos
+            time.sleep(0.2)  # espera en segundos
             print('Supongo que la camara esta apagada')
 
         # RECONOCIMIENTO -> FASE 5
@@ -284,7 +284,7 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
-                turn_speed = 0.2
+                turn_speed = 0.35
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
@@ -296,7 +296,7 @@ def main(args):
 
 
             else:
-                turn_speed = -0.2
+                turn_speed = -0.35
                 objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
@@ -323,7 +323,7 @@ def main(args):
                 [_,_,new_value] = robot.readSensors()
                 new_value = math.floor(new_value)
                 print("new value", new_value)
-                time.sleep(0.1)
+                time.sleep(0.02)
 
             idem = idem + 1
 
