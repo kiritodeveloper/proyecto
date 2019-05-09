@@ -45,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 2
+phase_from = 4
 phase_to = 5
 
 
@@ -333,7 +333,7 @@ def main(args):
             time.sleep(0.1 * 4 *  idem / 5)
 
             retro_value = 0.1
-            time_retro = abs((0.55 - previous_value/100)) / retro_value
+            time_retro = abs((0.25 - previous_value/100)) / retro_value
 
             print("tiempo", time_retro)
             if previous_value > 25:
