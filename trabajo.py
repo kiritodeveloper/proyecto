@@ -45,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 4
+phase_from = 2
 phase_to = 5
 
 
@@ -115,8 +115,8 @@ def main(args):
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], -2.677945048)
-                pos2 = coord2Meters((1, 5, 0))
-                pos3 = coord2Meters((1, 3, math.pi))
+                pos2 = coord2Meters((1, 5, -0.4636475288))
+                pos3 = coord2Meters((1, 3, -2.677945048))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.240775
                 w_parado = -math.pi / 8
