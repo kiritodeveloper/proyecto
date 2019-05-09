@@ -433,11 +433,11 @@ class Robot:
 
         # Depending how far is the ball, the robot will follow it faster or slower
         if size < 40:
-            v = 0.15
+            v = 0.3
         elif size < 80:
-            v = 0.10
+            v = 0.2
         else:
-            v = 0.08
+            v = 0.1
 
         return v, w
 
@@ -552,12 +552,12 @@ class Robot:
         if movement != self.basket_state:
             if movement == 'up':
                 self.BP.set_motor_dps(self.motor_port_basket, -270)
-                time.sleep(0.25)
+                time.sleep(0.27)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
             elif movement == 'down':
                 self.BP.set_motor_dps(self.motor_port_basket, 270)
-                time.sleep(0.25)
+                time.sleep(0.27)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
