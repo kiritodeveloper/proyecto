@@ -87,6 +87,10 @@ class Robot:
             self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
             self.min_distance_obstacle_detection = 30  # cm
 
+            # Color config
+            self.color_sensor = self.BP.PORT_2
+            self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
+
         # Basket state
         self.basket_state = 'up'
 
@@ -96,6 +100,15 @@ class Robot:
         # Previous values of encoders in rads
         self.r_prev_encoder_left = 0
         self.r_prev_encoder_right = 0
+
+        # Color vector
+        self.color = 10 * [None]
+        self.color_vector_pos = 0
+        self.actual_color = -1
+
+        self.color_limit = 2800
+
+
 
     def setSpeed(self, v, w):
         """
@@ -524,3 +537,44 @@ class Robot:
             self.setSpeed(0, 0)
 
             return True
+
+    def update_color(self):
+        # Color = -1 is NONE
+        # Color = 0 is WHITE
+        # Color = 1 is BLACK
+        # Color = 2 is LINE
+
+        value = self.BP.get_sensor(self.color_sensor)
+
+        #print(value)
+
+        self.color[self.color_vector_pos] = value
+        self.color_vector_pos = (self.color_vector_pos + 1) % 10
+
+        if self.color[0] >= self.color_limit:
+            actual_color = 1
+        elif self.color[0] < self.color_limit:
+            actual_color = 0
+
+        for i in range(1, 10):
+            if self.color[0] >= self.color_limit and actual_color == 0:
+                actual_color = -1
+                break
+            elif self.color[0] < self.color_limit and actual_color == 1:
+                actual_color = -1
+                break
+
+        return actual_color
+
+    def detect_color(self):
+        actual_color = self.update_color()
+        while actual_color == -1:
+            actual_color = self.update_color()
+
+        return actual_color
+
+    def turn_off_color(self):
+        self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_OFF)
+
+
+
