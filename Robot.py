@@ -101,19 +101,6 @@ class Robot:
             self.gyro_1_offset = 2325
             self.gyro_2_offset = 2367
 
-        """
-            for i in range(10):
-                self.gyro_1_offset += self.BP.get_sensor(self.BP.PORT_3)[0]
-                self.gyro_2_offset += self.BP.get_sensor(self.BP.PORT_4)[0]
-                time.sleep(0.1)
-
-            self.gyro_1_offset /= 10
-            self.gyro_2_offset /= 10
-        """
-
-        # print("Gyro 1 offset ", self.gyro_1_offset)
-        # print("Gyro 2 offset ", self.gyro_2_offset)
-
         self.gyro_1_correction_factor = 0.14
         self.gyro_2_correction_factor = 0.135
 
