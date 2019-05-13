@@ -38,7 +38,6 @@ from reco import Reco
 # 4 -> COGER PELOTA
 # 5 -> RECONOCER Y SALIR
 
-salida = 'A'
 sizeCell = 400  # in mm
 
 # LOGO -> BB8 - R2D2
@@ -46,7 +45,6 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 1
 phase_to = 5
 
 
@@ -107,6 +105,9 @@ def main(args):
         # 1. load map and compute costs and path
 
         # TODO START ODOMETRY POR SEPARADO
+
+        phase_from = sys.argv[1]
+        salida = sys.argv[2]
 
         # COLOR -> FASE 1
 
@@ -251,8 +252,8 @@ def main(args):
 
             # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
             # Avanza un poco hacia delante para cruzar la linea de meta
-            robot.orientate(math.pi / 2 + math.pi / 6)
-            robot.resetOdometry(_, _, math.pi/2)
+            robot.orientate(math.pi / 2)
+            #robot.resetOdometry(_, _, math.pi/2)
             robot.setSpeed(0.2, 0)
             time.sleep(2)
             robot.setSpeed(0, 0)
