@@ -40,7 +40,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 2
+phase_from = 1
 phase_to = 5
 
 
@@ -72,13 +72,13 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
         # None th provided
         while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
-            t_next_period += robot.odometry_update_period
+            t_next_period += robot.P
             delay_until(t_next_period)
     else:
         while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
                 th_error_margin < abs(th - th_odo)):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
-            t_next_period += robot.odometry_update_period
+            t_next_period += robot.P
             delay_until(t_next_period)
             # print ([x_odo, y_odo, th_odo])
     print([x_odo, y_odo, th_odo])
@@ -158,12 +158,12 @@ def main(args):
                 starting_point = coord2Meters((1, 3, -math.pi / 2))
                 init_pos = [1, 3]
                 goal_x = 3
-                goal_y = 2
+                goal_y = 3
             else:  # Salida es B
                 starting_point = coord2Meters((5, 3, -math.pi / 2))
                 init_pos = [5, 3]
                 goal_x = 3
-                goal_y = 2
+                goal_y = 3
 
             if primera:
                 robot = Robot(starting_point)
@@ -215,10 +215,10 @@ def main(args):
 
             # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
             # Avanza un poco hacia delante para cruzar la linea de meta
-            robot.orientate(math.pi / 2)
-            robot.setSpeed(0.2, 0)
-            time.sleep(2)
-            robot.setSpeed(0, 0)
+            #robot.orientate(math.pi / 2)
+            #robot.setSpeed(0.3, 0)
+            #time.sleep(2)
+            #robot.setSpeed(0, 0)
 
             [x, y, th] = robot.readOdometry()
             print("Estoy principio 4", x, y, th)
@@ -262,7 +262,7 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
-                turn_speed = 0.2
+                turn_speed = 0.3
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
@@ -274,7 +274,7 @@ def main(args):
 
 
             else:
-                turn_speed = -0.2
+                turn_speed = -0.3
                 objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
@@ -301,14 +301,14 @@ def main(args):
                 new_value = robot.proximity_raw.get()
                 new_value = math.floor(new_value)
                 print("new value", new_value)
-                time.sleep(0.1)
+                time.sleep(0.075)
 
             idem = idem + 1
 
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.1 * 4 * idem / 5)
+            time.sleep(0.75 * idem / 2)
 
             retro_value = 0.1
             time_retro = abs((0.20 - previous_value / 100)) / retro_value

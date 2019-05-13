@@ -157,7 +157,7 @@ class Map2D:
             6: lambda p: [p[0] - 1, p[1]],
             7: lambda p: [p[0] - 1, p[1] + 1],
         }
-
+        print('en cell2connCoord: ', numNeigh, p)
         return result[numNeigh](p)
 
     def _pos2cell(self, x_mm, y_mm):
@@ -183,6 +183,7 @@ class Map2D:
         close a connection, i.e., we can NOT go straight from cellX,cellY to its neighbour number numNeigh 
         """
         # from coordinates in the grid of cells to coordinates in the connection matrix
+        print('en delete connection: ', cellX, cellY, numNeigh)
         [connX, connY] = self._cell2connCoord(cellX, cellY, numNeigh)
         self.connectionMatrix[connX, connY] = 0  # False
 
@@ -497,12 +498,13 @@ class Map2D:
         Helper function to browse a direction by an angle
         """
         desviation = math.pi / 4
-
+        print('EN RAD 2 DIR ', th)
         if desviation > th > -desviation:
             return 2
         elif (math.pi / 2 + desviation) > th > (math.pi / 2 - desviation):
             return 0
-        elif (-math.pi + desviation) > th > (math.pi - desviation):
+        #
+        elif (math.pi - desviation) < th or th < (-math.pi + desviation):
             return 6
         elif (-math.pi / 2 + desviation) > th > (-math.pi / 2 - desviation):
             return 4

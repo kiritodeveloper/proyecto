@@ -603,6 +603,7 @@ class Robot:
                 last_error = actual_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = self.readOdometry()
+                    #print(x_odo, y_odo, x, y)
                     last_error = actual_error
                     actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
                     t_next_period += self.odometry_update_period
@@ -644,7 +645,7 @@ class Robot:
         [_, _, th_actual] = self.readOdometry()
 
         # Turn
-        turn_speed = math.pi / 4
+        turn_speed = math.pi / 3
 
         if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
             turn_speed = -turn_speed
@@ -659,9 +660,9 @@ class Robot:
         print('Estoy buscando th ', aligned_angle)
         print('Velocidad ', turn_speed)
         self.setSpeed(0, turn_speed)
-        self.wait_for_th(aligned_angle, 0.03)
+        self.wait_for_th(aligned_angle, 0.10)
 
-        correction_speed = np.sign(turn_speed) * math.pi / 16
+        correction_speed = np.sign(turn_speed) * math.pi / 8
 
         self.setSpeed(0, -correction_speed)
         self.wait_for_th(aligned_angle, 0.02)
@@ -695,8 +696,8 @@ class Robot:
             return False
         else:
             # Go forward
-            self.setSpeed(0.15, 0)
-            self.wait_for_position(final_x, final_y, 0.1)
+            self.setSpeed(0.25, 0)
+            self.wait_for_position(final_x, final_y, 0.2)
 
             # Stop robot
             self.setSpeed(0, 0)
