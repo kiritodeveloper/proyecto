@@ -157,7 +157,7 @@ class Map2D:
             6: lambda p: [p[0] - 1, p[1]],
             7: lambda p: [p[0] - 1, p[1] + 1],
         }
-
+        print('en cell2connCoord: ', numNeigh, p)
         return result[numNeigh](p)
 
     def _pos2cell(self, x_mm, y_mm):
