@@ -5,6 +5,7 @@ import os
 import time
 import math
 import cv2
+import sys
 
 from RobotDrawer import start_robot_drawer
 from TimeUtils import delay_until
@@ -44,7 +45,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 2
+phase_from = 1
 phase_to = 5
 
 
@@ -103,37 +104,60 @@ def main(args):
         map_file = args.mapfile
 
         # 1. load map and compute costs and path
-        myMap = Map2D(map_file)
 
         # TODO START ODOMETRY POR SEPARADO
 
+        # COLOR -> FASE 1
+
+        robot = Robot()
+        if phase_from <= 1 and 1 <= phase_to:
+            new_color = robot.detect_color()
+            if new_color == 0:
+                salida = 'A'
+
+            elif new_color == 1:
+                salida = 'B'
+                map_file = "./maps/mapaB.txt"
+
+            print('LA SALIDA ES: ', salida)
+
+            robot.turn_off_color()
+
+            myMap = Map2D(map_file)
+
+        print("Pulsa un botón para empezar")
+        sys.stdin.read(1)
+
         # SLALOM -> FASE 2
 
+
         if phase_from <= 2 and 2 <= phase_to:
-            primera = False
+
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
-                pos1 = (starting_point[0], starting_point[1], math.pi)
-                pos2 = coord2Meters((1, 5, 0))
-                pos3 = coord2Meters((1, 3, math.pi))
+                pos1 = (starting_point[0], starting_point[1], -2.677945048)
+                pos2 = coord2Meters((1, 5, -0.4636475288))
+                pos3 = coord2Meters((1, 3, -2.677945048))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
-                v = 0.15
+                v = 0.198052943
                 w_parado = -math.pi / 8
-                w_movimiento = 0.375
+                w_movimiento = 0.442859844
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
-                pos1 = (starting_point[0], starting_point[1], 0)
-                pos2 = coord2Meters((5, 5, math.pi))
-                pos3 = coord2Meters((5, 3, 0))
-                pos4 = coord2Meters((5, 3, math.pi))
-                v = 0.15
+                pos1 = (starting_point[0], starting_point[1], -0.4636475288)
+                pos2 = coord2Meters((5, 5, -2.677945048))
+                pos3 = coord2Meters((5, 3, -0.4636475288))
+                pos4 = coord2Meters((5, 3, -math.pi/2))
+                v = 0.198052943
                 w_parado = math.pi / 8
-                w_movimiento = -0.375
+                w_movimiento = -0.442859844
+            if primera:
+                # Robot logger
+                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
+                robot.startRobot()
+                robot.resetOdometry(starting_point[0], starting_point[1], starting_point[2])
+                primera = False
 
-            robot = Robot(starting_point)
-            # Robot logger
-            start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
-            robot.startRobot()
 
             # Disable sensors
             robot.enableProximitySensor(False)
@@ -152,14 +176,6 @@ def main(args):
             robot.setSpeed(v, -w_movimiento)
             # robot.wait_for_position(pos3[0], pos3[1], 0.2, False)
             wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
-
-            # Giro 90 grados mirando al frente
-            robot.setSpeed(0, 0)
-
-            robot.setOdometry(None, None, math.pi)
-
-            robot.setSpeed(0, -w_parado)
-            robot.wait_for_th(pos4[2], 0.02)
 
             # Me detengo
             robot.setSpeed(0, 0)
@@ -271,7 +287,7 @@ def main(args):
             res = robot.trackObject(salida, colorRangeMin=redMin, colorRangeMax=redMax)
 
             print('Espero a que la camara se apague')
-            time.sleep(3)  # espera en segundos
+            time.sleep(0.2)  # espera en segundos
             print('Supongo que la camara esta apagada')
 
         # RECONOCIMIENTO -> FASE 5
@@ -283,7 +299,7 @@ def main(args):
             reco = Reco()
 
             if salida is 'A':
-                turn_speed = 0.1
+                turn_speed = 0.2
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
@@ -295,7 +311,7 @@ def main(args):
 
 
             else:
-                turn_speed = -0.1
+                turn_speed = -0.2
                 objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
@@ -332,10 +348,10 @@ def main(args):
             time.sleep(0.1 * 4 *  idem / 5)
 
             retro_value = 0.1
-            time_retro = abs((0.55 - previous_value/100)) / retro_value
+            time_retro = abs((0.20 - previous_value/100)) / retro_value
 
             print("tiempo", time_retro)
-            if previous_value > 55:
+            if previous_value > 20:
                 robot.setSpeed(retro_value, 0)
             else:
                 robot.setSpeed(-retro_value, 0)
@@ -362,89 +378,16 @@ def main(args):
 
             robot.setOdometry(None, 3.2 - previous_value / 100, None)
 
-            time_retro = abs((0.55 - previous_value/100)) / retro_value
-            """
-            print("tiempo",time_retro)
-            if previous_value > 55:
-                robot.setSpeed(retro_value, 0)
-            else:
-                robot.setSpeed(-retro_value, 0)
-            time.sleep(time_retro)
-            """
-            robot.setSpeed(0, 0)
-            print('YA HE PILLADO LA PELOTA Y VOY A: ', cell_to_recognize)
-            robot.go(cell_to_recognize[0], cell_to_recognize[1])
-            #print('y me MARCHEEEEE')
-
-
-
-            # ORIENTARSE HACIA ARRIBA (mirando al frente)
-
-            robot.orientate(math.pi / 2)
-
-            robot.enableProximitySensor(False)
-
-            R2D2 = cv2.imread("reco/R2-D2_s.png", cv2.IMREAD_COLOR)
-            BB8 = cv2.imread("reco/BB8_s.png", cv2.IMREAD_COLOR)
-
-            R2D2_detected, R2D2_points = reco.search_img(R2D2)
-            BB8_detected, BB8_points = reco.search_img(BB8)
-
-            print(R2D2_detected, BB8_detected)
-
-            turn_speed = 0.4
-            advance_time = 3.8
-
-            # SALIR POR LA PUERTA CORRESPONDIENTE
-            if BB8_detected and logo == 'BB8' and salida == 'A':
-                print('1')
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
-            elif R2D2_detected and logo == 'BB8' and salida == 'A':
-                print('2')
-                #turn_speed = -turn_speed
-                #advance_time = advance_time * 2
-                robot.go(cell_to_exit_right_1[0], cell_to_exit_right_1[1])
-                robot.go(cell_to_exit_right_2[0], cell_to_exit_right_2[1])
-                robot.go(cell_to_exit_right_3[0], cell_to_exit_right_3[1])
-            elif R2D2_detected and logo == 'R2D2' and salida == 'A':
-                print('3')
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
-            elif BB8_detected and logo == 'R2D2' and salida == 'A':
-                print('4')
-                robot.go(cell_to_exit_right_1[0], cell_to_exit_right_1[1])
-                robot.go(cell_to_exit_right_2[0], cell_to_exit_right_2[1])
-                robot.go(cell_to_exit_right_3[0], cell_to_exit_right_3[1])
-                turn_speed = -turn_speed
-                advance_time = advance_time * 2
-            elif BB8_detected and logo == 'BB8' and salida == 'B':
-                print('5')
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
-                turn_speed = -turn_speed
-            elif R2D2_detected and logo == 'BB8' and salida == 'B':
-                print('6')
-                robot.go(cell_to_exit_left_1[0], cell_to_exit_left_1[1])
-                robot.go(cell_to_exit_left_2[0], cell_to_exit_left_2[1])
-                robot.go(cell_to_exit_left_3[0], cell_to_exit_left_3[1])
-                advance_time = advance_time * 2
-            elif R2D2_detected and logo == 'R2D2' and salida == 'B':
-                print('7')
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
-                turn_speed = - turn_speed
-            elif BB8_detected and logo == 'R2D2' and salida == 'B':
-                print('8')
-                robot.go(cell_to_exit_left_1[0], cell_to_exit_left_1[1])
-                robot.go(cell_to_exit_left_2[0], cell_to_exit_left_2[1])
-                robot.go(cell_to_exit_left_3[0], cell_to_exit_left_3[1])
-                advance_time = advance_time * 2
-            elif salida == 'A':
-                robot.go(cell_to_exit_left[0], cell_to_exit_left[1])
-            else:
-                robot.go(cell_to_exit_right[0], cell_to_exit_right[1])
 
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
-            robot.orientate((math.pi / 2) - 0.1)
-            robot.setSpeed(0.2, 0)
-            time.sleep(2.5)
+            robot.orientate(math.pi / 2)
+
+            # Calcular distancia hasta linea meta
+            distance = (0.4*8 + 0.2) - y
+            sprint_speed = 0.25
+            sprint_time = distance / sprint_speed
+            robot.setSpeed(sprint_speed, 0)
+            time.sleep(sprint_time)
             robot.setSpeed(0, 0)
 
 

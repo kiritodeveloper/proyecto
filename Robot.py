@@ -92,8 +92,19 @@ class Robot:
         self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
         self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
+        # Color config
+        self.color_sensor = self.BP.PORT_2
+        self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
+
         # Basket state
         self.basket_state = 'up'
+
+        # Color vector
+        self.color = 10 * [None]
+        self.color_vector_pos = 0
+        self.actual_color = -1
+
+        self.color_limit = 2800
 
     ####################################################################################################################
     # Start stop robot
@@ -437,11 +448,11 @@ class Robot:
 
         # Depending how far is the ball, the robot will follow it faster or slower
         if size < 40:
-            v = 0.15
+            v = 0.25
         elif size < 80:
-            v = 0.10
+            v = 0.15
         else:
-            v = 0.08
+            v = 0.1
 
         return v, w
 
@@ -535,13 +546,13 @@ class Robot:
         """
         if movement != self.basket_state:
             if movement == 'up':
-                self.BP.set_motor_dps(self.motor_port_basket, -85)
-                time.sleep(1)
+                self.BP.set_motor_dps(self.motor_port_basket, -270)
+                time.sleep(0.27)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'up'
             elif movement == 'down':
-                self.BP.set_motor_dps(self.motor_port_basket, 85)
-                time.sleep(1)
+                self.BP.set_motor_dps(self.motor_port_basket, 270)
+                time.sleep(0.27)
                 self.BP.set_motor_dps(self.motor_port_basket, 0)
                 self.basket_state = 'down'
 
@@ -621,7 +632,7 @@ class Robot:
         [_, _, th_actual] = self.readOdometry()
 
         # Turn
-        turn_speed = math.pi / 6
+        turn_speed = math.pi / 4
 
         if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
             turn_speed = -turn_speed
@@ -694,3 +705,45 @@ class Robot:
         elif angle > math.pi:
             angle = angle - 2 * math.pi
         return angle
+
+    def update_color(self):
+        # Color = -1 is NONE
+        # Color = 0 is WHITE
+        # Color = 1 is BLACK
+        # Color = 2 is LINE
+
+        value = self.BP.get_sensor(self.color_sensor)
+
+        #print(value)
+
+        self.color[self.color_vector_pos] = value
+        self.color_vector_pos = (self.color_vector_pos + 1) % 10
+
+        if self.color[0] >= self.color_limit:
+            actual_color = 1
+        elif self.color[0] < self.color_limit:
+            actual_color = 0
+
+        for i in range(1, 10):
+            if self.color[0] >= self.color_limit and actual_color == 0:
+                actual_color = -1
+                break
+            elif self.color[0] < self.color_limit and actual_color == 1:
+                actual_color = -1
+                break
+
+        return actual_color
+
+    def detect_color(self):
+        actual_color = self.update_color()
+        while actual_color == -1:
+            actual_color = self.update_color()
+
+        return actual_color
+
+    def turn_off_color(self):
+        self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_OFF)
+
+
+
+
