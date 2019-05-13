@@ -503,7 +503,8 @@ class Map2D:
             return 2
         elif (math.pi / 2 + desviation) > th > (math.pi / 2 - desviation):
             return 0
-        elif (math.pi - desviation) < th < (-math.pi + desviation):
+        #
+        elif (math.pi - desviation) < th or th < (-math.pi + desviation):
             return 6
         elif (-math.pi / 2 + desviation) > th > (-math.pi / 2 - desviation):
             return 4
