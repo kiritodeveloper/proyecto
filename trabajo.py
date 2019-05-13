@@ -395,7 +395,7 @@ def main(args):
             robot.setSpeed(0, 0)
             '''
 
-            final_go = coord2Meters(3, 7, 0)
+            final_go = coord2Meters([3, 7, 0])
             robot.go(final_go[0], final_go[1])
 
         robot.stopOdometry()
