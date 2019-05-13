@@ -397,6 +397,8 @@ def main(args):
 
             final_go = coord2Meters([3, 7, 0])
             robot.go(final_go[0], final_go[1])
+            final_go = coord2Meters([3, 6, 0])
+            robot.go(final_go[0], final_go[1])
             robot.setSpeed(0.2, 0)
             time.sleep(1)
             robot.orientate(math.pi/2)
