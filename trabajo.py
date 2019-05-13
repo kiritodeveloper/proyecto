@@ -114,13 +114,13 @@ def main(args):
             primera = False
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
-                pos1 = (starting_point[0], starting_point[1], -2)
+                pos1 = (starting_point[0], starting_point[1], -2.677945048)
                 pos2 = coord2Meters((1, 5, -0.4636475288))
                 pos3 = coord2Meters((1, 3, -2.677945048))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
-                v = 0.2475659794
+                v = 0.247566178
                 w_parado = -math.pi / 8
-                w_movimiento = 0.5535743589
+                w_movimiento = 0.553574805
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], 0)
