@@ -614,7 +614,7 @@ class Robot:
                 last_error = actual_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = self.readOdometry()
-                    print(x_odo, y_odo, x, y)
+                    #print(x_odo, y_odo, x, y)
                     last_error = actual_error
                     actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
                     t_next_period += self.P
@@ -702,7 +702,7 @@ class Robot:
         else:
             # Go forward
             self.setSpeed(0.15, 0)
-            self.wait_for_position(final_x, final_y, 0.1)
+            self.wait_for_position(final_x, final_y, 0.2)
 
             # Stop robot
             self.setSpeed(0, 0)
