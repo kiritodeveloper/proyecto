@@ -120,6 +120,8 @@ def main(args):
                 salida = 'B'
                 map_file = "./maps/mapaB.txt"
 
+            robot.turn_off_color()
+
             myMap = Map2D(map_file)
 
         print("Pulsa un botón para empezar")
