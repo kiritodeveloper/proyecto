@@ -399,6 +399,7 @@ def main():
             robot.go(final_go[0], final_go[1])
             robot.setSpeed(0.4, 0)
             time.sleep(0.5)
+            # ok
             #robot.orientate(math.pi/2)
 
         robot.stopOdometry()
