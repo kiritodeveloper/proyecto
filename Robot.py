@@ -38,10 +38,10 @@ class Robot:
         self.lock_odometry = Lock()
 
         # Update period (shared constant values)
-        self.odometry_update_period = 0.015
+        self.odometry_update_period = 0.02
         self.speed_update_period = 0.03
-        self.proximity_update_period = 0.05
-        self.gyros_update_period = 0.02
+        self.proximity_update_period = 0.1
+        self.gyros_update_period = 0.025
 
         # Set robot physical parameters (shared constant values)
         self.wheel_radius = 0.028  # m
@@ -85,16 +85,10 @@ class Robot:
 
         # Sonar config
         self.motor_port_ultrasonic = self.BP.PORT_1
-        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
         self.min_distance_obstacle_detection = 30  # cm
-
-        # Gyroscopic sensors
-        self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
-        self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
 
         # Color config
         self.color_sensor = self.BP.PORT_2
-        self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
 
         # Basket state
         self.basket_state = 'up'
@@ -105,6 +99,8 @@ class Robot:
         self.actual_color = -1
 
         self.color_limit = 2800
+
+        self.sensors_lock = Lock()
 
     ####################################################################################################################
     # Start stop robot
@@ -237,7 +233,6 @@ class Robot:
 
                 # Final w
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
-                print(w, actual_value_gyro_1, actual_value_gyro_2)
 
             # Save speeds
             self.lock_actual_speed.acquire()
@@ -358,6 +353,10 @@ class Robot:
         Update the gyro read values periodically
         :return:
         """
+        # Gyroscopic sensors
+        self.BP.set_sensor_type(self.BP.PORT_3, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
+        self.BP.set_sensor_type(self.BP.PORT_4, self.BP.SENSOR_TYPE.CUSTOM, [(self.BP.SENSOR_CUSTOM.PIN1_ADC)])
+
         # Gyro sensors history
         history_gyro_1 = collections.deque(5 * [self.gyro_1_offset], self.history_max_size)
         history_gyro_2 = collections.deque(5 * [self.gyro_2_offset], self.history_max_size)
@@ -367,8 +366,10 @@ class Robot:
 
         while not self.finished.get():
             if self.enable_gyro_sensors.get():
+                self.sensors_lock.acquire()
                 history_gyro_1.append(self.BP.get_sensor(self.BP.PORT_3)[0])
                 history_gyro_2.append(self.BP.get_sensor(self.BP.PORT_4)[0])
+                self.sensors_lock.release()
 
             else:
                 history_gyro_1.append(self.gyro_1_offset)
@@ -401,6 +402,10 @@ class Robot:
         Update the proximity read values periodically
         :return:
         """
+        # Enable sensor
+        self.BP.set_sensor_type(self.motor_port_ultrasonic, self.BP.SENSOR_TYPE.NXT_ULTRASONIC)
+
+        time.sleep(1)
         # Proximity sensors history
         history_proximity = collections.deque(5 * [255], self.history_max_size)
 
@@ -409,7 +414,13 @@ class Robot:
 
         while not self.finished.get():
             if self.enable_proximity_sensor.get():
-                history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
+                self.sensors_lock.acquire()
+                try:
+                    history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
+                except Exception:
+                    print("Ha fallado el sonar")
+
+                self.sensors_lock.release()
             else:
                 history_proximity.append(255)
 
@@ -629,6 +640,7 @@ class Robot:
         # print("He llegado a : ", th_odo, " y busco: ", th)
 
     def orientate(self, aligned_angle):
+        self.enableGyroSensors(True)
         [_, _, th_actual] = self.readOdometry()
 
         # Turn
@@ -658,6 +670,8 @@ class Robot:
         # Stop robot
         self.setSpeed(0, 0)
 
+        self.enableGyroSensors(False)
+
     def go(self, x_goal, y_goal):
 
         [x_actual, y_actual, th_actual] = self.readOdometry()
@@ -672,9 +686,7 @@ class Robot:
         gyro_enabled = self.enable_gyro_sensors.get()
 
         # Turn
-        self.enableGyroSensors(True)
         self.orientate(aligned_angle)
-        self.enableGyroSensors(False)
 
         # Detect wall
         if self.detectObstacle():
@@ -714,7 +726,7 @@ class Robot:
 
         value = self.BP.get_sensor(self.color_sensor)
 
-        #print(value)
+        # print(value)
 
         self.color[self.color_vector_pos] = value
         self.color_vector_pos = (self.color_vector_pos + 1) % 10
@@ -735,15 +747,9 @@ class Robot:
         return actual_color
 
     def detect_color(self):
+        self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
         actual_color = self.update_color()
         while actual_color == -1:
             actual_color = self.update_color()
-
-        return actual_color
-
-    def turn_off_color(self):
         self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_OFF)
-
-
-
-
+        return actual_color

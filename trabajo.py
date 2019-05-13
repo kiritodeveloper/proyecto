@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import argparse
-import os
 import time
 import math
-import cv2
 import sys
 
 from RobotDrawer import start_robot_drawer
@@ -12,9 +10,6 @@ from TimeUtils import delay_until
 
 # import matplotlib
 from config_file import is_debug
-
-# matplotlib.use("TkAgg")
-# sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
 # from Robot import Robot
 from MapLib import Map2D
@@ -45,7 +40,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 1
+phase_from = 2
 phase_to = 5
 
 
@@ -90,55 +85,38 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
 
 
 def main(args):
-    """
-    Example to load "mapa1.txt"
-    """
-
     primera = True
 
     try:
-        if not os.path.isfile(args.mapfile):
-            print('Map file %s does not exist' % args.mapfile)
-            exit(1)
-
-        map_file = args.mapfile
-
         # 1. load map and compute costs and path
-
-        # TODO START ODOMETRY POR SEPARADO
-
         # COLOR -> FASE 1
 
         robot = Robot()
-        if phase_from <= 1 and 1 <= phase_to:
+        if phase_from <= 1 <= phase_to:
             new_color = robot.detect_color()
-            if new_color == 0:
-                salida = 'A'
-
-            elif new_color == 1:
-                salida = 'B'
-                map_file = "./maps/mapaB.txt"
-
+            salida = 'A' if new_color == 0 else 'B'
             print('LA SALIDA ES: ', salida)
+        else:
+            salida = args.mapfile
 
-            robot.turn_off_color()
+        map_file = "./maps/mapaA.txt" if salida is "A" else "./maps/mapaB.txt"
 
-            myMap = Map2D(map_file)
+        myMap = Map2D(map_file)
+
+        robot.startRobot()
+        robot.enableProximitySensor(True)
 
         print("Pulsa un botón para empezar")
         sys.stdin.read(1)
 
         # SLALOM -> FASE 2
-
-
-        if phase_from <= 2 and 2 <= phase_to:
+        if phase_from <= 2 <= phase_to:
 
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], -2.677945048)
                 pos2 = coord2Meters((1, 5, -0.4636475288))
                 pos3 = coord2Meters((1, 3, -2.677945048))
-                pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.198052943
                 w_parado = -math.pi / 8
                 w_movimiento = 0.442859844
@@ -147,7 +125,6 @@ def main(args):
                 pos1 = (starting_point[0], starting_point[1], -0.4636475288)
                 pos2 = coord2Meters((5, 5, -2.677945048))
                 pos3 = coord2Meters((5, 3, -0.4636475288))
-                pos4 = coord2Meters((5, 3, -math.pi/2))
                 v = 0.198052943
                 w_parado = math.pi / 8
                 w_movimiento = -0.442859844
@@ -155,13 +132,8 @@ def main(args):
                 # Robot logger
                 start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
                 robot.startRobot()
-                robot.resetOdometry(starting_point[0], starting_point[1], starting_point[2])
+                robot.setOdometry(starting_point[0], starting_point[1], starting_point[2])
                 primera = False
-
-
-            # Disable sensors
-            robot.enableProximitySensor(False)
-            robot.enableGyroSensors(False)
 
             # girar 90
             robot.setSpeed(0, w_parado)
@@ -169,20 +141,19 @@ def main(args):
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            #robot.wait_for_position(pos2[0], pos2[1], 0.2, False)
-            wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos2[0], pos2[1], 0.2, True)
+            # wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.2, 0.02)
 
             # semicirculo 2
             robot.setSpeed(v, -w_movimiento)
-            # robot.wait_for_position(pos3[0], pos3[1], 0.2, False)
-            wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
+            robot.wait_for_position(pos3[0], pos3[1], 0.2, True)
+            # wait_for_position(pos3[0], pos3[1], pos3[2], robot, 0.2, 0.02)
 
             # Me detengo
             robot.setSpeed(0, 0)
 
         # LABERINTO -> FASE 3
-
-        if phase_from <= 3 and 3 <= phase_to:
+        if phase_from <= 3 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 3, -math.pi / 2))
                 init_pos = [1, 3]
@@ -202,36 +173,31 @@ def main(args):
 
             primera = False
 
-            # Disable sensors
-            # TODO: Enable gyro sensors
+            # Enable sensors
             robot.enableProximitySensor(True)
-            robot.enableGyroSensors(True)
 
-            print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
             route = myMap.planPath([init_pos[0], init_pos[1]], [goal_x, goal_y])
 
             robot_locations = []
 
-            # TODO is debug poner que dibuje
-
             last_reached_pos = [init_pos[0], init_pos[1]]
 
             while len(route) > 0:
                 goal = route.pop(0)
-                #print('Ruta', route)
+                # print('Ruta', route)
                 partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell / 1000.0
                 partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell / 1000.0
-                #print('Partials: ', partial_goal_x, partial_goal_y)
-                #print('El goal: ', goal)
-                #print('Estoy: ', robot.readOdometry())
+                # print('Partials: ', partial_goal_x, partial_goal_y)
+                # print('El goal: ', goal)
+                # print('Estoy: ', robot.readOdometry())
                 no_obstacle = robot.go(partial_goal_x, partial_goal_y)
                 x_odo, y_odo, th_odo = robot.readOdometry()
                 if not no_obstacle:
                     # There are a obstacle
                     print('Obstacle detected')
                     x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
-                    #print('ODOMETRIIIA:', x, y, th)
+                    # print('ODOMETRIIIA:', x, y, th)
                     # Delete connections from detected wall
                     myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
                     myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
@@ -258,8 +224,7 @@ def main(args):
             print("Estoy principio 4", x, y, th)
         # COGER PELOTA -> FASE 4
 
-
-        if phase_from <= 4 and 4 <= phase_to:
+        if phase_from <= 4 <= phase_to:
             if primera:
                 if salida is 'A':
                     robot = Robot(coord2Meters([3, 3, math.pi / 2]))
@@ -277,9 +242,7 @@ def main(args):
             primera = False
 
             # Disable sensors
-            # TODO: Enable gyro sensors
             robot.enableProximitySensor(False)
-            robot.enableGyroSensors(False)
 
             redMin = (168, 180, 80)
             redMax = (2, 255, 255)
@@ -292,7 +255,7 @@ def main(args):
 
         # RECONOCIMIENTO -> FASE 5
         [x, y, th] = robot.readOdometry()
-        print("Principio de la 5",x, y, th)
+        print("Principio de la 5", x, y, th)
         if phase_from <= 5 and 5 <= phase_to:
             # TODO si es la primera activar odometria y demas
             # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
@@ -345,10 +308,10 @@ def main(args):
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.1 * 4 *  idem / 5)
+            time.sleep(0.1 * 4 * idem / 5)
 
             retro_value = 0.1
-            time_retro = abs((0.20 - previous_value/100)) / retro_value
+            time_retro = abs((0.20 - previous_value / 100)) / retro_value
 
             print("tiempo", time_retro)
             if previous_value > 20:
@@ -367,29 +330,27 @@ def main(args):
                 robot.setOdometry(1, None, 0)
 
             [x, y, th] = robot.readOdometry()
-            print("Ajustadas x e y", x, y, th, math.pi/2)
-            robot.orientate((math.pi/2) - turn_speed)
+            print("Ajustadas x e y", x, y, th, math.pi / 2)
+            robot.orientate((math.pi / 2) - turn_speed)
 
             robot.setSpeed(0, 0)
-            for i in range(1,20):
+            for i in range(1, 20):
                 previous_value = robot.proximity_raw.get()
 
             print("previous value", previous_value)
 
             robot.setOdometry(None, 3.2 - previous_value / 100, None)
 
-
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate(math.pi / 2)
 
             # Calcular distancia hasta linea meta
-            distance = (0.4*8 + 0.2) - y
+            distance = (0.4 * 8 + 0.2) - y
             sprint_speed = 0.25
             sprint_time = distance / sprint_speed
             robot.setSpeed(sprint_speed, 0)
             time.sleep(sprint_time)
             robot.setSpeed(0, 0)
-
 
         robot.stopRobot()
 
@@ -407,6 +368,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapaA.txt")
+                        default="A")
     args = parser.parse_args()
     main(args)
