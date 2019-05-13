@@ -88,7 +88,7 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
     print([x_odo, y_odo, th_odo])
 
 
-def main(args):
+def main():
     """
     Example to load "mapa1.txt"
     """
@@ -96,9 +96,6 @@ def main(args):
     primera = True
 
     try:
-        if not os.path.isfile(args.mapfile):
-            print('Map file %s does not exist' % args.mapfile)
-            exit(1)
 
         # 1. load map and compute costs and path
 
@@ -418,8 +415,8 @@ def main(args):
 if __name__ == "__main__":
     # get and parse arguments passed to main
     # Add as many args as you need ...
-    parser = argparse.ArgumentParser()
+    #parser = argparse.ArgumentParser()
     #parser.add_argument("-m", "--mapfile", help="path to find map file",
      #                   default="./maps/mapaA.txt")
-    args = parser.parse_args()
-    main(args)
+    #args = parser.parse_args()
+    main()
