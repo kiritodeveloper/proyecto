@@ -6,6 +6,7 @@ import numpy as np
 import time
 import math
 import cv2
+import sys
 
 from RobotDrawer import start_robot_drawer
 from utils import delay_until
@@ -104,14 +105,31 @@ def main(args):
         map_file = args.mapfile
 
         # 1. load map and compute costs and path
-        myMap = Map2D(map_file)
 
         # TODO START ODOMETRY POR SEPARADO
 
+        # COLOR -> FASE 1
+
+        robot = Robot()
+        if phase_from <= 1 and 1 <= phase_to:
+            new_color = robot.detect_color()
+            if new_color == 0:
+                salida = 'A'
+
+            elif new_color == 1:
+                salida = 'B'
+                map_file = "./maps/mapaB.txt"
+
+            myMap = Map2D(map_file)
+
+        print("Pulsa un botón para empezar")
+        sys.stdin.read(1)
+
         # SLALOM -> FASE 2
 
+
         if phase_from <= 2 and 2 <= phase_to:
-            primera = False
+
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], -2.677945048)
@@ -130,11 +148,13 @@ def main(args):
                 v = 0.240775
                 w_parado = math.pi / 8
                 w_movimiento = -0.375
+            if primera:
+                # Robot logger
+                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
+                robot.startOdometry()
+                robot.resetOdometry(starting_point[0],starting_point[1],starting_point[2])
+                primera = False
 
-            robot = Robot(starting_point)
-            # Robot logger
-            start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
-            robot.startOdometry()
 
             # Disable sensors
             robot.enableProximitySensor(False)
