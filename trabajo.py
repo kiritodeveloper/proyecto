@@ -347,7 +347,7 @@ def main(args):
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.75 * 4 *  idem / 5)
+            time.sleep(0.75 * idem / 2)
 
             retro_value = 0.1
             time_retro = abs((0.20 - previous_value/100)) / retro_value
