@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 import argparse
 import os
-import numpy as np
 import time
 import math
 import cv2
@@ -77,13 +76,13 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
         # None th provided
         while position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
-            t_next_period += robot.P
+            t_next_period += robot.odometry_update_period
             delay_until(t_next_period)
     else:
         while (position_error_margin < math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)) or (
                 th_error_margin < abs(th - th_odo)):
             [x_odo, y_odo, th_odo] = robot.readOdometry()
-            t_next_period += robot.P
+            t_next_period += robot.odometry_update_period
             delay_until(t_next_period)
             # print ([x_odo, y_odo, th_odo])
     print([x_odo, y_odo, th_odo])
@@ -309,8 +308,8 @@ def main(args):
             robot.setSpeed(0, 0)
             previous_value = 1000
             idem = 0
-            for i in range(1, 5):
-                [_, _, new_value] = robot.readSensors()
+            for i in range(4):
+                new_value = robot.proximity_raw.get()
 
             robot.setSpeed(0, turn_speed)
             new_value = 1000
@@ -320,7 +319,7 @@ def main(args):
                 else:
                     idem = 0
                     previous_value = new_value
-                [_,_,new_value] = robot.readSensors()
+                new_value = robot.proximity_raw.get()
                 new_value = math.floor(new_value)
                 print("new value", new_value)
                 time.sleep(0.1)
@@ -357,7 +356,7 @@ def main(args):
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
-                [_,_,previous_value] = robot.readSensors()
+                previous_value = robot.proximity_raw.get()
 
             print("previous value", previous_value)
 

@@ -28,7 +28,7 @@ def loop_robot_logger(finished, robot, file_name):
     # Wait until update odometry start
     time.sleep(0.5)
 
-    while not finished.value:
+    while not finished.get():
         [x, y, th] = robot.readOdometry()
         line_to_write = str(x) + "," + str(y) + "," + str(th) + "\n"
         file_to_write.write(line_to_write)
