@@ -101,7 +101,7 @@ def main():
 
         # TODO START ODOMETRY POR SEPARADO
 
-        phase_from = sys.argv[1]
+        phase_from = int(sys.argv[1])
         salida = sys.argv[2]
 
         # COLOR -> FASE 1
