@@ -252,7 +252,7 @@ def main(args):
             # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
             # Avanza un poco hacia delante para cruzar la linea de meta
             robot.orientate(math.pi / 2)
-            robot.setSpeed(0.2, 0)
+            robot.setSpeed(0.3, 0)
             time.sleep(2)
             robot.setSpeed(0, 0)
 
