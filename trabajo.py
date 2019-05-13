@@ -397,6 +397,7 @@ def main(args):
 
             final_go = coord2Meters([3, 7, 0])
             robot.go(final_go[0], final_go[1])
+            robot.orientate(math.pi/2)
 
         robot.stopOdometry()
 
