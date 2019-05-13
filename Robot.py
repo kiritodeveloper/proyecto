@@ -655,7 +655,7 @@ class Robot:
         [_, _, th_actual] = self.readOdometry()
 
         # Turn
-        turn_speed = math.pi / 6
+        turn_speed = math.pi / 3
 
         if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
             turn_speed = -turn_speed
@@ -670,9 +670,9 @@ class Robot:
         print('Estoy buscando th ', aligned_angle)
         print('Velocidad ', turn_speed)
         self.setSpeed(0, turn_speed)
-        self.wait_for_th(aligned_angle, 0.03)
+        self.wait_for_th(aligned_angle, 0.1)
 
-        correction_speed = np.sign(turn_speed) * math.pi / 16
+        correction_speed = np.sign(turn_speed) * math.pi / 8
 
         self.setSpeed(0, -correction_speed)
         self.wait_for_th(aligned_angle, 0.02)
