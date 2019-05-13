@@ -46,7 +46,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 2
+phase_from = 1
 phase_to = 5
 
 
