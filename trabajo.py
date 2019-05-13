@@ -401,6 +401,7 @@ def main():
             time.sleep(1)
             # ok
             #robot.orientate(math.pi/2)
+        robot.celebracion()
 
         robot.stopOdometry()
 
