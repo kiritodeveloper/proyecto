@@ -672,7 +672,7 @@ class Robot:
         self.setSpeed(0, turn_speed)
         self.wait_for_th(aligned_angle, 0.2)
 
-        correction_speed = np.sign(turn_speed) * math.pi / 10
+        correction_speed = np.sign(turn_speed) * math.pi / 14
 
         self.setSpeed(0, -correction_speed)
         self.wait_for_th(aligned_angle, 0.04)
@@ -701,7 +701,7 @@ class Robot:
             return False
         else:
             # Go forward
-            self.setSpeed(0.25, 0)
+            self.setSpeed(0.20, 0)
             self.wait_for_position(final_x, final_y, 0.2)
 
             # Stop robot
