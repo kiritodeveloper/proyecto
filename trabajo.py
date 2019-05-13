@@ -136,23 +136,23 @@ def main(args):
                 pos2 = coord2Meters((1, 5, -0.4636475288))
                 pos3 = coord2Meters((1, 3, -2.677945048))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
-                v = 0.247566178
+                v = 0.198052943
                 w_parado = -math.pi / 8
-                w_movimiento = 0.553574805
+                w_movimiento = 0.442859844
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
-                pos1 = (starting_point[0], starting_point[1], 0)
-                pos2 = coord2Meters((5, 5, math.pi))
-                pos3 = coord2Meters((5, 3, 0))
+                pos1 = (starting_point[0], starting_point[1], -0.4636475288)
+                pos2 = coord2Meters((5, 5, -2.677945048))
+                pos3 = coord2Meters((5, 3, -0.4636475288))
                 pos4 = coord2Meters((5, 3, math.pi))
-                v = 0.240775
+                v = 0.198052943
                 w_parado = math.pi / 8
-                w_movimiento = -0.375
+                w_movimiento = -0.442859844
             if primera:
                 # Robot logger
                 start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
                 robot.startOdometry()
-                robot.resetOdometry(starting_point[0],starting_point[1],starting_point[2])
+                robot.resetOdometry(starting_point[0], starting_point[1], starting_point[2])
                 primera = False
 
 
