@@ -498,7 +498,7 @@ class Map2D:
         Helper function to browse a direction by an angle
         """
         desviation = math.pi / 4
-
+        print('EN RAD 2 DIR ', th)
         if desviation > th > -desviation:
             return 2
         elif (math.pi / 2 + desviation) > th > (math.pi / 2 - desviation):
