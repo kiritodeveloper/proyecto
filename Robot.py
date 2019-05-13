@@ -672,7 +672,7 @@ class Robot:
         self.setSpeed(0, turn_speed)
         self.wait_for_th(aligned_angle, 0.2)
 
-        correction_speed = np.sign(turn_speed) * math.pi / 14
+        correction_speed = np.sign(turn_speed) * math.pi / 16
 
         self.setSpeed(0, -correction_speed)
         self.wait_for_th(aligned_angle, 0.02)
