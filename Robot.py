@@ -179,7 +179,7 @@ class Robot:
         :param w: angular speed in rad/s
         """
 
-        print("setting speed to %.2f %.2f" % (v, w))
+        #print("setting speed to %.2f %.2f" % (v, w))
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],

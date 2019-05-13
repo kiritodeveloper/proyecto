@@ -293,9 +293,11 @@ def main(args):
             print('Supongo que la camara esta apagada')
 
         # RECONOCIMIENTO -> FASE 5
+
         [x, y, th] = robot.readOdometry()
         print("Principio de la 5",x, y, th)
         if phase_from <= 5 and 5 <= phase_to:
+            '''
             # TODO si es la primera activar odometria y demas
             # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
             reco = Reco()
@@ -391,7 +393,10 @@ def main(args):
             robot.setSpeed(sprint_speed, 0)
             time.sleep(sprint_time)
             robot.setSpeed(0, 0)
+            '''
 
+            final_go = coord2Meters(3, 7, 0)
+            robot.go(final_go[0], final_go[1])
 
         robot.stopOdometry()
 
