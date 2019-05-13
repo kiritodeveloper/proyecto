@@ -701,7 +701,7 @@ class Robot:
             return False
         else:
             # Go forward
-            self.setSpeed(0.15, 0)
+            self.setSpeed(0.25, 0)
             self.wait_for_position(final_x, final_y, 0.2)
 
             # Stop robot
