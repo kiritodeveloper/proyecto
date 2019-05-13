@@ -6,12 +6,10 @@ from __future__ import division  # ''
 import collections
 import math
 import time  # import the time library for the sleep function
-import sys
 from multiprocessing import Process, Lock
 import numpy as np
 
 from SharedValue import SharedValue
-from config_file import *
 
 from RobotFrameCapturer import RobotFrameCapturer
 
@@ -40,10 +38,10 @@ class Robot:
         self.lock_odometry = Lock()
 
         # Update period (shared constant values)
-        self.odometry_update_period = 0.03
+        self.odometry_update_period = 0.015
         self.speed_update_period = 0.03
-        self.proximity_update_period = 0.03
-        self.gyros_update_period = 0.03
+        self.proximity_update_period = 0.05
+        self.gyros_update_period = 0.02
 
         # Set robot physical parameters (shared constant values)
         self.wheel_radius = 0.028  # m
@@ -61,8 +59,8 @@ class Robot:
         self.gyro_1_offset = 2325
         self.gyro_2_offset = 2367
 
-        self.gyro_1_correction_factor = 0.14 * 0.03
-        self.gyro_2_correction_factor = 0.135 * 0.03
+        self.gyro_1_correction_factor = 270.0
+        self.gyro_2_correction_factor = 330.0
 
         # Sensors raw dara
         self.gyro_1_raw = SharedValue('d', self.gyro_1_offset)
@@ -221,13 +219,14 @@ class Robot:
                 gyro_2 = self.gyro_1_raw.get()
 
                 # Sensor 1
-                actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) * self.gyro_1_correction_factor
+                actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) / self.gyro_1_correction_factor
 
                 # Sensor 2
-                actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) * self.gyro_2_correction_factor
+                actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) / self.gyro_2_correction_factor
 
                 # Final w
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
+                print(w, actual_value_gyro_1, actual_value_gyro_2)
 
             # Save speeds
             self.lock_actual_speed.acquire()

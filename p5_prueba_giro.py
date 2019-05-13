@@ -44,19 +44,22 @@ def path_90_degree_odometry(robot):
     """
     robot.enableGyroSensors(True)
     robot.orientate(math.pi / 2)
-    time.sleep(5)
+    robot.enableGyroSensors(False)
+    time.sleep(1)
 
-    robot.orientate(0)
-    time.sleep(5)
-
+# Odometry paths tests
+def path_180_degree_odometry(robot):
+    """
+    Instructions to do a 90 degrees turn based on odometry
+    :param robot: robot configuration
+    """
+    robot.enableGyroSensors(True)
     robot.orientate(math.pi)
-
-    # robot.setSpeed(0,  math.pi / 8)
-    # wait_for_th(robot,  math.pi / 2, 0.02)
-
-    # [_, _, th_odo] = robot.readOdometry()
-    #  print (th_odo)
-
+    robot.enableGyroSensors(False)
+    time.sleep(5)
+    robot.enableGyroSensors(True)
+    robot.orientate(0)
+    robot.enableGyroSensors(False)
 
 # Odometry paths tests
 def path_90_degree_odometry_2(robot):
