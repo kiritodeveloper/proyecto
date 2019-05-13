@@ -6,7 +6,6 @@ import os
 import matplotlib
 from config_file import is_debug
 
-
 matplotlib.use("TkAgg")
 # sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
 
@@ -15,6 +14,7 @@ import argparse
 from Robot import Robot
 from RobotLogger import start_robot_logger
 from RobotDrawer import *
+import sys
 
 
 # NOTES ABOUT TASKS to DO in P4:
@@ -32,6 +32,8 @@ def main(args):
         robot = Robot()
         robot.startOdometry()
 
+        print("Pulsa un botón para empezar")
+        sys.stdin.read(1)
 
         # Detect color
         '''color = None
