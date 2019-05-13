@@ -210,6 +210,7 @@ def main(args):
 
             print("Salida: ", salida)
             myMap.fillCostMatrix([goal_x, goal_y])
+            print(init_pos, goal_x, goal_y)
             route = myMap.planPath([init_pos[0], init_pos[1]], [goal_x, goal_y])
 
             robot_locations = []
