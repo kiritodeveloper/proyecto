@@ -183,6 +183,7 @@ class Map2D:
         close a connection, i.e., we can NOT go straight from cellX,cellY to its neighbour number numNeigh 
         """
         # from coordinates in the grid of cells to coordinates in the connection matrix
+        print('en delete connection: ', cellX, cellY, numNeigh)
         [connX, connY] = self._cell2connCoord(cellX, cellY, numNeigh)
         self.connectionMatrix[connX, connY] = 0  # False
 
