@@ -5,7 +5,7 @@ from config_file import is_debug
 from Robot import Robot
 from RobotDrawer import start_robot_drawer
 from RobotLogger import start_robot_logger
-
+import time
 
 def main(args):
     try:
@@ -43,6 +43,7 @@ def main(args):
         # 3. wrap up and close stuff ...
         # This currently unconfigure the sensors, disable the motors, 
         # and restore the LED to the control of the BrickPi3 firmware.
+        time.sleep(1000)
         robot.stopOdometry()
 
     except KeyboardInterrupt:
