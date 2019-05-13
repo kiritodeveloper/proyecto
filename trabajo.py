@@ -40,7 +40,7 @@ sizeCell = 400  # in mm
 logo = 'R2D2'
 
 # DUBUG
-phase_from = 1
+phase_from = 2
 phase_to = 5
 
 
@@ -86,14 +86,21 @@ def wait_for_position(x, y, th, robot, position_error_margin, th_error_margin):
 
 def main(args):
     primera = True
+    robot = Robot()
 
     try:
         # 1. load map and compute costs and path
         # COLOR -> FASE 1
 
-        robot = Robot()
+        robot.startRobot()
+
+        # Robot logger
+        start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
+
+        robot.enableProximitySensor(True)
+
         if phase_from <= 1 <= phase_to:
-            new_color = robot.detect_color()
+            new_color = robot.detectColor()
             salida = 'A' if new_color == 0 else 'B'
             print('LA SALIDA ES: ', salida)
         else:
@@ -103,15 +110,11 @@ def main(args):
 
         myMap = Map2D(map_file)
 
-        robot.startRobot()
-        robot.enableProximitySensor(True)
-
         print("Pulsa un botón para empezar")
         sys.stdin.read(1)
 
         # SLALOM -> FASE 2
         if phase_from <= 2 <= phase_to:
-
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], -2.677945048)
@@ -128,12 +131,9 @@ def main(args):
                 v = 0.198052943
                 w_parado = math.pi / 8
                 w_movimiento = -0.442859844
-            if primera:
-                # Robot logger
-                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
-                robot.startRobot()
-                robot.setOdometry(starting_point[0], starting_point[1], starting_point[2])
-                primera = False
+
+            robot.setOdometry(starting_point[0], starting_point[1], starting_point[2])
+            primera = False
 
             # girar 90
             robot.setSpeed(0, w_parado)
@@ -166,12 +166,8 @@ def main(args):
                 goal_y = 3
 
             if primera:
-                robot = Robot(starting_point)
-                # Robot logger
-                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
-                robot.startRobot()
-
-            primera = False
+                robot.setOdometry(starting_point[0], starting_point[1], starting_point[2])
+                primera = False
 
             # Enable sensors
             robot.enableProximitySensor(True)
@@ -213,33 +209,16 @@ def main(args):
             else:
                 print('Can\'t reached the goal')
 
-            # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
-            # Avanza un poco hacia delante para cruzar la linea de meta
-            #robot.orientate(math.pi / 2)
-            #robot.setSpeed(0.3, 0)
-            #time.sleep(2)
-            #robot.setSpeed(0, 0)
-
             [x, y, th] = robot.readOdometry()
             print("Estoy principio 4", x, y, th)
-        # COGER PELOTA -> FASE 4
 
+        # COGER PELOTA -> FASE 4
         if phase_from <= 4 <= phase_to:
             if primera:
                 if salida is 'A':
                     robot = Robot(coord2Meters([3, 3, math.pi / 2]))
                 else:
                     robot = Robot(coord2Meters([3, 3, math.pi / 2]))
-
-                if is_debug:
-                    start_robot_drawer(robot.finished, robot)
-                else:
-                    start_robot_logger(robot.finished, robot, "trayectoria_tracking.csv")
-
-                # 1. launch updateOdometry thread()
-                robot.startRobot()
-
-            primera = False
 
             # Disable sensors
             robot.enableProximitySensor(False)
@@ -256,39 +235,27 @@ def main(args):
         # RECONOCIMIENTO -> FASE 5
         [x, y, th] = robot.readOdometry()
         print("Principio de la 5", x, y, th)
-        if phase_from <= 5 and 5 <= phase_to:
-            # TODO si es la primera activar odometria y demas
+        if phase_from <= 5 <= phase_to:
             # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
             reco = Reco()
 
             if salida is 'A':
                 turn_speed = 0.3
                 objective_angle = 7 * math.pi / 8
-                cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_left[0] = cell_to_exit_left[0] - 0.1
-                cell_to_exit_right_1 = coord2Meters([5, 6, 0])
                 cell_to_exit_right_2 = coord2Meters([6, 6, 0])
                 cell_to_exit_right_2[0] = cell_to_exit_right_2[0] + 0.05
-                cell_to_exit_right_3 = coord2Meters([6, 7, 0])
-
 
             else:
                 turn_speed = -0.3
                 objective_angle = math.pi / 8
-                cell_to_recognize = coord2Meters([2, 6, 0])
-                cell_to_exit_left_1 = coord2Meters([1, 6, 0])
-                cell_to_exit_left_2 = coord2Meters([0, 6, 0])
-                cell_to_exit_left_3 = coord2Meters([0, 7, 0])
-                cell_to_exit_right = coord2Meters([3, 7, 0])
 
             robot.enableProximitySensor(True)
             robot.orientate(objective_angle)
             robot.setSpeed(0, 0)
             previous_value = 1000
             idem = 0
-            for i in range(4):
-                new_value = robot.proximity_raw.get()
 
             robot.setSpeed(0, turn_speed)
             new_value = 1000
@@ -355,9 +322,6 @@ def main(args):
         robot.stopRobot()
 
     except KeyboardInterrupt:
-        # except the program gets interrupted by Ctrl+C on the keyboard.
-        # THIS IS IMPORTANT if we want that motors STOP when we Ctrl+C ...
-        #    robot.stopOdometry()
         robot.catch("up")
         robot.stopRobot()
         reco.stop_camera()

@@ -38,9 +38,9 @@ class Robot:
         self.lock_odometry = Lock()
 
         # Update period (shared constant values)
-        self.odometry_update_period = 0.02
+        self.odometry_update_period = 0.015
         self.speed_update_period = 0.03
-        self.proximity_update_period = 0.1
+        self.proximity_update_period = 0.08
         self.gyros_update_period = 0.025
 
         # Set robot physical parameters (shared constant values)
@@ -93,14 +93,11 @@ class Robot:
         # Basket state
         self.basket_state = 'up'
 
-        # Color vector
-        self.color = 10 * [None]
-        self.color_vector_pos = 0
-        self.actual_color = -1
-
-        self.color_limit = 2800
-
+        # Lock to avoid read two sensors at same time
         self.sensors_lock = Lock()
+
+        # Color limit between black and white
+        self.color_limit = 2800
 
     ####################################################################################################################
     # Start stop robot
@@ -136,6 +133,10 @@ class Robot:
         Stop the odometry thread.
         """
         self.finished.set(True)
+        self.process_odometry.join()
+        self.process_update.join()
+        self.process_gyros.join()
+        self.process_proximity.join()
         self.BP.reset_all()
 
     ####################################################################################################################
@@ -411,14 +412,17 @@ class Robot:
 
         # current processor time in a floating point value, in seconds
         t_next_period = time.time()
+        i_dentro_sonar = 0
 
         while not self.finished.get():
             if self.enable_proximity_sensor.get():
                 self.sensors_lock.acquire()
                 try:
-                    history_proximity.append(self.BP.get_sensor(self.motor_port_ultrasonic))
+                    sensor_proximidad = self.BP.get_sensor(self.motor_port_ultrasonic)
+                    history_proximity.append(sensor_proximidad)
                 except Exception:
-                    print("Ha fallado el sonar")
+                    i_dentro_sonar += 1
+                    print("Ha fallado el sonar", i_dentro_sonar)
 
                 self.sensors_lock.release()
             else:
@@ -603,7 +607,7 @@ class Robot:
                 last_error = actual_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = self.readOdometry()
-                    #print(x_odo, y_odo, x, y)
+                    # print(x_odo, y_odo, x, y)
                     last_error = actual_error
                     actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
                     t_next_period += self.odometry_update_period
@@ -719,38 +723,24 @@ class Robot:
             angle = angle - 2 * math.pi
         return angle
 
-    def update_color(self):
-        # Color = -1 is NONE
-        # Color = 0 is WHITE
-        # Color = 1 is BLACK
-        # Color = 2 is LINE
+    def detectColor(self):
+        """
+        Detect the color below sensor
+        :return:
+        """
+        # Color vector
+        history_size = 10
+        color_vector = history_size * [2000]
 
-        value = self.BP.get_sensor(self.color_sensor)
-
-        # print(value)
-
-        self.color[self.color_vector_pos] = value
-        self.color_vector_pos = (self.color_vector_pos + 1) % 10
-
-        if self.color[0] >= self.color_limit:
-            actual_color = 1
-        elif self.color[0] < self.color_limit:
-            actual_color = 0
-
-        for i in range(1, 10):
-            if self.color[0] >= self.color_limit and actual_color == 0:
-                actual_color = -1
-                break
-            elif self.color[0] < self.color_limit and actual_color == 1:
-                actual_color = -1
-                break
-
-        return actual_color
-
-    def detect_color(self):
         self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
-        actual_color = self.update_color()
-        while actual_color == -1:
-            actual_color = self.update_color()
+
+        for i in range(history_size):
+            color_vector[i] = self.BP.get_sensor(self.color_sensor)
+            time.sleep(0.1)
+
+        color_mean = sum(color_vector) / history_size
+
+        actual_color = 1 if color_mean >= self.color_limit else 0
+
         self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_OFF)
         return actual_color
