@@ -675,7 +675,7 @@ class Robot:
         correction_speed = np.sign(turn_speed) * math.pi / 12
 
         self.setSpeed(0, -correction_speed)
-        self.wait_for_th(aligned_angle, 0.2)
+        self.wait_for_th(aligned_angle, 0.04)
         print("Ha encontrado th")
 
         # Stop robot
