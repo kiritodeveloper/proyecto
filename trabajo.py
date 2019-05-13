@@ -137,18 +137,18 @@ def main():
                 pos2 = coord2Meters((1, 5, -0.4636475288))
                 pos3 = coord2Meters((1, 3, -2.677945048))
                 pos4 = coord2Meters((1, 3, -math.pi/2))
-                v = 0.198052943 * 1.2
+                v = 0.198052943 * 1.1
                 w_parado = -math.pi / 8
-                w_movimiento = 0.442859844 * 1.2
+                w_movimiento = 0.442859844 * 1.1
             else:  # Salida es B
                 starting_point = coord2Meters((5, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], -0.4636475288)
                 pos2 = coord2Meters((5, 5, -2.677945048))
                 pos3 = coord2Meters((5, 3, -0.4636475288))
                 pos4 = coord2Meters((5, 3, -math.pi/2))
-                v = 0.198052943 * 1.2
+                v = 0.198052943 * 1.1
                 w_parado = math.pi / 8
-                w_movimiento = -0.442859844 * 1.2
+                w_movimiento = -0.442859844 * 1.1
             if primera:
                 # Robot logger
                 start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
