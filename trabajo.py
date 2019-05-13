@@ -100,8 +100,6 @@ def main(args):
             print('Map file %s does not exist' % args.mapfile)
             exit(1)
 
-        map_file = args.mapfile
-
         # 1. load map and compute costs and path
 
         # TODO START ODOMETRY POR SEPARADO
@@ -116,6 +114,7 @@ def main(args):
             new_color = robot.detect_color()
             if new_color == 0:
                 salida = 'A'
+                map_file = './maps/mapaA.txt'
 
             elif new_color == 1:
                 salida = 'B'
@@ -420,7 +419,7 @@ if __name__ == "__main__":
     # get and parse arguments passed to main
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="./maps/mapaA.txt")
+    #parser.add_argument("-m", "--mapfile", help="path to find map file",
+     #                   default="./maps/mapaA.txt")
     args = parser.parse_args()
     main(args)
