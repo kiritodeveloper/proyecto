@@ -5,13 +5,8 @@ import time
 import math
 import sys
 
-from RobotDrawer import start_robot_drawer
 from TimeUtils import delay_until
 
-# import matplotlib
-from config_file import is_debug
-
-# from Robot import Robot
 from MapLib import Map2D
 from Robot import Robot
 from RobotLogger import start_robot_logger
@@ -96,8 +91,6 @@ def main(args):
 
         # Robot logger
         start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
-
-        robot.enableProximitySensor(True)
 
         if phase_from <= 1 <= phase_to:
             new_color = robot.detectColor()
@@ -332,6 +325,6 @@ if __name__ == "__main__":
     # Add as many args as you need ...
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mapfile", help="path to find map file",
-                        default="A")
+                        default="B")
     args = parser.parse_args()
     main(args)

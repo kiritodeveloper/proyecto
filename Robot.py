@@ -38,10 +38,10 @@ class Robot:
         self.lock_odometry = Lock()
 
         # Update period (shared constant values)
-        self.odometry_update_period = 0.015
-        self.speed_update_period = 0.03
-        self.proximity_update_period = 0.08
-        self.gyros_update_period = 0.025
+        self.odometry_update_period = 0.01
+        self.speed_update_period = 0.02
+        self.proximity_update_period = 0.1
+        self.gyros_update_period = 0.02
 
         # Set robot physical parameters (shared constant values)
         self.wheel_radius = 0.028  # m
@@ -59,8 +59,8 @@ class Robot:
         self.gyro_1_offset = 2325
         self.gyro_2_offset = 2367
 
-        self.gyro_1_correction_factor = 270.0
-        self.gyro_2_correction_factor = 330.0
+        self.gyro_1_correction_factor = 260.0
+        self.gyro_2_correction_factor = 290.0
 
         # Sensors raw dara
         self.gyro_1_raw = SharedValue('d', self.gyro_1_offset)
@@ -233,6 +233,7 @@ class Robot:
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) / self.gyro_2_correction_factor
 
                 # Final w
+                print(w, actual_value_gyro_1, actual_value_gyro_2)
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
 
             # Save speeds
@@ -631,17 +632,15 @@ class Robot:
         t_next_period = time.time()
 
         # Repeat while error decrease
-        last_error = abs(self.normalizeAngle(th - th_odo))
-        actual_error = last_error
-        while th_error_margin < actual_error:
+        actual_error = abs(self.normalizeAngle(th - th_odo))
+        last_error = 0
+        while th_error_margin < actual_error or last_error >= actual_error:
+            [_, _, th_odo] = self.readOdometry()
+            # print("Tengo th: ", th_odo, " y busco: ", th)
             last_error = actual_error
-            while last_error >= actual_error:
-                [_, _, th_odo] = self.readOdometry()
-                # print("Tengo th: ", th_odo, " y busco: ", th)
-                last_error = actual_error
-                actual_error = abs(self.normalizeAngle(th - th_odo))
-                t_next_period += self.odometry_update_period
-                delay_until(t_next_period)
+            actual_error = abs(self.normalizeAngle(th - th_odo))
+            t_next_period += self.odometry_update_period
+            delay_until(t_next_period)
         # print("He llegado a : ", th_odo, " y busco: ", th)
 
     def orientate(self, aligned_angle):
@@ -649,7 +648,7 @@ class Robot:
         [_, _, th_actual] = self.readOdometry()
 
         # Turn
-        turn_speed = math.pi / 3
+        turn_speed = math.pi / 4
 
         if aligned_angle > 5 * math.pi / 6 and th_actual < -math.pi / 4:
             turn_speed = -turn_speed
@@ -661,15 +660,13 @@ class Robot:
         elif aligned_angle < th_actual and not (th_actual > 5 * math.pi / 6 and aligned_angle < -math.pi / 4):
             turn_speed = -turn_speed
 
-        print('Estoy buscando th ', aligned_angle)
-        print('Velocidad ', turn_speed)
         self.setSpeed(0, turn_speed)
-        self.wait_for_th(aligned_angle, 0.10)
+        self.wait_for_th(aligned_angle, 0.1)
 
-        correction_speed = np.sign(turn_speed) * math.pi / 8
+        correction_speed = np.sign(turn_speed) * math.pi / 12
 
         self.setSpeed(0, -correction_speed)
-        self.wait_for_th(aligned_angle, 0.02)
+        self.wait_for_th(aligned_angle, 0.01)
         print("Ha encontrado th")
 
         # Stop robot

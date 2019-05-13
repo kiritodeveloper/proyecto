@@ -42,9 +42,7 @@ def path_90_degree_odometry(robot):
     Instructions to do a 90 degrees turn based on odometry
     :param robot: robot configuration
     """
-    robot.enableGyroSensors(True)
     robot.orientate(math.pi / 2)
-    robot.enableGyroSensors(False)
     time.sleep(1)
 
 # Odometry paths tests
@@ -53,13 +51,9 @@ def path_180_degree_odometry(robot):
     Instructions to do a 90 degrees turn based on odometry
     :param robot: robot configuration
     """
-    robot.enableGyroSensors(True)
     robot.orientate(math.pi)
-    robot.enableGyroSensors(False)
     time.sleep(5)
-    robot.enableGyroSensors(True)
     robot.orientate(0)
-    robot.enableGyroSensors(False)
 
 # Odometry paths tests
 def path_90_degree_odometry_2(robot):
@@ -67,7 +61,6 @@ def path_90_degree_odometry_2(robot):
     Instructions to do a 90 degrees turn based on odometry
     :param robot: robot configuration
     """
-    robot.enableGyroSensors(True)
     time.sleep(3)
 
     print("Estamos girando 90")
@@ -99,7 +92,7 @@ def main():
 
         # 1. launch updateOdometry Process()
         robot.startRobot()
-
+        time.sleep(2)
         # 2. perform trajectory
         path_90_degree_odometry(robot)
 
