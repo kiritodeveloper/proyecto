@@ -59,12 +59,12 @@ class Robot:
         self.gyro_1_offset = 2325
         self.gyro_2_offset = 2367
 
-        self.gyro_1_correction_factor = 260.0
-        self.gyro_2_correction_factor = 290.0
+        self.gyro_1_correction_factor = 230.0
+        self.gyro_2_correction_factor = 270.0
 
         # Sensors raw dara
         self.gyro_1_raw = SharedValue('d', self.gyro_1_offset)
-        self.gyro_2_raw = ('d', self.gyro_2_offset)
+        self.gyro_2_raw = SharedValue('d', self.gyro_1_offset)
         self.proximity_raw = SharedValue('d', 255)
 
         # Enable sensors
@@ -224,7 +224,7 @@ class Robot:
             if self.enable_gyro_sensors.get():
                 # Only if is enabled, read gyro sensors
                 gyro_1 = self.gyro_1_raw.get()
-                gyro_2 = self.gyro_1_raw.get()
+                gyro_2 = self.gyro_2_raw.get()
 
                 # Sensor 1
                 actual_value_gyro_1 = - (gyro_1 - self.gyro_1_offset) / self.gyro_1_correction_factor
@@ -233,7 +233,6 @@ class Robot:
                 actual_value_gyro_2 = - (gyro_2 - self.gyro_2_offset) / self.gyro_2_correction_factor
 
                 # Final w
-                print(w, actual_value_gyro_1, actual_value_gyro_2)
                 w = (w + actual_value_gyro_1 + actual_value_gyro_2) / 3.0
 
             # Save speeds
@@ -381,7 +380,7 @@ class Robot:
                 history_gyro_2) / self.history_max_size
 
             self.gyro_1_raw.set(gyro_1)
-            self.gyro_1_raw.set(gyro_1)
+            self.gyro_2_raw.set(gyro_2)
 
         # Periodic task
         t_next_period += self.gyros_update_period
@@ -390,7 +389,6 @@ class Robot:
     ####################################################################################################################
     # Proximity sensor
     ####################################################################################################################
-
     def enableProximitySensor(self, value):
         """
         Enable/Disable proximity sensor
@@ -575,15 +573,12 @@ class Robot:
     ####################################################################################################################
     # Navigating
     ####################################################################################################################
-
     def detectObstacle(self):
         """
         Return true if detect obstacle in the next cell
         :return:
         """
         sensor_value = self.proximity_raw.get()
-
-        print("Distancia: ", sensor_value)
         return sensor_value < self.min_distance_obstacle_detection
 
     def wait_for_position(self, x, y, position_error_margin, minimize_error=True):
@@ -620,8 +615,6 @@ class Robot:
                 t_next_period += self.odometry_update_period
                 delay_until(t_next_period)
 
-        print("He llegado a : ", x_odo, y_odo, " y busco: ", x, y)
-
     def wait_for_th(self, th, th_error_margin):
         """
         Wait until the robot reaches the position
@@ -636,14 +629,17 @@ class Robot:
         last_error = 0
         while th_error_margin < actual_error or last_error >= actual_error:
             [_, _, th_odo] = self.readOdometry()
-            # print("Tengo th: ", th_odo, " y busco: ", th)
             last_error = actual_error
             actual_error = abs(self.normalizeAngle(th - th_odo))
             t_next_period += self.odometry_update_period
             delay_until(t_next_period)
-        # print("He llegado a : ", th_odo, " y busco: ", th)
 
     def orientate(self, aligned_angle):
+        """
+        Orientate to aligned angle
+        :param aligned_angle:
+        :return:
+        """
         self.enableGyroSensors(True)
         [_, _, th_actual] = self.readOdometry()
 
@@ -667,7 +663,6 @@ class Robot:
 
         self.setSpeed(0, -correction_speed)
         self.wait_for_th(aligned_angle, 0.01)
-        print("Ha encontrado th")
 
         # Stop robot
         self.setSpeed(0, 0)
@@ -675,10 +670,13 @@ class Robot:
         self.enableGyroSensors(False)
 
     def go(self, x_goal, y_goal):
-
+        """
+        Go to the position x and y
+        :param x_goal:
+        :param y_goal:
+        :return:
+        """
         [x_actual, y_actual, th_actual] = self.readOdometry()
-
-        print('Estoy en: ', x_actual, y_actual, th_actual)
 
         # Obtain positions
         final_x = x_goal
@@ -730,6 +728,7 @@ class Robot:
         color_vector = history_size * [2000]
 
         self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
+        time.sleep(1)
 
         for i in range(history_size):
             color_vector[i] = self.BP.get_sensor(self.color_sensor)
