@@ -185,12 +185,12 @@ def main():
                 starting_point = coord2Meters((1, 3, -math.pi / 2))
                 init_pos = [1, 3]
                 goal_x = 3
-                goal_y = 3
+                goal_y = 2
             else:  # Salida es B
                 starting_point = coord2Meters((5, 3, -math.pi / 2))
                 init_pos = [5, 3]
                 goal_x = 3
-                goal_y = 3
+                goal_y = 2
 
             if primera:
                 robot = Robot(starting_point)
@@ -247,13 +247,18 @@ def main():
             else:
                 print('Can\'t reached the goal')
 
+            robot.setSpeed(0, -0.5)
+            time.sleep(0.2)
+
+            robot.resetOdometry(None, None, math.pi / 2)
+
             # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
             # Avanza un poco hacia delante para cruzar la linea de meta
             #robot.orientate(math.pi / 2)
             #robot.resetOdometry(_, _, math.pi/2)
-            #robot.setSpeed(0.2, 0)
-            #time.sleep(2)
-            #robot.setSpeed(0, 0)
+            robot.setSpeed(0.2, 0)
+            time.sleep(2)
+            robot.setSpeed(0, 0)
 
             [x, y, th] = robot.readOdometry()
             print("Estoy principio 4", x, y, th)
