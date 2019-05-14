@@ -1,4 +1,4 @@
-from RobotDrawer_python3 import plot_log, plot_log_with_map
+from test.RobotDrawer_python3 import plot_log
 
 
 def main():

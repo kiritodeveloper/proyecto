@@ -43,7 +43,7 @@ def main(args):
         robot.startRobot()
 
         # Robot logger
-        start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
+        start_robot_logger(robot.finished, robot, "./out/trayectoria.csv")
 
         if phase_from <= 1 <= phase_to:
             new_color = robot.detectColor()
