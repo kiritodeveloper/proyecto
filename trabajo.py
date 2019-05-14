@@ -400,6 +400,7 @@ def main():
             robot.go(final_go[0], final_go[1])
             robot.setSpeed(0.3, 0)
             time.sleep(1)
+            robot.setSpeed(0, 0)
             # ok
             #robot.orientate(math.pi/2)
         robot.celebracion()
