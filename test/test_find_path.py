@@ -1,5 +1,5 @@
-from MapLib_python3 import Map2D
-from RobotDrawer_python3 import plot_log_with_map_path
+from test.MapLib_python3 import Map2D
+from test.RobotDrawer_python3 import plot_log_with_map_path
 
 map_path = "./maps/mapa3.txt"
 myMap = Map2D(map_path)

@@ -128,7 +128,7 @@ def main():
                 w_movimiento = -0.442859844
             if primera:
                 # Robot logger
-                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo_2.csv")
+                start_robot_logger(robot.finished, robot, "./out/trayectoria.csv")
                 robot.startOdometry()
                 robot.resetOdometry(starting_point[0], starting_point[1], starting_point[2])
                 primera = False
@@ -170,7 +170,7 @@ def main():
             if primera:
                 robot = Robot(starting_point)
                 # Robot logger
-                start_robot_logger(robot.finished, robot, "./out/trayectoria_trabajo.csv")
+                start_robot_logger(robot.finished, robot, "./out/trayectoria.csv")
                 robot.startOdometry()
 
             primera = False
@@ -242,7 +242,7 @@ def main():
                 if is_debug:
                     start_robot_drawer(robot.finished, robot)
                 else:
-                    start_robot_logger(robot.finished, robot, "trayectoria_tracking.csv")
+                    start_robot_logger(robot.finished, robot, "trayectoria.csv")
 
                 # 1. launch updateOdometry thread()
                 robot.startOdometry()
