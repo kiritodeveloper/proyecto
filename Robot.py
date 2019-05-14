@@ -32,24 +32,6 @@ class Robot:
         Initialize Motors and Sensors according to the set up in your robot
         """
 
-        ##################################################
-        # Motors and sensors setup
-
-        # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-        # self.BP = brickpi3.BrickPi3()
-
-        # Configure sensors, for example a touch sensor.
-        # self.BP.set_sensor_type(self.BP.PORT_1, self.BP.SENSOR_TYPE.TOUCH)
-
-        # reset encoder B and C (or all the motors you are using)
-        # self.BP.offset_motor_encoder(self.BP.PORT_B,
-        #    self.BP.get_motor_encoder(self.BP.PORT_B))
-        # self.BP.offset_motor_encoder(self.BP.PORT_C,
-        #    self.BP.get_motor_encoder(self.BP.PORT_C))
-
-        ##################################################
-
-
         # odometry shared memory values
         self.x = Value('d', init_position[0])
         self.y = Value('d', init_position[1])
@@ -102,19 +84,6 @@ class Robot:
             self.gyro_1_offset = 2325
             self.gyro_2_offset = 2367
 
-        """
-            for i in range(10):
-                self.gyro_1_offset += self.BP.get_sensor(self.BP.PORT_3)[0]
-                self.gyro_2_offset += self.BP.get_sensor(self.BP.PORT_4)[0]
-                time.sleep(0.1)
-
-            self.gyro_1_offset /= 10
-            self.gyro_2_offset /= 10
-        """
-
-        # print("Gyro 1 offset ", self.gyro_1_offset)
-        # print("Gyro 2 offset ", self.gyro_2_offset)
-
         self.gyro_1_correction_factor = 0.14
         self.gyro_2_correction_factor = 0.135
 
@@ -160,8 +129,6 @@ class Robot:
 
         self.color_limit = 2800
 
-
-
     def enableGyroSensors(self, value):
         self.lock_odometry.acquire()
         self.enable_gyro_sensors.value = value
@@ -178,8 +145,6 @@ class Robot:
         :param v: lineal speed in m/s
         :param w: angular speed in rad/s
         """
-
-        #print("setting speed to %.2f %.2f" % (v, w))
 
         # compute the speed that should be set in each motor ..
         w_motors = np.array([[1 / self.wheel_radius, self.axis_length / (2 * self.wheel_radius)],
@@ -532,26 +497,6 @@ class Robot:
                         self.catch('down')
                         followBallRecognised = False
                         finished = True
-                        '''
-                        if salida == 'A':
-                            self.setSpeed(0, 0.4)
-                        else:
-                            self.setSpeed(0, -0.4)
-
-                        time.sleep(5)
-
-                        self.setSpeed(0, 0)
-                        _, _, size = frame_capturer.getPosition()
-
-                        # If ball is in the basket, finish, else lift the basket
-                        if size > 70:
-                            followBallRecognised = False
-                            finished = True
-
-                        else:
-                            self.catch('up')
-                            self.setSpeed(next_v, next_w)
-                        '''
                     else:
                         self.setSpeed(next_v, next_w)
                 else:
@@ -614,7 +559,7 @@ class Robot:
                 last_error = actual_error
                 while last_error >= actual_error:
                     [x_odo, y_odo, _] = self.readOdometry()
-                    #print(x_odo, y_odo, x, y)
+                    # print(x_odo, y_odo, x, y)
                     last_error = actual_error
                     actual_error = math.sqrt((x_odo - x) ** 2 + (y_odo - y) ** 2)
                     t_next_period += self.P
@@ -717,7 +662,7 @@ class Robot:
 
         value = self.BP.get_sensor(self.color_sensor)
 
-        #print(value)
+        # print(value)
 
         self.color[self.color_vector_pos] = value
         self.color_vector_pos = (self.color_vector_pos + 1) % 10
@@ -747,11 +692,14 @@ class Robot:
     def turn_off_color(self):
         self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_OFF)
 
-
     def turn_on_color(self):
         self.BP.set_sensor_type(self.color_sensor, self.BP.SENSOR_TYPE.NXT_LIGHT_ON)
 
     def celebracion(self):
+        """
+        Realiza la celebracion final
+        :return:
+        """
         print("Pulsa un botón para celebrar")
         sys.stdin.read(1)
         self.setSpeed(0, 5)
@@ -797,4 +745,3 @@ class Robot:
         self.catch('down')
         self.turn_off_color()
         self.catch('up')
-

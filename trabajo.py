@@ -1,35 +1,20 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import argparse
-import os
-import numpy as np
 import time
 import math
-import cv2
 import sys
 
 from RobotDrawer import start_robot_drawer
 from utils import delay_until
 
-# import matplotlib
 from config_file import is_debug
 
-# matplotlib.use("TkAgg")
-# sudo apt-get install tcl-dev tk-dev python-tk python3-tk if TkAgg is not available
-
-# from Robot import Robot
 from MapLib import Map2D
 from Robot import Robot
 from RobotLogger import start_robot_logger
 
 # Recognization
 from reco import Reco
-
-# NOTES ABOUT TASKS to DO in P4:
-# 1)findPath(x1,y1, x2,y2),   fillCostMatrix(), replanPath () --> should be methods from the new Map2D class
-# 2) go(x,y) and detectObstacle() could be part of your Robot class (depending how you have implemented things)
-# 3) you can change the method signatures if you need, depending how you have implemented things
-
 
 # ---- PHASES ----
 # 1 -> DETECTAR SALIDA
@@ -98,16 +83,13 @@ def main():
     try:
 
         # 1. load map and compute costs and path
-
-        # TODO START ODOMETRY POR SEPARADO
-
         phase_from = int(sys.argv[1])
         salida = sys.argv[2]
 
         # COLOR -> FASE 1
 
         robot = Robot()
-        if phase_from <= 1 and 1 <= phase_to:
+        if phase_from <= 1 <= phase_to:
             new_color = robot.detect_color()
             if new_color == 0:
                 salida = 'A'
@@ -127,16 +109,12 @@ def main():
         sys.stdin.read(1)
 
         # SLALOM -> FASE 2
-
-
-        if phase_from <= 2 and 2 <= phase_to:
-
+        if phase_from <= 2 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 7, -math.pi / 2))
                 pos1 = (starting_point[0], starting_point[1], -2.677945048)
                 pos2 = coord2Meters((1, 5, -0.4636475288))
                 pos3 = coord2Meters((1, 3, -2.677945048))
-                pos4 = coord2Meters((1, 3, -math.pi/2))
                 v = 0.198052943
                 w_parado = -math.pi / 8
                 w_movimiento = 0.442859844
@@ -145,7 +123,6 @@ def main():
                 pos1 = (starting_point[0], starting_point[1], -0.4636475288)
                 pos2 = coord2Meters((5, 5, -2.677945048))
                 pos3 = coord2Meters((5, 3, -0.4636475288))
-                pos4 = coord2Meters((5, 3, -math.pi/2))
                 v = 0.198052943
                 w_parado = math.pi / 8
                 w_movimiento = -0.442859844
@@ -155,7 +132,6 @@ def main():
                 robot.startOdometry()
                 robot.resetOdometry(starting_point[0], starting_point[1], starting_point[2])
                 primera = False
-
 
             # Disable sensors
             robot.enableProximitySensor(False)
@@ -167,7 +143,7 @@ def main():
 
             # semicirculo 1
             robot.setSpeed(v, w_movimiento)
-            #robot.wait_for_position(pos2[0], pos2[1], 0.2, False)
+            # robot.wait_for_position(pos2[0], pos2[1], 0.2, False)
             wait_for_position(pos2[0], pos2[1], pos2[2], robot, 0.1, 0.02)
 
             # semicirculo 2
@@ -179,8 +155,7 @@ def main():
             robot.setSpeed(0, 0)
 
         # LABERINTO -> FASE 3
-
-        if phase_from <= 3 and 3 <= phase_to:
+        if phase_from <= 3 <= phase_to:
             if salida is 'A':
                 starting_point = coord2Meters((1, 3, -math.pi / 2))
                 init_pos = [1, 3]
@@ -201,7 +176,6 @@ def main():
             primera = False
 
             # Disable sensors
-            # TODO: Enable gyro sensors
             robot.enableProximitySensor(True)
             robot.enableGyroSensors(True)
 
@@ -213,25 +187,21 @@ def main():
 
             robot_locations = []
 
-            # TODO is debug poner que dibuje
-
             last_reached_pos = [init_pos[0], init_pos[1]]
 
             while len(route) > 0:
                 goal = route.pop(0)
-                #print('Ruta', route)
+
                 partial_goal_x = (goal[0] + 0.5) * myMap.sizeCell / 1000.0
                 partial_goal_y = (goal[1] + 0.5) * myMap.sizeCell / 1000.0
-                #print('Partials: ', partial_goal_x, partial_goal_y)
-                #print('El goal: ', goal)
-                #print('Estoy: ', robot.readOdometry())
+
                 no_obstacle = robot.go(partial_goal_x, partial_goal_y)
                 x_odo, y_odo, th_odo = robot.readOdometry()
                 if not no_obstacle:
                     # There are a obstacle
                     print('Obstacle detected')
                     x, y, th = myMap.odometry2Cells(x_odo, y_odo, th_odo)
-                    #print('ODOMETRIIIA:', x, y, th)
+
                     # Delete connections from detected wall
                     myMap.deleteConnection(int(x), int(y), myMap.rad2Dir(th))
                     myMap.deleteConnection(int(x), int(y), (myMap.rad2Dir(th) + 1) % 8)
@@ -254,18 +224,15 @@ def main():
 
             # ORIENTARSE Y AVANZAR UN POCO PARA DELANTE
             # Avanza un poco hacia delante para cruzar la linea de meta
-            #robot.orientate(math.pi / 2)
-            #robot.resetOdometry(_, _, math.pi/2)
             robot.setSpeed(0.2, 0)
             time.sleep(2)
             robot.setSpeed(0, 0)
 
             [x, y, th] = robot.readOdometry()
             print("Estoy principio 4", x, y, th)
+
         # COGER PELOTA -> FASE 4
-
-
-        if phase_from <= 4 and 4 <= phase_to:
+        if phase_from <= 4 <= phase_to:
             if primera:
                 if salida is 'A':
                     robot = Robot(coord2Meters([3, 3, math.pi / 2]))
@@ -280,10 +247,7 @@ def main():
                 # 1. launch updateOdometry thread()
                 robot.startOdometry()
 
-            primera = False
-
             # Disable sensors
-            # TODO: Enable gyro sensors
             robot.enableProximitySensor(False)
             robot.enableGyroSensors(False)
 
@@ -299,41 +263,29 @@ def main():
         # RECONOCIMIENTO -> FASE 5
 
         [x, y, th] = robot.readOdometry()
-        print("Principio de la 5",x, y, th)
-        if phase_from <= 5 and 5 <= phase_to:
+        print("Principio de la 5", x, y, th)
+        if phase_from <= 5 <= phase_to:
 
-            # TODO si es la primera activar odometria y demas
             # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
             reco = Reco()
 
             if salida is 'A':
                 turn_speed = 0.1
                 objective_angle = 7 * math.pi / 8
-                cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
                 cell_to_exit_left[0] = cell_to_exit_left[0] - 0.1
-                cell_to_exit_right_1 = coord2Meters([5, 6, 0])
                 cell_to_exit_right_2 = coord2Meters([6, 6, 0])
                 cell_to_exit_right_2[0] = cell_to_exit_right_2[0] + 0.05
-                cell_to_exit_right_3 = coord2Meters([6, 7, 0])
-
 
             else:
                 turn_speed = -0.1
                 objective_angle = math.pi / 8
-                cell_to_recognize = coord2Meters([2, 6, 0])
-                cell_to_exit_left_1 = coord2Meters([1, 6, 0])
-                cell_to_exit_left_2 = coord2Meters([0, 6, 0])
-                cell_to_exit_left_3 = coord2Meters([0, 7, 0])
-                cell_to_exit_right = coord2Meters([3, 7, 0])
 
             robot.enableProximitySensor(True)
             robot.orientate(objective_angle)
             robot.setSpeed(0, 0)
             previous_value = 1000
             idem = 0
-            for i in range(1, 5):
-                [_, _, new_value] = robot.readSensors()
 
             robot.setSpeed(0, turn_speed)
             new_value = 1000
@@ -343,22 +295,19 @@ def main():
                 else:
                     idem = 0
                     previous_value = new_value
-                [_,_,new_value] = robot.readSensors()
+                [_, _, new_value] = robot.readSensors()
                 new_value = math.floor(new_value)
                 print("new value", new_value)
                 time.sleep(0.1)
 
             idem = idem + 1
 
-            print("idem", idem)
-
             robot.setSpeed(0, -turn_speed)
             time.sleep(0.1 * 5 * idem / 6)
 
             retro_value = 0.1
-            time_retro = abs((0.20 - previous_value/100)) / retro_value
+            time_retro = abs((0.20 - previous_value / 100)) / retro_value
 
-            print("tiempo", time_retro)
             if previous_value > 20:
                 robot.setSpeed(retro_value, 0)
             else:
@@ -370,50 +319,21 @@ def main():
             time.sleep(0.3)
 
             if salida == 'A':
-                robot.resetOdometry(1.4, None, math.pi-0.001)
+                robot.resetOdometry(1.4, None, math.pi - 0.001)
             else:
                 robot.resetOdometry(1.4, None, 0)
 
-            '''
-
-
-            [x, y, th] = robot.readOdometry()
-            print("Ajustadas x e y", x, y, th, math.pi/2)
-            robot.orientate((math.pi/2) - turn_speed)
-
-
-
-            robot.setSpeed(0, 0)
-            for i in range(1,20):
-                [_,_,previous_value] = robot.readSensors()
-
-            print("previous value", previous_value)
-
-            robot.resetOdometry(None, 3.2-previous_value/100, None)
-
-'''
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate(math.pi / 2)
 
             # Calcular distancia hasta linea meta
-            distance = (0.4*8 + 0.2) - y
+            distance = (0.4 * 8 + 0.2) - y
             sprint_speed = 0.25
             sprint_time = distance / sprint_speed
             robot.setSpeed(sprint_speed, 0)
             time.sleep(sprint_time)
             robot.setSpeed(0, 0)
 
-'''
-            final_go = coord2Meters([3, 6, 0])
-            robot.go(final_go[0], final_go[1])
-            final_go = coord2Meters([3, 7, 0])
-            robot.go(final_go[0], final_go[1])
-            robot.setSpeed(0.3, 0)
-            time.sleep(1)
-            robot.setSpeed(0, 0)
-            # ok
-            #robot.orientate(math.pi/2)
-            '''
         robot.celebracion()
 
         robot.stopOdometry()
@@ -430,8 +350,4 @@ def main():
 if __name__ == "__main__":
     # get and parse arguments passed to main
     # Add as many args as you need ...
-    #parser = argparse.ArgumentParser()
-    #parser.add_argument("-m", "--mapfile", help="path to find map file",
-     #                   default="./maps/mapaA.txt")
-    #args = parser.parse_args()
     main()
