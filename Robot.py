@@ -101,19 +101,6 @@ class Robot:
             self.gyro_1_offset = 2325
             self.gyro_2_offset = 2367
 
-        """
-            for i in range(10):
-                self.gyro_1_offset += self.BP.get_sensor(self.BP.PORT_3)[0]
-                self.gyro_2_offset += self.BP.get_sensor(self.BP.PORT_4)[0]
-                time.sleep(0.1)
-
-            self.gyro_1_offset /= 10
-            self.gyro_2_offset /= 10
-        """
-
-        # print("Gyro 1 offset ", self.gyro_1_offset)
-        # print("Gyro 2 offset ", self.gyro_2_offset)
-
         self.gyro_1_correction_factor = 0.14
         self.gyro_2_correction_factor = 0.135
 
@@ -515,26 +502,7 @@ class Robot:
                         self.catch('down')
                         followBallRecognised = False
                         finished = True
-                        '''
-                        if salida == 'A':
-                            self.setSpeed(0, 0.4)
-                        else:
-                            self.setSpeed(0, -0.4)
 
-                        time.sleep(5)
-
-                        self.setSpeed(0, 0)
-                        _, _, size = frame_capturer.getPosition()
-
-                        # If ball is in the basket, finish, else lift the basket
-                        if size > 70:
-                            followBallRecognised = False
-                            finished = True
-
-                        else:
-                            self.catch('up')
-                            self.setSpeed(next_v, next_w)
-                        '''
                     else:
                         self.setSpeed(next_v, next_w)
                 else:
@@ -626,12 +594,10 @@ class Robot:
             last_error = actual_error
             while last_error >= actual_error:
                 [_, _, th_odo] = self.readOdometry()
-                # print("Tengo th: ", th_odo, " y busco: ", th)
                 last_error = actual_error
                 actual_error = abs(self.normalizeAngle(th - th_odo))
                 t_next_period += self.P
                 delay_until(t_next_period)
-        # print("He llegado a : ", th_odo, " y busco: ", th)
 
     def orientate(self, aligned_angle):
         [_, _, th_actual] = self.readOdometry()
