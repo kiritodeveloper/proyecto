@@ -301,13 +301,13 @@ def main():
         [x, y, th] = robot.readOdometry()
         print("Principio de la 5",x, y, th)
         if phase_from <= 5 and 5 <= phase_to:
-            '''
+
             # TODO si es la primera activar odometria y demas
             # NO PUEDE SER LA PRIEMRA FASE, TIENE QUE COGER PELOTA PRIMERO
             reco = Reco()
 
             if salida is 'A':
-                turn_speed = 0.3
+                turn_speed = 0.1
                 objective_angle = 7 * math.pi / 8
                 cell_to_recognize = coord2Meters([4, 6, 0])
                 cell_to_exit_left = coord2Meters([3, 7, 0])
@@ -319,7 +319,7 @@ def main():
 
 
             else:
-                turn_speed = -0.3
+                turn_speed = -0.1
                 objective_angle = math.pi / 8
                 cell_to_recognize = coord2Meters([2, 6, 0])
                 cell_to_exit_left_1 = coord2Meters([1, 6, 0])
@@ -346,14 +346,14 @@ def main():
                 [_,_,new_value] = robot.readSensors()
                 new_value = math.floor(new_value)
                 print("new value", new_value)
-                time.sleep(0.075)
+                time.sleep(0.1)
 
             idem = idem + 1
 
             print("idem", idem)
 
             robot.setSpeed(0, -turn_speed)
-            time.sleep(0.75 * idem / 2)
+            time.sleep(0.1 * 5 * idem / 6)
 
             retro_value = 0.1
             time_retro = abs((0.20 - previous_value/100)) / retro_value
@@ -372,11 +372,16 @@ def main():
             if salida == 'A':
                 robot.resetOdometry(1.4, None, math.pi-0.001)
             else:
-                robot.resetOdometry(1, None, 0)
+                robot.resetOdometry(1.4, None, 0)
+
+            '''
+
 
             [x, y, th] = robot.readOdometry()
             print("Ajustadas x e y", x, y, th, math.pi/2)
             robot.orientate((math.pi/2) - turn_speed)
+
+
 
             robot.setSpeed(0, 0)
             for i in range(1,20):
@@ -386,7 +391,7 @@ def main():
 
             robot.resetOdometry(None, 3.2-previous_value/100, None)
 
-
+'''
             # SPRIIIIINT FINAAAAAL HACIA LA LINEA DE METAAAAA
             robot.orientate(math.pi / 2)
 
@@ -397,8 +402,8 @@ def main():
             robot.setSpeed(sprint_speed, 0)
             time.sleep(sprint_time)
             robot.setSpeed(0, 0)
-            '''
 
+'''
             final_go = coord2Meters([3, 6, 0])
             robot.go(final_go[0], final_go[1])
             final_go = coord2Meters([3, 7, 0])
@@ -408,6 +413,7 @@ def main():
             robot.setSpeed(0, 0)
             # ok
             #robot.orientate(math.pi/2)
+            '''
         robot.celebracion()
 
         robot.stopOdometry()
